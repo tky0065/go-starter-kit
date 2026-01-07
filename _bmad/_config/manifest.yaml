@@ -1,0 +1,12 @@
+installation:
+  version: 6.0.0-alpha.22
+  installDate: 2026-01-07T14:09:50.716Z
+  lastUpdated: 2026-01-07T14:09:50.716Z
+modules:
+  - core
+  - bmm
+ides:
+  - claude-code
+  - github-copilot
+  - antigravity
+  - gemini
