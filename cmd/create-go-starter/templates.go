@@ -1,0 +1,519 @@
+package main
+
+// ProjectTemplates holds all the templates for project file generation
+type ProjectTemplates struct {
+	projectName string
+}
+
+// NewProjectTemplates creates a new templates instance with the given project name
+func NewProjectTemplates(projectName string) *ProjectTemplates {
+	return &ProjectTemplates{
+		projectName: projectName,
+	}
+}
+
+// GoModTemplate returns the go.mod file content
+func (t *ProjectTemplates) GoModTemplate() string {
+	return `module ` + t.projectName + `
+
+go 1.25.5
+
+require (
+	github.com/gofiber/fiber/v2 v2.52.10
+	github.com/rs/zerolog v1.33.0
+	go.uber.org/fx v1.24.0
+	gorm.io/driver/postgres v1.5.11
+	gorm.io/gorm v1.31.1
+)
+`
+}
+
+// MainGoTemplate returns the main.go file content
+func (t *ProjectTemplates) MainGoTemplate() string {
+	return `package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	// TODO: This is a placeholder main.go
+	// Infrastructure components (Fiber, GORM, fx) will be added in Story 1.4
+	fmt.Println("` + t.projectName + ` - Project structure initialized")
+	fmt.Println("Next steps:")
+	fmt.Println("  1. Run 'go mod download' to fetch dependencies")
+	fmt.Println("  2. Implement your application logic")
+	fmt.Println("  3. Run 'make build' to build the binary")
+}
+`
+}
+
+// DockerfileTemplate returns the Dockerfile content
+func (t *ProjectTemplates) DockerfileTemplate() string {
+	return `# Build stage
+FROM golang:1.25-alpine AS builder
+
+WORKDIR /app
+
+# Copy go mod files
+COPY go.mod ./
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -o ` + t.projectName + ` ./cmd
+
+# Runtime stage
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+# Copy the binary from builder
+COPY --from=builder /app/` + t.projectName + ` .
+
+# Expose port
+EXPOSE 8080
+
+# Run the binary
+CMD ["./` + t.projectName + `"]
+`
+}
+
+// MakefileTemplate returns the Makefile content
+func (t *ProjectTemplates) MakefileTemplate() string {
+	return `.PHONY: help build run test clean dev
+
+# Binary name
+BINARY_NAME=` + t.projectName + `
+
+help: ## Display this help message
+	@echo "Available targets:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-15s %s\n", $$1, $$2}'
+
+build: ## Build the application
+	@echo "Building $(BINARY_NAME)..."
+	@go build -o $(BINARY_NAME) ./cmd
+	@echo "Build complete: $(BINARY_NAME)"
+
+run: ## Run the application
+	@echo "Running $(BINARY_NAME)..."
+	@go run ./cmd
+
+dev: ## Run the application with air for hot reload
+	@echo "Starting development server with hot reload..."
+	@air
+
+test: ## Run tests
+	@echo "Running tests..."
+	@go test -v ./...
+
+clean: ## Clean build artifacts
+	@echo "Cleaning..."
+	@rm -f $(BINARY_NAME)
+	@echo "Clean complete"
+
+docker-build: ## Build docker image
+	@echo "Building Docker image..."
+	@docker build -t $(BINARY_NAME):latest .
+
+docker-run: ## Run docker container
+	@echo "Running Docker container..."
+	@docker run -p 8080:8080 $(BINARY_NAME):latest
+`
+}
+
+// EnvTemplate returns the .env.example file content
+func (t *ProjectTemplates) EnvTemplate() string {
+	return `# Application Configuration
+APP_NAME=` + t.projectName + `
+APP_ENV=development
+APP_PORT=8080
+
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=` + t.projectName + `
+DB_SSLMODE=disable
+
+# JWT Configuration
+# IMPORTANT: Generate a secure random secret for production!
+# Example: openssl rand -base64 32
+JWT_SECRET=
+JWT_EXPIRY=24h
+`
+}
+
+// GitignoreTemplate returns the .gitignore file content
+func (t *ProjectTemplates) GitignoreTemplate() string {
+	return `# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+` + t.projectName + `
+
+# Test binary, built with 'go test -c'
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# Environment files
+.env
+.env.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+`
+}
+
+// ReadmeTemplate returns the README.md file content
+func (t *ProjectTemplates) ReadmeTemplate() string {
+	return `# ` + t.projectName + `
+
+A Go application scaffolded with create-go-starter.
+
+## Architecture
+
+This project follows Hexagonal Architecture (Ports and Adapters) pattern:
+
+- **cmd/**: Application entry points
+- **internal/adapters/**: External adapters (HTTP handlers, etc.)
+- **internal/domain/**: Core business logic
+- **internal/interfaces/**: Port definitions
+- **internal/infrastructure/**: Infrastructure concerns (DB, config, etc.)
+- **pkg/**: Public libraries
+
+## Prerequisites
+
+- Go 1.25 or later
+- Docker (optional, for containerized deployment)
+- PostgreSQL (or use Docker Compose)
+
+## Getting Started
+
+1. Install dependencies:
+   ` + "```bash" + `
+   go mod download
+   ` + "```" + `
+
+2. Copy environment file:
+   ` + "```bash" + `
+   cp .env.example .env
+   ` + "```" + `
+
+3. Run the application:
+   ` + "```bash" + `
+   make run
+   ` + "```" + `
+
+## Development
+
+### Available Commands
+
+` + "```bash" + `
+make help          # Show all available commands
+make build         # Build the binary
+make run           # Run the application
+make test          # Run tests
+make clean         # Clean build artifacts
+make docker-build  # Build Docker image
+make docker-run    # Run Docker container
+` + "```" + `
+
+### Running Tests
+
+` + "```bash" + `
+go test ./...
+` + "```" + `
+
+## Project Structure
+
+` + "```" + `
+` + t.projectName + `/
+├── cmd/
+│   └── main.go              # Application entry point
+├── internal/
+│   ├── adapters/            # HTTP, gRPC adapters
+│   ├── domain/              # Business logic
+│   ├── interfaces/          # Port definitions
+│   └── infrastructure/      # DB, config, logging
+├── pkg/                     # Public libraries
+├── deployments/             # Docker, K8s configs
+├── .env.example             # Environment template
+├── Dockerfile               # Docker build config
+├── Makefile                 # Build automation
+├── go.mod                   # Go modules
+└── README.md                # This file
+` + "```" + `
+
+## License
+
+MIT
+`
+}
+
+// LoggerTemplate returns the pkg/logger/logger.go file content
+func (t *ProjectTemplates) LoggerTemplate() string {
+	return `package logger
+
+import (
+	"os"
+
+	"github.com/rs/zerolog"
+	"go.uber.org/fx"
+)
+
+// Module provides the logger dependency via fx
+var Module = fx.Module("logger",
+	fx.Provide(NewLogger),
+)
+
+// NewLogger creates a new zerolog logger instance
+func NewLogger() zerolog.Logger {
+	// Use JSON format in production, console format in development
+	env := os.Getenv("APP_ENV")
+
+	var logger zerolog.Logger
+	if env == "production" {
+		logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
+	} else {
+		logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Logger()
+	}
+
+	return logger
+}
+`
+}
+
+// DatabaseTemplate returns the internal/infrastructure/database/database.go file content
+func (t *ProjectTemplates) DatabaseTemplate() string {
+	return `package database
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/rs/zerolog"
+	"go.uber.org/fx"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+
+	"` + t.projectName + `/pkg/config"
+)
+
+// Module provides the database dependency via fx
+var Module = fx.Module("database",
+	fx.Provide(NewDatabase),
+	fx.Invoke(registerHooks),
+)
+
+// NewDatabase creates a new GORM database connection
+func NewDatabase(logger zerolog.Logger) (*gorm.DB, error) {
+	// Build DSN from environment variables
+	dsn := fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		config.GetEnv("DB_HOST", "localhost"),
+		config.GetEnv("DB_PORT", "5432"),
+		config.GetEnv("DB_USER", "postgres"),
+		config.GetEnv("DB_PASSWORD", "postgres"),
+		config.GetEnv("DB_NAME", "` + t.projectName + `"),
+		config.GetEnv("DB_SSLMODE", "disable"),
+	)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	logger.Info().Msg("Successfully connected to database")
+
+	// Configure connection pool
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get database instance: %w", err)
+	}
+
+	// Set connection pool parameters
+	sqlDB.SetMaxOpenConns(25)
+	sqlDB.SetMaxIdleConns(5)
+	sqlDB.SetConnMaxLifetime(5 * 60) // 5 minutes
+
+	// AutoMigrate database schemas
+	// Add your domain models here when ready
+	// Example: if err := db.AutoMigrate(&models.User{}); err != nil { return nil, err }
+
+	logger.Info().Msg("Database connection pool configured and ready")
+
+	return db, nil
+}
+
+// registerHooks registers lifecycle hooks for graceful shutdown
+func registerHooks(lifecycle fx.Lifecycle, db *gorm.DB, logger zerolog.Logger) {
+	lifecycle.Append(fx.Hook{
+		OnStop: func(ctx context.Context) error {
+			logger.Info().Msg("Closing database connection")
+			sqlDB, err := db.DB()
+			if err != nil {
+				return err
+			}
+			return sqlDB.Close()
+		},
+	})
+}
+
+`
+}
+
+// ServerTemplate returns the internal/infrastructure/server/server.go file content
+func (t *ProjectTemplates) ServerTemplate() string {
+	return `package server
+
+import (
+	"context"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog"
+	"go.uber.org/fx"
+	"gorm.io/gorm"
+
+	"` + t.projectName + `/pkg/config"
+	httphandlers "` + t.projectName + `/internal/adapters/http"
+)
+
+// Module provides the Fiber server dependency via fx
+var Module = fx.Module("server",
+	fx.Provide(NewServer),
+	fx.Invoke(registerHooks),
+)
+
+// NewServer creates and configures a new Fiber application
+func NewServer(logger zerolog.Logger, db *gorm.DB) *fiber.App {
+	app := fiber.New(fiber.Config{
+		AppName: "` + t.projectName + `",
+	})
+
+	logger.Info().Msg("Fiber server initialized")
+
+	// Register routes
+	httphandlers.RegisterHealthRoutes(app)
+
+	return app
+}
+
+// registerHooks registers lifecycle hooks for server startup and shutdown
+func registerHooks(lifecycle fx.Lifecycle, app *fiber.App, logger zerolog.Logger) {
+	lifecycle.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			port := config.GetEnv("APP_PORT", "3000")
+			logger.Info().Str("port", port).Msg("Starting Fiber server")
+
+			// Start server in background goroutine
+			go func() {
+				if err := app.Listen(":" + port); err != nil {
+					logger.Error().Err(err).Msg("Server stopped unexpectedly")
+				}
+			}()
+
+			return nil
+		},
+		OnStop: func(ctx context.Context) error {
+			logger.Info().Msg("Shutting down Fiber server gracefully")
+			return app.ShutdownWithContext(ctx)
+		},
+	})
+}
+
+`
+}
+
+// HealthHandlerTemplate returns the internal/adapters/http/health.go file content
+func (t *ProjectTemplates) HealthHandlerTemplate() string {
+	return `package http
+
+import (
+	"github.com/gofiber/fiber/v2"
+)
+
+// HealthResponse represents the health check response
+type HealthResponse struct {
+	Status string ` + "`json:\"status\"`" + `
+}
+
+// RegisterHealthRoutes registers health check routes
+func RegisterHealthRoutes(app *fiber.App) {
+	app.Get("/health", healthHandler)
+}
+
+// healthHandler handles health check requests
+func healthHandler(c *fiber.Ctx) error {
+	return c.JSON(HealthResponse{
+		Status: "ok",
+	})
+}
+`
+}
+
+// ConfigTemplate returns the pkg/config/env.go file content
+func (t *ProjectTemplates) ConfigTemplate() string {
+	return `package config
+
+import "os"
+
+// GetEnv retrieves an environment variable with a fallback default value
+func GetEnv(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
+`
+}
+
+// UpdatedMainGoTemplate returns the updated cmd/main.go file content with fx integration
+func (t *ProjectTemplates) UpdatedMainGoTemplate() string {
+	return `package main
+
+import (
+	"go.uber.org/fx"
+
+	"` + t.projectName + `/pkg/logger"
+	"` + t.projectName + `/internal/infrastructure/database"
+	"` + t.projectName + `/internal/infrastructure/server"
+)
+
+func main() {
+	fx.New(
+		// Register all modules
+		logger.Module,
+		database.Module,
+		server.Module,
+	).Run()
+}
+`
+}
