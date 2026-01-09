@@ -19,9 +19,13 @@ func (t *ProjectTemplates) GoModTemplate() string {
 go 1.25.5
 
 require (
+	github.com/go-playground/validator/v10 v10.30.1
+	github.com/gofiber/contrib/jwt v1.1.2
 	github.com/gofiber/fiber/v2 v2.52.10
+	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/rs/zerolog v1.33.0
 	go.uber.org/fx v1.24.0
+	golang.org/x/crypto v0.32.0
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.31.1
 )
@@ -426,6 +430,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
+	"` + t.projectName + `/internal/domain/user"
 	"` + t.projectName + `/pkg/config"
 )
 
@@ -467,9 +472,11 @@ func NewDatabase(logger zerolog.Logger) (*gorm.DB, error) {
 	sqlDB.SetConnMaxLifetime(5 * 60) // 5 minutes
 
 	// AutoMigrate database schemas
-	// Add your domain models here when ready
-	// Example: if err := db.AutoMigrate(&models.User{}); err != nil { return nil, err }
+	if err := db.AutoMigrate(&user.User{}, &user.RefreshToken{}); err != nil {
+		return nil, fmt.Errorf("failed to run database migrations: %w", err)
+	}
 
+	logger.Info().Msg("Database migrations completed successfully")
 	logger.Info().Msg("Database connection pool configured and ready")
 
 	return db, nil
@@ -606,16 +613,34 @@ func (t *ProjectTemplates) UpdatedMainGoTemplate() string {
 import (
 	"go.uber.org/fx"
 
-	"` + t.projectName + `/pkg/logger"
+	"` + t.projectName + `/internal/adapters/handlers"
+	"` + t.projectName + `/internal/adapters/repository"
+	"` + t.projectName + `/internal/domain/user"
 	"` + t.projectName + `/internal/infrastructure/database"
 	"` + t.projectName + `/internal/infrastructure/server"
+	"` + t.projectName + `/pkg/auth"
+	"` + t.projectName + `/pkg/logger"
 )
 
 func main() {
 	fx.New(
-		// Register all modules
+		// Core infrastructure
 		logger.Module,
 		database.Module,
+
+		// Authentication & authorization
+		auth.Module,
+
+		// Domain services
+		user.Module,
+
+		// Data persistence
+		repository.Module,
+
+		// HTTP handlers
+		handlers.Module,
+
+		// HTTP server (must be last as it depends on handlers)
 		server.Module,
 	).Run()
 }

@@ -615,6 +615,10 @@ func TestUpdatedMainGoTemplate(t *testing.T) {
 	requiredModules := []string{
 		"logger.Module",
 		"database.Module",
+		"auth.Module",
+		"user.Module",
+		"repository.Module",
+		"handlers.Module",
 		"server.Module",
 	}
 
@@ -640,5 +644,359 @@ func TestUpdatedMainGoTemplate(t *testing.T) {
 
 	if !strings.Contains(content, "internal/infrastructure/server") {
 		t.Error("UpdatedMainGoTemplate() should import server package")
+	}
+}
+
+// Test User Templates
+func TestUserEntityTemplate(t *testing.T) {
+	projectName := "my-auth-app"
+	templates := NewProjectTemplates(projectName)
+	content := templates.UserEntityTemplate()
+
+	requiredContent := []string{
+		"package user",
+		"type User struct",
+		"ID           uint",
+		"Email        string",
+		"PasswordHash string",
+		"CreatedAt    time.Time",
+		"UpdatedAt    time.Time",
+		"DeletedAt    gorm.DeletedAt",
+		`json:"-"`, // Password should not be in JSON
+	}
+
+	for _, required := range requiredContent {
+		if !strings.Contains(content, required) {
+			t.Errorf("UserEntityTemplate() should contain '%s'", required)
+		}
+	}
+}
+
+func TestUserRefreshTokenTemplate(t *testing.T) {
+	projectName := "my-auth-app"
+	templates := NewProjectTemplates(projectName)
+	content := templates.UserRefreshTokenTemplate()
+
+	requiredContent := []string{
+		"package user",
+		"type RefreshToken struct",
+		"UserID    uint",
+		"Token     string",
+		"ExpiresAt time.Time",
+		"Revoked   bool",
+		"IsExpired() bool",
+		"IsRevoked() bool",
+	}
+
+	for _, required := range requiredContent {
+		if !strings.Contains(content, required) {
+			t.Errorf("UserRefreshTokenTemplate() should contain '%s'", required)
+		}
+	}
+}
+
+func TestUserServiceTemplate(t *testing.T) {
+	projectName := "my-auth-app"
+	templates := NewProjectTemplates(projectName)
+	content := templates.UserServiceTemplate()
+
+	requiredContent := []string{
+		"package user",
+		"type Service struct",
+		"func NewService(",
+		"func NewServiceWithJWT(",
+		"func (s *Service) Register(",
+		"func (s *Service) Authenticate(",
+		"func (s *Service) RefreshToken(",
+		"func (s *Service) GetProfile(",
+		"func (s *Service) GetAll(",
+		"func (s *Service) UpdateUser(",
+		"func (s *Service) DeleteUser(",
+		"bcrypt.GenerateFromPassword",
+		"bcrypt.CompareHashAndPassword",
+		projectName + "/internal/domain",
+	}
+
+	for _, required := range requiredContent {
+		if !strings.Contains(content, required) {
+			t.Errorf("UserServiceTemplate() should contain '%s'", required)
+		}
+	}
+}
+
+func TestUserRepositoryTemplate(t *testing.T) {
+	projectName := "my-auth-app"
+	templates := NewProjectTemplates(projectName)
+	content := templates.UserRepositoryTemplate()
+
+	requiredContent := []string{
+		"package repository",
+		"type UserRepository struct",
+		"func NewUserRepository(",
+		"func (r *UserRepository) CreateUser(",
+		"func (r *UserRepository) GetUserByEmail(",
+		"func (r *UserRepository) FindByID(",
+		"func (r *UserRepository) FindAll(",
+		"func (r *UserRepository) Update(",
+		"func (r *UserRepository) Delete(",
+		"func (r *UserRepository) SaveRefreshToken(",
+		"func (r *UserRepository) GetRefreshToken(",
+		"func (r *UserRepository) RevokeRefreshToken(",
+		"func (r *UserRepository) RotateRefreshToken(",
+		"WithContext(ctx)",
+		projectName + "/internal/domain/user",
+	}
+
+	for _, required := range requiredContent {
+		if !strings.Contains(content, required) {
+			t.Errorf("UserRepositoryTemplate() should contain '%s'", required)
+		}
+	}
+}
+
+func TestAuthHandlerTemplate(t *testing.T) {
+	projectName := "my-auth-app"
+	templates := NewProjectTemplates(projectName)
+	content := templates.AuthHandlerTemplate()
+
+	requiredContent := []string{
+		"package handlers",
+		"type AuthHandler struct",
+		"func NewAuthHandler(",
+		"func (h *AuthHandler) Register(",
+		"func (h *AuthHandler) Login(",
+		"func (h *AuthHandler) Refresh(",
+		"type RegisterRequest struct",
+		"type LoginRequest struct",
+		"type RefreshRequest struct",
+		`validate:"required,email,max=255"`,
+		`validate:"required,min=8,max=72"`,
+		"fiber.StatusCreated",
+		"validator.New()",
+		projectName + "/internal/interfaces",
+	}
+
+	for _, required := range requiredContent {
+		if !strings.Contains(content, required) {
+			t.Errorf("AuthHandlerTemplate() should contain '%s'", required)
+		}
+	}
+}
+
+func TestUserHandlerTemplate(t *testing.T) {
+	projectName := "my-auth-app"
+	templates := NewProjectTemplates(projectName)
+	content := templates.UserHandlerTemplate()
+
+	requiredContent := []string{
+		"package handlers",
+		"type UserHandler struct",
+		"func NewUserHandler(",
+		"func (h *UserHandler) GetMe(",
+		"func (h *UserHandler) GetAllUsers(",
+		"func (h *UserHandler) UpdateUser(",
+		"func (h *UserHandler) DeleteUser(",
+		"auth.GetUserID",
+		"validator.New()",
+		projectName + "/pkg/auth",
+	}
+
+	for _, required := range requiredContent {
+		if !strings.Contains(content, required) {
+			t.Errorf("UserHandlerTemplate() should contain '%s'", required)
+		}
+	}
+}
+
+func TestJWTAuthTemplate(t *testing.T) {
+	projectName := "my-auth-app"
+	templates := NewProjectTemplates(projectName)
+	content := templates.JWTAuthTemplate()
+
+	requiredContent := []string{
+		"package auth",
+		"type JWTService struct",
+		"func NewJWTService()",
+		"func (s *JWTService) GenerateTokens(",
+		"func GetUserID(c *fiber.Ctx)",
+		"func (s *JWTService) ValidateToken(",
+		"jwt.NewWithClaims",
+		"jwt.SigningMethodHS256",
+		"ErrInvalidToken",
+		"ErrMissingUserID",
+		projectName + "/pkg/config",
+	}
+
+	for _, required := range requiredContent {
+		if !strings.Contains(content, required) {
+			t.Errorf("JWTAuthTemplate() should contain '%s'", required)
+		}
+	}
+}
+
+func TestJWTMiddlewareTemplate(t *testing.T) {
+	projectName := "my-auth-app"
+	templates := NewProjectTemplates(projectName)
+	content := templates.JWTMiddlewareTemplate()
+
+	requiredContent := []string{
+		"package auth",
+		"func NewJWTMiddleware()",
+		"jwtware.New(",
+		"SigningKey:",
+		"JWTAlg: jwtware.HS256",
+		"ErrorHandler:",
+		"fiber.StatusUnauthorized",
+		projectName + "/pkg/config",
+	}
+
+	for _, required := range requiredContent {
+		if !strings.Contains(content, required) {
+			t.Errorf("JWTMiddlewareTemplate() should contain '%s'", required)
+		}
+	}
+}
+
+func TestUserInterfacesTemplate(t *testing.T) {
+	projectName := "my-auth-app"
+	templates := NewProjectTemplates(projectName)
+	content := templates.UserInterfacesTemplate()
+
+	requiredContent := []string{
+		"package interfaces",
+		"type AuthService interface",
+		"Register(ctx context.Context,",
+		"Authenticate(ctx context.Context,",
+		"RefreshToken(ctx context.Context,",
+		"type UserService interface",
+		"GetProfile(ctx context.Context,",
+		"GetAll(ctx context.Context,",
+		"UpdateUser(ctx context.Context,",
+		"DeleteUser(ctx context.Context,",
+		"type TokenService interface",
+		"GenerateTokens(userID uint)",
+		projectName + "/internal/domain/user",
+	}
+
+	for _, required := range requiredContent {
+		if !strings.Contains(content, required) {
+			t.Errorf("UserInterfacesTemplate() should contain '%s'", required)
+		}
+	}
+}
+
+func TestUserRepositoryInterfaceTemplate(t *testing.T) {
+	projectName := "my-auth-app"
+	templates := NewProjectTemplates(projectName)
+	content := templates.UserRepositoryInterfaceTemplate()
+
+	requiredContent := []string{
+		"package interfaces",
+		"type UserRepository interface",
+		"CreateUser(ctx context.Context,",
+		"GetUserByEmail(ctx context.Context,",
+		"FindByID(ctx context.Context,",
+		"FindAll(ctx context.Context,",
+		"Update(ctx context.Context,",
+		"Delete(ctx context.Context,",
+		"SaveRefreshToken(ctx context.Context,",
+		"GetRefreshToken(ctx context.Context,",
+		"RevokeRefreshToken(ctx context.Context,",
+		"RotateRefreshToken(ctx context.Context,",
+		projectName + "/internal/domain/user",
+	}
+
+	for _, required := range requiredContent {
+		if !strings.Contains(content, required) {
+			t.Errorf("UserRepositoryInterfaceTemplate() should contain '%s'", required)
+		}
+	}
+}
+
+func TestUserModuleTemplate(t *testing.T) {
+	projectName := "my-auth-app"
+	templates := NewProjectTemplates(projectName)
+	content := templates.UserModuleTemplate()
+
+	requiredContent := []string{
+		"package user",
+		"var Module = fx.Module(",
+		"fx.Provide(NewServiceWithJWT)",
+	}
+
+	for _, required := range requiredContent {
+		if !strings.Contains(content, required) {
+			t.Errorf("UserModuleTemplate() should contain '%s'", required)
+		}
+	}
+}
+
+func TestRepositoryModuleTemplate(t *testing.T) {
+	projectName := "my-auth-app"
+	templates := NewProjectTemplates(projectName)
+	content := templates.RepositoryModuleTemplate()
+
+	requiredContent := []string{
+		"package repository",
+		"var Module = fx.Module(",
+		"fx.Provide(",
+		"NewUserRepository(",
+		projectName + "/internal/interfaces",
+	}
+
+	for _, required := range requiredContent {
+		if !strings.Contains(content, required) {
+			t.Errorf("RepositoryModuleTemplate() should contain '%s'", required)
+		}
+	}
+}
+
+func TestAuthModuleTemplate(t *testing.T) {
+	projectName := "my-auth-app"
+	templates := NewProjectTemplates(projectName)
+	content := templates.AuthModuleTemplate()
+
+	requiredContent := []string{
+		"package auth",
+		"var Module = fx.Module(",
+		"fx.Provide(",
+		"NewJWTService()",
+		"NewJWTMiddleware",
+		projectName + "/internal/interfaces",
+	}
+
+	for _, required := range requiredContent {
+		if !strings.Contains(content, required) {
+			t.Errorf("AuthModuleTemplate() should contain '%s'", required)
+		}
+	}
+}
+
+func TestHandlerModuleTemplate(t *testing.T) {
+	projectName := "my-auth-app"
+	templates := NewProjectTemplates(projectName)
+	content := templates.HandlerModuleTemplate()
+
+	requiredContent := []string{
+		"package handlers",
+		"var Module = fx.Module(",
+		"fx.Provide(func(s *user.Service) *AuthHandler",
+		"fx.Provide(func(s *user.Service) *UserHandler",
+		"fx.Invoke(RegisterAllRoutes)",
+		"func RegisterAuthRoutes(",
+		"func RegisterUserRoutes(",
+		`v1.Group("/auth")`,
+		`authGroup.Post("/register"`,
+		`authGroup.Post("/login"`,
+		`authGroup.Post("/refresh"`,
+		`v1.Group("/users"`,
+		`userGroup.Get("/me"`,
+		projectName + "/internal/domain/user",
+	}
+
+	for _, required := range requiredContent {
+		if !strings.Contains(content, required) {
+			t.Errorf("HandlerModuleTemplate() should contain '%s'", required)
+		}
 	}
 }

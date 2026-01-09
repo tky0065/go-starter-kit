@@ -67,20 +67,64 @@ func generateProjectFiles(projectPath, projectName string) error {
 			Content: templates.LoggerTemplate(),
 		},
 		{
+			Path:    filepath.Join(projectPath, "pkg", "auth", "jwt.go"),
+			Content: templates.JWTAuthTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "pkg", "auth", "middleware.go"),
+			Content: templates.JWTMiddlewareTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "pkg", "auth", "module.go"),
+			Content: templates.AuthModuleTemplate(),
+		},
+		{
 			Path:    filepath.Join(projectPath, "internal", "domain", "errors.go"),
 			Content: templates.DomainErrorsTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "domain", "user", "entity.go"),
+			Content: templates.UserEntityTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "domain", "user", "refresh_token.go"),
+			Content: templates.UserRefreshTokenTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "domain", "user", "service.go"),
+			Content: templates.UserServiceTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "domain", "user", "module.go"),
+			Content: templates.UserModuleTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "interfaces", "services.go"),
+			Content: templates.UserInterfacesTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "interfaces", "user_repository.go"),
+			Content: templates.UserRepositoryInterfaceTemplate(),
 		},
 		{
 			Path:    filepath.Join(projectPath, "internal", "adapters", "middleware", "error_handler.go"),
 			Content: templates.ErrorHandlerMiddlewareTemplate(),
 		},
 		{
-			Path:    filepath.Join(projectPath, "internal", "infrastructure", "database", "database.go"),
-			Content: templates.DatabaseTemplate(),
+			Path:    filepath.Join(projectPath, "internal", "adapters", "repository", "user_repository.go"),
+			Content: templates.UserRepositoryTemplate(),
 		},
 		{
-			Path:    filepath.Join(projectPath, "internal", "infrastructure", "server", "server.go"),
-			Content: templates.ServerTemplate(),
+			Path:    filepath.Join(projectPath, "internal", "adapters", "repository", "module.go"),
+			Content: templates.RepositoryModuleTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "adapters", "handlers", "auth_handler.go"),
+			Content: templates.AuthHandlerTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "adapters", "handlers", "user_handler.go"),
+			Content: templates.UserHandlerTemplate(),
 		},
 		{
 			Path:    filepath.Join(projectPath, "internal", "adapters", "handlers", "module.go"),
@@ -89,6 +133,14 @@ func generateProjectFiles(projectPath, projectName string) error {
 		{
 			Path:    filepath.Join(projectPath, "internal", "adapters", "http", "health.go"),
 			Content: templates.HealthHandlerTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "infrastructure", "database", "database.go"),
+			Content: templates.DatabaseTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "infrastructure", "server", "server.go"),
+			Content: templates.ServerTemplate(),
 		},
 		{
 			Path:    filepath.Join(projectPath, "Dockerfile"),

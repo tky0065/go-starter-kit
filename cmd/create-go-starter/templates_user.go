@@ -711,7 +711,6 @@ func (t *ProjectTemplates) UserHandlerTemplate() string {
 	return `package handlers
 
 import (
-	"errors"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -941,5 +940,397 @@ func RegisterUserRoutes(v1 fiber.Router, userHandler *UserHandler, authMiddlewar
 	userGroup.Put("/:id", userHandler.UpdateUser)
 	userGroup.Delete("/:id", userHandler.DeleteUser)
 }
+`
+}
+
+// AuthHandlerTemplate returns the internal/adapters/handlers/auth_handler.go file content
+func (t *ProjectTemplates) AuthHandlerTemplate() string {
+	return `package handlers
+
+import (
+	"errors"
+	"time"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/gofiber/fiber/v2"
+	"` + t.projectName + `/internal/domain"
+	"` + t.projectName + `/internal/interfaces"
+)
+
+// AuthHandler handles authentication-related HTTP requests
+type AuthHandler struct {
+	service  interfaces.AuthService
+	validate *validator.Validate
+}
+
+// NewAuthHandler creates a new AuthHandler instance
+func NewAuthHandler(service interfaces.AuthService) *AuthHandler {
+	return &AuthHandler{
+		service:  service,
+		validate: validator.New(),
+	}
+}
+
+// RegisterRequest represents the user registration request
+type RegisterRequest struct {
+	Email    string ` + "`json:\"email\" validate:\"required,email,max=255\"`" + `
+	Password string ` + "`json:\"password\" validate:\"required,min=8,max=72\"`" + `
+}
+
+// RegisterResponse represents the user registration response
+type RegisterResponse struct {
+	ID        uint   ` + "`json:\"id\"`" + `
+	Email     string ` + "`json:\"email\"`" + `
+	CreatedAt string ` + "`json:\"created_at\"`" + `
+}
+
+// Register godoc
+// @Summary Register a new user
+// @Description Create a new user account with email and password
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body RegisterRequest true "Registration request"
+// @Success 201 {object} map[string]interface{} "Standard JSON Envelope with user data"
+// @Failure 400 {object} map[string]string "Validation error"
+// @Failure 409 {object} map[string]string "Email already registered"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /api/v1/auth/register [post]
+func (h *AuthHandler) Register(c *fiber.Ctx) error {
+	var req RegisterRequest
+	if err := c.BodyParser(&req); err != nil {
+		return domain.NewBadRequestError("Invalid request body", "INVALID_JSON", nil)
+	}
+
+	if err := h.validate.Struct(&req); err != nil {
+		validationErrors := make(map[string]string)
+		for _, err := range err.(validator.ValidationErrors) {
+			field := err.Field()
+			switch field {
+			case "Email":
+				validationErrors["email"] = "Email must be valid and max 255 characters"
+			case "Password":
+				validationErrors["password"] = "Password must be between 8 and 72 characters"
+			default:
+				validationErrors[field] = err.Error()
+			}
+		}
+		return domain.NewBadRequestError("Validation failed", "VALIDATION_FAILED", validationErrors)
+	}
+
+	user, err := h.service.Register(c.Context(), req.Email, req.Password)
+	if err != nil {
+		if errors.Is(err, domain.ErrEmailAlreadyRegistered) {
+			return domain.NewConflictError("Email already registered", "EMAIL_ALREADY_REGISTERED")
+		}
+		return err // Handled by middleware
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"status": "success",
+		"data": RegisterResponse{
+			ID:        user.ID,
+			Email:     user.Email,
+			CreatedAt: user.CreatedAt.Format(time.RFC3339),
+		},
+		"meta": fiber.Map{},
+	})
+}
+
+// LoginRequest represents the authentication request
+type LoginRequest struct {
+	Email    string ` + "`json:\"email\" validate:\"required,email\"`" + `
+	Password string ` + "`json:\"password\" validate:\"required\"`" + `
+}
+
+// Login godoc
+// @Summary Authenticate user
+// @Description Login with email and password to receive JWT tokens
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body LoginRequest true "Login credentials"
+// @Success 200 {object} map[string]interface{} "Standard JSON Envelope with tokens"
+// @Failure 400 {object} map[string]string "Validation error"
+// @Failure 401 {object} map[string]string "Invalid credentials"
+// @Router /api/v1/auth/login [post]
+func (h *AuthHandler) Login(c *fiber.Ctx) error {
+	var req LoginRequest
+	if err := c.BodyParser(&req); err != nil {
+		return domain.NewBadRequestError("Invalid request body", "INVALID_JSON", nil)
+	}
+
+	if err := h.validate.Struct(&req); err != nil {
+		return domain.NewBadRequestError("Validation failed: email and password required", "VALIDATION_FAILED", nil)
+	}
+
+	authResp, err := h.service.Authenticate(c.Context(), req.Email, req.Password)
+	if err != nil {
+		return err // Handled by middleware
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status": "success",
+		"data":   authResp,
+		"meta":   fiber.Map{},
+	})
+}
+
+// RefreshRequest represents the token refresh request
+type RefreshRequest struct {
+	RefreshToken string ` + "`json:\"refresh_token\" validate:\"required\"`" + `
+}
+
+// Refresh godoc
+// @Summary Refresh access token
+// @Description Use refresh token to obtain new access and refresh tokens
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body RefreshRequest true "Refresh token"
+// @Success 200 {object} map[string]interface{} "Standard JSON Envelope with new tokens"
+// @Failure 400 {object} map[string]string "Validation error"
+// @Failure 401 {object} map[string]string "Invalid or expired refresh token"
+// @Router /api/v1/auth/refresh [post]
+func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
+	var req RefreshRequest
+	if err := c.BodyParser(&req); err != nil {
+		return domain.NewBadRequestError("Invalid request body", "INVALID_JSON", nil)
+	}
+
+	if err := h.validate.Struct(&req); err != nil {
+		return domain.NewBadRequestError("Refresh token is required", "VALIDATION_FAILED", nil)
+	}
+
+	authResp, err := h.service.RefreshToken(c.Context(), req.RefreshToken)
+	if err != nil {
+		return err // Handled by middleware
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status": "success",
+		"data":   authResp,
+		"meta":   fiber.Map{},
+	})
+}
+`
+}
+
+// JWTAuthTemplate returns the pkg/auth/jwt.go file content
+func (t *ProjectTemplates) JWTAuthTemplate() string {
+	return `package auth
+
+import (
+	"errors"
+	"fmt"
+	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
+	"` + t.projectName + `/pkg/config"
+)
+
+var (
+	// ErrInvalidToken is returned when the JWT token is invalid
+	ErrInvalidToken = errors.New("invalid token")
+	// ErrMissingUserID is returned when user ID is missing from token claims
+	ErrMissingUserID = errors.New("missing user ID in token")
+)
+
+// JWTService handles JWT token generation and validation
+type JWTService struct {
+	secretKey string
+	expiresIn time.Duration
+}
+
+// NewJWTService creates a new JWT service instance
+func NewJWTService() *JWTService {
+	secret := config.GetEnv("JWT_SECRET", "")
+	if secret == "" {
+		panic("JWT_SECRET environment variable is required")
+	}
+
+	expiryStr := config.GetEnv("JWT_EXPIRY", "24h")
+	expiry, err := time.ParseDuration(expiryStr)
+	if err != nil {
+		panic(fmt.Sprintf("Invalid JWT_EXPIRY format: %v", err))
+	}
+
+	return &JWTService{
+		secretKey: secret,
+		expiresIn: expiry,
+	}
+}
+
+// GenerateTokens creates a new JWT access token and refresh token for the given user ID
+func (s *JWTService) GenerateTokens(userID uint) (accessToken string, refreshToken string, expiresIn int64, err error) {
+	// Create access token claims
+	now := time.Now()
+	expiresAt := now.Add(s.expiresIn)
+
+	claims := jwt.MapClaims{
+		"user_id": userID,
+		"exp":     expiresAt.Unix(),
+		"iat":     now.Unix(),
+	}
+
+	// Generate access token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	accessToken, err = token.SignedString([]byte(s.secretKey))
+	if err != nil {
+		return "", "", 0, fmt.Errorf("failed to sign access token: %w", err)
+	}
+
+	// Generate refresh token (longer expiry, same structure)
+	refreshExpiresAt := now.Add(7 * 24 * time.Hour) // 7 days
+	refreshClaims := jwt.MapClaims{
+		"user_id": userID,
+		"exp":     refreshExpiresAt.Unix(),
+		"iat":     now.Unix(),
+		"type":    "refresh",
+	}
+
+	refreshTokenObj := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
+	refreshToken, err = refreshTokenObj.SignedString([]byte(s.secretKey))
+	if err != nil {
+		return "", "", 0, fmt.Errorf("failed to sign refresh token: %w", err)
+	}
+
+	return accessToken, refreshToken, int64(s.expiresIn.Seconds()), nil
+}
+
+// GetUserID extracts the user ID from the JWT token stored in the Fiber context
+func GetUserID(c *fiber.Ctx) (uint, error) {
+	// Get user from JWT middleware (stored by gofiber/contrib/jwt)
+	user := c.Locals("user")
+	if user == nil {
+		return 0, ErrInvalidToken
+	}
+
+	token, ok := user.(*jwt.Token)
+	if !ok {
+		return 0, ErrInvalidToken
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0, ErrInvalidToken
+	}
+
+	userIDFloat, ok := claims["user_id"].(float64)
+	if !ok {
+		return 0, ErrMissingUserID
+	}
+
+	return uint(userIDFloat), nil
+}
+
+// ValidateToken validates a JWT token and returns the claims
+func (s *JWTService) ValidateToken(tokenString string) (jwt.MapClaims, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(s.secretKey), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return claims, nil
+	}
+
+	return nil, ErrInvalidToken
+}
+`
+}
+
+// JWTMiddlewareTemplate returns the pkg/auth/middleware.go file content
+func (t *ProjectTemplates) JWTMiddlewareTemplate() string {
+	return `package auth
+
+import (
+	"github.com/gofiber/contrib/jwt"
+	"github.com/gofiber/fiber/v2"
+	"` + t.projectName + `/pkg/config"
+)
+
+// NewJWTMiddleware creates a new JWT authentication middleware
+func NewJWTMiddleware() fiber.Handler {
+	secret := config.GetEnv("JWT_SECRET", "")
+	if secret == "" {
+		panic("JWT_SECRET environment variable is required for middleware")
+	}
+
+	return jwtware.New(jwtware.Config{
+		SigningKey: jwtware.SigningKey{
+			JWTAlg: jwtware.HS256,
+			Key:    []byte(secret),
+		},
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"status":  "error",
+				"code":    "UNAUTHORIZED",
+				"message": "Missing or invalid authentication token",
+			})
+		},
+	})
+}
+`
+}
+
+// UserModuleTemplate returns the internal/domain/user/module.go file content
+func (t *ProjectTemplates) UserModuleTemplate() string {
+	return `package user
+
+import (
+	"go.uber.org/fx"
+)
+
+// Module provides user domain services via fx
+var Module = fx.Module("user",
+	// Provide service with JWT support - TokenService is injected by fx from auth.Module
+	fx.Provide(NewServiceWithJWT),
+)
+`
+}
+
+// RepositoryModuleTemplate returns the internal/adapters/repository/module.go file content
+func (t *ProjectTemplates) RepositoryModuleTemplate() string {
+	return `package repository
+
+import (
+	"go.uber.org/fx"
+	"gorm.io/gorm"
+	"` + t.projectName + `/internal/interfaces"
+)
+
+// Module provides repository implementations via fx
+var Module = fx.Module("repository",
+	fx.Provide(func(db *gorm.DB) interfaces.UserRepository {
+		return NewUserRepository(db)
+	}),
+)
+`
+}
+
+// AuthModuleTemplate returns the pkg/auth/module.go file content
+func (t *ProjectTemplates) AuthModuleTemplate() string {
+	return `package auth
+
+import (
+	"go.uber.org/fx"
+	"` + t.projectName + `/internal/interfaces"
+)
+
+// Module provides auth services via fx
+var Module = fx.Module("auth",
+	fx.Provide(func() interfaces.TokenService {
+		return NewJWTService()
+	}),
+	fx.Provide(NewJWTMiddleware),
+)
 `
 }
