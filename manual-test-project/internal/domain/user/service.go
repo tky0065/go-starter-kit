@@ -6,13 +6,15 @@ import (
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
+	"manual-test-project/internal/domain"
 )
 
 // UserRepository defines the persistence interface required by the service
 type UserRepository interface {
 	CreateUser(ctx context.Context, user *User) error
 	GetUserByEmail(ctx context.Context, email string) (*User, error)
-	SaveRefreshToken(ctx context.Context, UserID uint, token string, expiresAt time.Time) error
+	FindByID(ctx context.Context, id uint) (*User, error)
+	SaveRefreshToken(ctx context.Context, userID uint, token string, expiresAt time.Time) error
 	GetRefreshToken(ctx context.Context, token string) (*RefreshToken, error)
 	RevokeRefreshToken(ctx context.Context, tokenID uint) error
 	RotateRefreshToken(ctx context.Context, oldTokenID uint, newToken *RefreshToken) error
@@ -20,7 +22,7 @@ type UserRepository interface {
 
 // TokenService defines the token generation interface required by the service
 type TokenService interface {
-	GenerateTokens(UserID uint) (accessToken string, refreshToken string, expiresIn int64, err error)
+	GenerateTokens(userID uint) (accessToken string, refreshToken string, expiresIn int64, err error)
 }
 
 // Service handles user business logic
@@ -50,7 +52,7 @@ func (s *Service) Register(ctx context.Context, email, password string) (*User, 
 		return nil, fmt.Errorf("failed to check existing user: %w", err)
 	}
 	if existing != nil {
-		return nil, ErrEmailAlreadyRegistered
+		return nil, domain.ErrEmailAlreadyRegistered
 	}
 
 	// Hash password with explicit cost validation
@@ -94,13 +96,13 @@ func (s *Service) Authenticate(ctx context.Context, email, password string) (*Au
 
 	// Check if user exists
 	if u == nil {
-		return nil, ErrInvalidCredentials
+		return nil, domain.ErrInvalidCredentials
 	}
 
 	// Validate password
 	err = bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password))
 	if err != nil {
-		return nil, ErrInvalidCredentials
+		return nil, domain.ErrInvalidCredentials
 	}
 
 	// Generate tokens
@@ -135,19 +137,19 @@ func (s *Service) RefreshToken(ctx context.Context, oldToken string) (*AuthRespo
 
 	// Validate token exists
 	if rt == nil {
-		return nil, ErrInvalidRefreshToken
+		return nil, domain.ErrInvalidRefreshToken
 	}
 
 	// Validate token is not expired
 	if rt.IsExpired() {
-		return nil, ErrRefreshTokenExpired
+		return nil, domain.ErrRefreshTokenExpired
 	}
 
 	// Validate token is not revoked
 	if rt.IsRevoked() {
 		// LOG SECURITY ALERT: Revoked token usage attempt (Potential theft)
 		fmt.Printf("SECURITY ALERT: Attempt to use revoked refresh token ID: %d UserID: %d\n", rt.ID, rt.UserID)
-		return nil, ErrRefreshTokenRevoked
+		return nil, domain.ErrRefreshTokenRevoked
 	}
 
 	// Generate new tokens
@@ -169,10 +171,10 @@ func (s *Service) RefreshToken(ctx context.Context, oldToken string) (*AuthRespo
 	// Perform atomic rotation (Revoke Old + Save New)
 	err = s.repo.RotateRefreshToken(ctx, rt.ID, newRefreshToken)
 	if err != nil {
-		if err == ErrRefreshTokenRevoked {
+		if err == domain.ErrRefreshTokenRevoked {
 			// Race condition detected
 			fmt.Printf("SECURITY ALERT: Race condition on refresh token rotation ID: %d\n", rt.ID)
-			return nil, ErrRefreshTokenRevoked
+			return nil, domain.ErrRefreshTokenRevoked
 		}
 		return nil, fmt.Errorf("failed to rotate refresh token: %w", err)
 	}
@@ -182,4 +184,20 @@ func (s *Service) RefreshToken(ctx context.Context, oldToken string) (*AuthRespo
 		RefreshToken: refreshToken,
 		ExpiresIn:    expiresIn,
 	}, nil
+}
+
+// GetProfile retrieves a user's profile by their ID
+func (s *Service) GetProfile(ctx context.Context, userID uint) (*User, error) {
+	// Get user from repository
+	u, err := s.repo.FindByID(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	// Check if user exists
+	if u == nil {
+		return nil, domain.ErrUserNotFound
+	}
+
+	return u, nil
 }

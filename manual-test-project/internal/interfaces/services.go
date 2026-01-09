@@ -14,8 +14,14 @@ type AuthService interface {
 	RefreshToken(ctx context.Context, oldToken string) (*user.AuthResponse, error)
 }
 
+// UserService defines the business logic operations for user management.
+// Implemented by internal/domain/user/Service.
+type UserService interface {
+	GetProfile(ctx context.Context, userID uint) (*user.User, error)
+}
+
 // TokenService defines the interface for token generation.
 // Implemented by pkg/auth/JWTService.
 type TokenService interface {
-	GenerateTokens(UserID uint) (accessToken string, refreshToken string, expiresIn int64, err error)
+	GenerateTokens(userID uint) (accessToken string, refreshToken string, expiresIn int64, err error)
 }

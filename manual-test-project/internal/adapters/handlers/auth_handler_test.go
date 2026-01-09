@@ -10,6 +10,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"manual-test-project/internal/adapters/handlers"
+	"manual-test-project/internal/domain"
 	"manual-test-project/internal/domain/user"
 )
 
@@ -70,7 +71,7 @@ func TestAuthHandler_Register(t *testing.T) {
 				"email":    "test@example.com",
 				"password": "password123",
 			},
-			serviceError:   user.ErrEmailAlreadyRegistered,
+			serviceError:   domain.ErrEmailAlreadyRegistered,
 			expectedStatus: http.StatusConflict,
 			description:    "Duplicate email should return 409",
 		},

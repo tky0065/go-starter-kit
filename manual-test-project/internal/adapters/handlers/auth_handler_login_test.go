@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
+	"manual-test-project/internal/domain"
 	"manual-test-project/internal/domain/user"
 )
 
@@ -88,9 +89,10 @@ func TestAuthHandler_Login_Success(t *testing.T) {
 func TestAuthHandler_Login_InvalidCredentials(t *testing.T) {
 	app := fiber.New()
 
+	// Create mock service that returns invalid credentials
 	mockService := &mockAuthService{
 		authenticateFunc: func(ctx context.Context, email, password string) (*user.AuthResponse, error) {
-			return nil, user.ErrInvalidCredentials
+			return nil, domain.ErrInvalidCredentials
 		},
 	}
 

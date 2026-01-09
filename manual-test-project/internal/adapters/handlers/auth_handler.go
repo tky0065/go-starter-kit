@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"manual-test-project/internal/domain/user"
+	"manual-test-project/internal/domain"
 	"manual-test-project/internal/interfaces"
 	"manual-test-project/pkg/auth"
 )
@@ -70,12 +70,13 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 		})
 	}
 
-	u, err := h.service.Register(c.Context(), req.Email, req.Password)
+	// Register user
+	newUser, err := h.service.Register(c.Context(), req.Email, req.Password)
 	if err != nil {
-		// Handle specific domain errors with appropriate HTTP status codes
-		if errors.Is(err, user.ErrEmailAlreadyRegistered) {
+		if errors.Is(err, domain.ErrEmailAlreadyRegistered) {
 			return c.Status(fiber.StatusConflict).JSON(fiber.Map{
-				"error": "Email already registered",
+				"status": "error",
+				"error":  "Email already registered",
 			})
 		}
 		// Internal server error for unexpected errors
@@ -87,9 +88,9 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"status": "success",
 		"data": RegisterResponse{
-			ID:        u.ID,
-			Email:     u.Email,
-			CreatedAt: u.CreatedAt.Format(time.RFC3339),
+			ID:        newUser.ID,
+			Email:     newUser.Email,
+			CreatedAt: newUser.CreatedAt.Format(time.RFC3339),
 		},
 	})
 }
@@ -139,12 +140,13 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		})
 	}
 
+	// Authenticate user
 	authResponse, err := h.service.Authenticate(c.Context(), req.Email, req.Password)
 	if err != nil {
-		// Handle specific domain errors with appropriate HTTP status codes
-		if errors.Is(err, user.ErrInvalidCredentials) {
+		if errors.Is(err, domain.ErrInvalidCredentials) {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Invalid credentials",
+				"status": "error",
+				"error":  "Invalid email or password",
 			})
 		}
 		// Internal server error for unexpected errors
@@ -202,18 +204,27 @@ func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 
 	authResponse, err := h.service.RefreshToken(c.Context(), req.RefreshToken)
 	if err != nil {
-		// Handle specific domain errors with appropriate HTTP status codes
-		if errors.Is(err, user.ErrInvalidRefreshToken) ||
-			errors.Is(err, user.ErrRefreshTokenExpired) ||
-			errors.Is(err, user.ErrRefreshTokenRevoked) {
+		switch {
+		case errors.Is(err, domain.ErrInvalidRefreshToken):
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Invalid or expired refresh token",
+				"status": "error",
+				"error":  "Invalid refresh token",
+			})
+		case errors.Is(err, domain.ErrRefreshTokenExpired):
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"status": "error",
+				"error":  "Refresh token expired",
+			})
+		case errors.Is(err, domain.ErrRefreshTokenRevoked):
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"status": "error",
+				"error":  "Refresh token revoked",
+			})
+		default:
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to refresh token",
 			})
 		}
-		// Internal server error for unexpected errors
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Token refresh failed",
-		})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{

@@ -15,8 +15,7 @@ func NewAuthMiddleware() fiber.Handler {
 	}
 
 	return jwtware.New(jwtware.Config{
-		SigningKey:    jwtware.SigningKey{Key: []byte(secret)},
-		SigningMethod: "HS256",
+		SigningKey: jwtware.SigningKey{Key: []byte(secret)},
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
 			// Return standard error format
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
@@ -26,5 +25,6 @@ func NewAuthMiddleware() fiber.Handler {
 		},
 		// Default behavior: token parsed and stored in c.Locals("user")
 		// We can access it later via GetUserID helper
+		// Note: HS256 is the default signing method used by the library
 	})
 }

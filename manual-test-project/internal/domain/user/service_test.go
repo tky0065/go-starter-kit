@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
+	"manual-test-project/internal/domain"
 	"manual-test-project/internal/domain/user"
 )
 
@@ -34,6 +35,15 @@ func (m *mockRepo) GetUserByEmail(ctx context.Context, email string) (*user.User
 		return u, nil
 	}
 	return nil, nil // Return nil, nil if not found for this mock
+}
+
+func (m *mockRepo) FindByID(ctx context.Context, id uint) (*user.User, error) {
+	for _, u := range m.users {
+		if u.ID == id {
+			return u, nil
+		}
+	}
+	return nil, nil
 }
 
 func (m *mockRepo) SaveRefreshToken(ctx context.Context, userID uint, token string, expiresAt time.Time) error {
@@ -89,7 +99,7 @@ func TestService_Register(t *testing.T) {
 	if err == nil {
 		t.Error("expected error for duplicate email, got nil")
 	}
-	if !errors.Is(err, user.ErrEmailAlreadyRegistered) {
+	if !errors.Is(err, domain.ErrEmailAlreadyRegistered) {
 		t.Errorf("expected ErrEmailAlreadyRegistered, got %v", err)
 	}
 }

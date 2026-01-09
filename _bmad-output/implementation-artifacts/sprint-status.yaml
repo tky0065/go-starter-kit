@@ -27,10 +27,10 @@ development_status:
   2-2-authentification: done
   2-3-renouvellement-de-session: done
   2-4-securisation-des-routes: done
-  3-1-gestion-du-profil-utilisateur: ready-for-dev
-  3-2-operations-crud-utilisateur: backlog
-  4-1-standardisation-des-api: backlog
-  4-2-gestion-centralisee-des-erreurs: backlog
-  4-3-documentation-interactive: backlog
-  4-4-automatisation-de-la-qualite: backlog
-  4-5-integration-continue: backlog
+  3-1-gestion-du-profil-utilisateur: done
+  3-2-operations-crud-utilisateur: ready-for-dev
+  4-1-standardisation-des-api: ready-for-dev
+  4-2-gestion-centralisee-des-erreurs: ready-for-dev
+  4-3-documentation-interactive: ready-for-dev
+  4-4-automatisation-de-la-qualite: ready-for-dev
+  4-5-integration-continue: ready-for-dev

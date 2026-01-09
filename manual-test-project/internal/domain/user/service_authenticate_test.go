@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
+	"manual-test-project/internal/domain"
 )
 
 // mockJWTService is a mock implementation of JWTService for testing
@@ -35,6 +36,11 @@ func (m *mockRepositoryForAuth) GetUserByEmail(ctx context.Context, email string
 	if m.getUserByEmailFunc != nil {
 		return m.getUserByEmailFunc(ctx, email)
 	}
+	return nil, nil
+}
+
+func (m *mockRepositoryForAuth) FindByID(ctx context.Context, id uint) (*User, error) {
+	// Mock implementation for FindByID
 	return nil, nil
 }
 
@@ -116,7 +122,7 @@ func TestService_Authenticate_UserNotFound(t *testing.T) {
 
 	_, err := service.Authenticate(context.Background(), "nonexistent@example.com", "password123")
 
-	if !errors.Is(err, ErrInvalidCredentials) {
+	if !errors.Is(err, domain.ErrInvalidCredentials) {
 		t.Errorf("Authenticate() error = %v, want ErrInvalidCredentials", err)
 	}
 }
@@ -139,7 +145,7 @@ func TestService_Authenticate_WrongPassword(t *testing.T) {
 
 	_, err := service.Authenticate(context.Background(), "test@example.com", "wrongpassword")
 
-	if !errors.Is(err, ErrInvalidCredentials) {
+	if !errors.Is(err, domain.ErrInvalidCredentials) {
 		t.Errorf("Authenticate() error = %v, want ErrInvalidCredentials", err)
 	}
 }
@@ -160,7 +166,7 @@ func TestService_Authenticate_RepositoryError(t *testing.T) {
 		t.Error("Authenticate() expected error but got nil")
 	}
 
-	if errors.Is(err, ErrInvalidCredentials) {
+	if errors.Is(err, domain.ErrInvalidCredentials) {
 		t.Error("Authenticate() should not return ErrInvalidCredentials for infrastructure errors")
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"gorm.io/gorm"
+	"manual-test-project/internal/domain"
 	"manual-test-project/internal/domain/user"
 )
 
@@ -37,10 +38,23 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*use
 	return &u, nil
 }
 
+// FindByID retrieves a user by ID, returns nil if not found
+func (r *UserRepository) FindByID(ctx context.Context, id uint) (*user.User, error) {
+	var u user.User
+	err := r.db.WithContext(ctx).Where("id = ?", id).First(&u).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &u, nil
+}
+
 // SaveRefreshToken saves a refresh token for the given user
-func (r *UserRepository) SaveRefreshToken(ctx context.Context, UserID uint, token string, expiresAt time.Time) error {
+func (r *UserRepository) SaveRefreshToken(ctx context.Context, userID uint, token string, expiresAt time.Time) error {
 	refreshToken := &user.RefreshToken{
-		UserID:    UserID,
+		UserID:    userID,
 		Token:     token,
 		ExpiresAt: expiresAt,
 		Revoked:   false,
@@ -84,7 +98,7 @@ func (r *UserRepository) RotateRefreshToken(ctx context.Context, oldTokenID uint
 		// If no rows affected, it means the token was already revoked (race condition)
 		// or doesn't exist
 		if result.RowsAffected == 0 {
-			return user.ErrRefreshTokenRevoked
+			return domain.ErrRefreshTokenRevoked
 		}
 
 		// 2. Create new token

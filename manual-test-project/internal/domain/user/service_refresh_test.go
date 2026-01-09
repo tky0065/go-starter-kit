@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"manual-test-project/internal/domain"
 	"manual-test-project/internal/domain/user"
 )
 
@@ -40,6 +41,15 @@ func (m *mockUserRepository) GetUserByEmail(ctx context.Context, email string) (
 		return nil, nil
 	}
 	return u, nil
+}
+
+func (m *mockUserRepository) FindByID(ctx context.Context, id uint) (*user.User, error) {
+	for _, u := range m.users {
+		if u.ID == id {
+			return u, nil
+		}
+	}
+	return nil, nil
 }
 
 func (m *mockUserRepository) SaveRefreshToken(ctx context.Context, userID uint, token string, expiresAt time.Time) error {
@@ -81,7 +91,7 @@ func (m *mockUserRepository) RotateRefreshToken(ctx context.Context, oldTokenID 
 	for _, rt := range m.refreshTokens {
 		if rt.ID == oldTokenID {
 			if rt.Revoked {
-				return user.ErrRefreshTokenRevoked // Simulate DB check
+				return domain.ErrRefreshTokenRevoked // Simulate DB check
 			}
 			rt.Revoked = true
 			foundOld = true
@@ -91,7 +101,7 @@ func (m *mockUserRepository) RotateRefreshToken(ctx context.Context, oldTokenID 
 	if !foundOld {
 		// In a real DB, if ID not found, rows affected = 0.
 		// For mock, we can just say revoked (as per implementation logic if rows=0) or ignore
-		return user.ErrRefreshTokenRevoked
+		return domain.ErrRefreshTokenRevoked
 	}
 
 	// 2. Create new token
@@ -199,7 +209,7 @@ func TestService_RefreshToken_InvalidToken(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for invalid token, got nil")
 	}
-	if err != user.ErrInvalidRefreshToken {
+	if err != domain.ErrInvalidRefreshToken {
 		t.Errorf("expected ErrInvalidRefreshToken, got %v", err)
 	}
 }
@@ -233,7 +243,7 @@ func TestService_RefreshToken_ExpiredToken(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for expired token, got nil")
 	}
-	if err != user.ErrRefreshTokenExpired {
+	if err != domain.ErrRefreshTokenExpired {
 		t.Errorf("expected ErrRefreshTokenExpired, got %v", err)
 	}
 }
@@ -279,7 +289,7 @@ func TestService_RefreshToken_RevokedToken(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for revoked token, got nil")
 	}
-	if err != user.ErrRefreshTokenRevoked {
+	if err != domain.ErrRefreshTokenRevoked {
 		t.Errorf("expected ErrRefreshTokenRevoked, got %v", err)
 	}
 }
