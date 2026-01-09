@@ -18,6 +18,9 @@ type AuthService interface {
 // Implemented by internal/domain/user/Service.
 type UserService interface {
 	GetProfile(ctx context.Context, userID uint) (*user.User, error)
+	GetAll(ctx context.Context, page, limit int) ([]*user.User, int64, error)
+	UpdateUser(ctx context.Context, userID uint, email string) (*user.User, error)
+	DeleteUser(ctx context.Context, userID uint) error
 }
 
 // TokenService defines the interface for token generation.

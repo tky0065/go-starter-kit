@@ -63,6 +63,18 @@ func (m *mockRepositoryForAuth) RotateRefreshToken(ctx context.Context, oldToken
 	return nil
 }
 
+func (m *mockRepositoryForAuth) FindAll(ctx context.Context, page, limit int) ([]*User, int64, error) {
+	return nil, 0, nil
+}
+
+func (m *mockRepositoryForAuth) Update(ctx context.Context, user *User) error {
+	return nil
+}
+
+func (m *mockRepositoryForAuth) Delete(ctx context.Context, id uint) error {
+	return nil
+}
+
 func TestService_Authenticate_Success(t *testing.T) {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
 

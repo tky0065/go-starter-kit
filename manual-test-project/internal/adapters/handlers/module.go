@@ -27,4 +27,7 @@ func RegisterAllRoutes(authHandler *AuthHandler, userHandler *UserHandler, app *
 	// Protected routes (authentication required)
 	protected := app.Group("/api/v1", authMiddleware)
 	protected.Get("/users/me", userHandler.GetMe)
+	protected.Get("/users", userHandler.GetAllUsers)
+	protected.Put("/users/:id", userHandler.UpdateUser)
+	protected.Delete("/users/:id", userHandler.DeleteUser)
 }

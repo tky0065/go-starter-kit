@@ -28,7 +28,7 @@ development_status:
   2-3-renouvellement-de-session: done
   2-4-securisation-des-routes: done
   3-1-gestion-du-profil-utilisateur: done
-  3-2-operations-crud-utilisateur: ready-for-dev
+  3-2-operations-crud-utilisateur: done
   4-1-standardisation-des-api: ready-for-dev
   4-2-gestion-centralisee-des-erreurs: ready-for-dev
   4-3-documentation-interactive: ready-for-dev

@@ -113,6 +113,35 @@ func (m *mockUserRepository) RotateRefreshToken(ctx context.Context, oldTokenID 
 	return nil
 }
 
+func (m *mockUserRepository) FindAll(ctx context.Context, page, limit int) ([]*user.User, int64, error) {
+	users := make([]*user.User, 0, len(m.users))
+	for _, u := range m.users {
+		users = append(users, u)
+	}
+	return users, int64(len(users)), nil
+}
+
+func (m *mockUserRepository) Update(ctx context.Context, u *user.User) error {
+	for email, existing := range m.users {
+		if existing.ID == u.ID {
+			delete(m.users, email)
+			m.users[u.Email] = u
+			return nil
+		}
+	}
+	return nil
+}
+
+func (m *mockUserRepository) Delete(ctx context.Context, id uint) error {
+	for email, u := range m.users {
+		if u.ID == id {
+			delete(m.users, email)
+			return nil
+		}
+	}
+	return nil
+}
+
 // mockTokenService is a mock implementation of interfaces.TokenService for testing
 type mockTokenService struct {
 	accessToken  string

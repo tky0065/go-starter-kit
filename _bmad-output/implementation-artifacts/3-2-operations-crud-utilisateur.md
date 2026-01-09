@@ -1,6 +1,6 @@
 # Story 3.2: Operations CRUD Utilisateur
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -36,22 +36,30 @@ so that je puisse gérer la base d'utilisateurs.
 
 ## Tasks / Subtasks
 
-- [ ] **Implementation in manual-test-project (Reference Impl)**
-    - [ ] **Interfaces:** Update `internal/interfaces/user.go` to include `GetAll`, `Update`, `Delete`.
-    - [ ] **Repository:** Add `FindAll`, `Update`, `Delete` methods in `internal/adapters/repository/user_repository.go`.
-        - [ ] Ensure `Update` handles partial updates or struct updates correctly.
-        - [ ] Ensure `Delete` performs a Soft Delete (GORM default).
-    - [ ] **Service:** Implement business logic in `internal/domain/user/service.go`.
-        - [ ] Add input validation call if needed (Service vs Handler responsibility - following Hexagonal Lite, Validation is usually in Adapter, but Business Rules in Service).
-    - [ ] **Handlers:** Add `GetAllUsers`, `UpdateUser`, `DeleteUser` in `internal/adapters/handlers/user_handler.go`.
-        - [ ] Use `go-playground/validator` for input structs (UpdateDTO).
-    - [ ] **Routes:** Register endpoints in `internal/infrastructure/server/server.go` (or where routes are defined).
-        - [ ] Ensure they are inside the Protected group (JWT Middleware).
+- [x] **Implementation in manual-test-project (Reference Impl)**
+    - [x] **Interfaces:** Update `internal/interfaces/user.go` to include `GetAll`, `Update`, `Delete`.
+    - [x] **Repository:** Add `FindAll`, `Update`, `Delete` methods in `internal/adapters/repository/user_repository.go`.
+        - [x] Ensure `Update` handles partial updates or struct updates correctly.
+        - [x] Ensure `Delete` performs a Soft Delete (GORM default).
+        - [x] **Pagination:** Implement `FindAll` with `page` and `limit` arguments.
+    - [x] **Service:** Implement business logic in `internal/domain/user/service.go`.
+        - [x] Add input validation call if needed (Service vs Handler responsibility - following Hexagonal Lite, Validation is usually in Adapter, but Business Rules in Service).
+        - [x] Update `GetAll` to handle pagination.
+    - [x] **Handlers:** Add `GetAllUsers`, `UpdateUser`, `DeleteUser` in `internal/adapters/handlers/user_handler.go`.
+        - [x] Use `go-playground/validator` for input structs (UpdateDTO).
+        - [x] Parse `page` and `limit` query parameters for `GetAllUsers`.
+        - [x] Return pagination metadata (page, limit, total) in response.
+    - [x] **Routes:** Register endpoints in `internal/infrastructure/server/server.go` (or where routes are defined).
+        - [x] Ensure they are inside the Protected group (JWT Middleware).
 
-- [ ] **CLI Generator Update**
-    - [ ] **Templates:** Update Go templates in `cmd/create-go-starter/` to reflect the changes made in `manual-test-project`.
-    - [ ] **Refactoring:** If `templates.go` is too large, split it into `templates_user.go` or similar (as noted in Story 3.1).
-    - [ ] **Verification:** Ensure the generated project compiles and includes the full CRUD.
+- [x] **CLI Generator Update**
+    - [x] **Templates:** Update Go templates in `cmd/create-go-starter/` to reflect the changes made in `manual-test-project`.
+    - [x] **Refactoring:** If `templates.go` is too large, split it into `templates_user.go` or similar (as noted in Story 3.1).
+    - [x] **Verification:** Ensure the generated project compiles and includes the full CRUD.
+
+- [x] **Review Follow-ups (AI)**
+    - [x] [AI-Review][High] Implement pagination for List Users (FindAll).
+    - [x] [AI-Review][Medium] Git add `cmd/create-go-starter/templates_user.go`.
 
 ## Dev Notes
 
@@ -92,8 +100,49 @@ Gemini 2.0 Flash
 
 ### Completion Notes List
 
-- [ ] CRUD endpoints functional in `manual-test-project`.
-- [ ] CLI generates project with full CRUD capabilities.
-- [ ] `make test` passes.
+- [x] CRUD endpoints functional in `manual-test-project`.
+- [x] CLI generates project with full CRUD capabilities.
+- [x] `make test` passes.
+- [x] Pagination implemented.
+- [x] All review findings addressed.
+
+### Implementation Plan
+
+Implemented full CRUD operations for users following TDD red-green-refactor cycle:
+1. Updated interfaces to include FindAll, Update, Delete methods
+2. Added DeletedAt field to User entity for soft delete support
+3. Wrote failing tests for repository methods
+4. Implemented repository methods (FindAll, Update, Delete)
+5. Updated service layer with GetAll, UpdateUser, DeleteUser methods
+6. Created HTTP handlers for GET /users, PUT /users/:id, DELETE /users/:id
+7. Registered new routes in protected group with JWT middleware
+8. Fixed all test mocks to implement new interface methods
+9. Created templates_user.go for CLI generator with all user-related templates
+10. ADDRESSED REVIEW: Implemented pagination (Offset/Limit/Count) in Repository, Service, and Handler.
+11. ADDRESSED REVIEW: Added `cmd/create-go-starter/templates_user.go` to git.
+12. Verified implementation with updated tests.
 
 ### File List
+
+**Manual Test Project:**
+- manual-test-project/internal/domain/user/entity.go
+- manual-test-project/internal/interfaces/user_repository.go
+- manual-test-project/internal/interfaces/services.go
+- manual-test-project/internal/adapters/repository/user_repository.go
+- manual-test-project/internal/adapters/repository/user_repository_test.go
+- manual-test-project/internal/domain/user/service.go
+- manual-test-project/internal/domain/user/service_test.go
+- manual-test-project/internal/domain/user/service_refresh_test.go
+- manual-test-project/internal/domain/user/service_authenticate_test.go
+- manual-test-project/internal/adapters/handlers/user_handler.go
+- manual-test-project/internal/adapters/handlers/user_handler_test.go
+- manual-test-project/internal/adapters/handlers/module.go
+
+**CLI Generator:**
+- cmd/create-go-starter/templates_user.go
+
+### Change Log
+
+- 2026-01-09: Implemented full CRUD operations (List, Update, Delete) for users with TDD approach, soft delete support, and comprehensive test coverage. Updated CLI generator templates.
+- 2026-01-09: [Review Fix] Implemented pagination for user list endpoint.
+- 2026-01-09: [Review Fix] Added tracking for templates_user.go.

@@ -109,3 +109,34 @@ func (r *UserRepository) RotateRefreshToken(ctx context.Context, oldTokenID uint
 		return nil
 	})
 }
+
+// FindAll retrieves users with pagination
+func (r *UserRepository) FindAll(ctx context.Context, page, limit int) ([]*user.User, int64, error) {
+	var users []*user.User
+	var total int64
+
+	// Get total count (ignoring soft deleted)
+	if err := r.db.WithContext(ctx).Model(&user.User{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Calculate offset
+	offset := (page - 1) * limit
+
+	// Get paginated users
+	err := r.db.WithContext(ctx).Limit(limit).Offset(offset).Find(&users).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	return users, total, nil
+}
+
+// Update updates an existing user in the database
+func (r *UserRepository) Update(ctx context.Context, u *user.User) error {
+	return r.db.WithContext(ctx).Save(u).Error
+}
+
+// Delete performs a soft delete on the user (sets deleted_at)
+func (r *UserRepository) Delete(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Delete(&user.User{}, id).Error
+}

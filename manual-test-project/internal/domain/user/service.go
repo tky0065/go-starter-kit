@@ -14,6 +14,9 @@ type UserRepository interface {
 	CreateUser(ctx context.Context, user *User) error
 	GetUserByEmail(ctx context.Context, email string) (*User, error)
 	FindByID(ctx context.Context, id uint) (*User, error)
+	FindAll(ctx context.Context, page, limit int) ([]*User, int64, error)
+	Update(ctx context.Context, user *User) error
+	Delete(ctx context.Context, id uint) error
 	SaveRefreshToken(ctx context.Context, userID uint, token string, expiresAt time.Time) error
 	GetRefreshToken(ctx context.Context, token string) (*RefreshToken, error)
 	RevokeRefreshToken(ctx context.Context, tokenID uint) error
@@ -200,4 +203,80 @@ func (s *Service) GetProfile(ctx context.Context, userID uint) (*User, error) {
 	}
 
 	return u, nil
+}
+
+// GetAll retrieves all users with pagination
+func (s *Service) GetAll(ctx context.Context, page, limit int) ([]*User, int64, error) {
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 10
+	}
+	if limit > 100 {
+		limit = 100
+	}
+
+	users, total, err := s.repo.FindAll(ctx, page, limit)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to get all users: %w", err)
+	}
+	return users, total, nil
+}
+
+// UpdateUser updates a user's email address
+func (s *Service) UpdateUser(ctx context.Context, userID uint, email string) (*User, error) {
+	// Get user from repository
+	u, err := s.repo.FindByID(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	// Check if user exists
+	if u == nil {
+		return nil, domain.ErrUserNotFound
+	}
+
+	// Check if new email is already taken by another user
+	if email != u.Email {
+		existing, err := s.repo.GetUserByEmail(ctx, email)
+		if err != nil {
+			return nil, fmt.Errorf("failed to check existing email: %w", err)
+		}
+		if existing != nil {
+			return nil, domain.ErrEmailAlreadyRegistered
+		}
+	}
+
+	// Update email
+	u.Email = email
+
+	// Save updated user
+	err = s.repo.Update(ctx, u)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update user: %w", err)
+	}
+
+	return u, nil
+}
+
+// DeleteUser performs a soft delete on a user
+func (s *Service) DeleteUser(ctx context.Context, userID uint) error {
+	// Check if user exists
+	u, err := s.repo.FindByID(ctx, userID)
+	if err != nil {
+		return fmt.Errorf("failed to get user: %w", err)
+	}
+
+	if u == nil {
+		return domain.ErrUserNotFound
+	}
+
+	// Perform soft delete
+	err = s.repo.Delete(ctx, userID)
+	if err != nil {
+		return fmt.Errorf("failed to delete user: %w", err)
+	}
+
+	return nil
 }

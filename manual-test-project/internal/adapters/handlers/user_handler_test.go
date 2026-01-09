@@ -29,6 +29,18 @@ func (m *mockUserService) GetProfile(ctx context.Context, userID uint) (*user.Us
 	return nil, nil
 }
 
+func (m *mockUserService) GetAll(ctx context.Context, page, limit int) ([]*user.User, int64, error) {
+	return nil, 0, nil
+}
+
+func (m *mockUserService) UpdateUser(ctx context.Context, userID uint, email string) (*user.User, error) {
+	return nil, nil
+}
+
+func (m *mockUserService) DeleteUser(ctx context.Context, userID uint) error {
+	return nil
+}
+
 func TestGetMe_Success(t *testing.T) {
 	// Set JWT_SECRET for middleware
 	secret := "test-secret-key"

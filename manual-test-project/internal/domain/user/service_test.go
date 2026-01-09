@@ -62,6 +62,35 @@ func (m *mockRepo) RotateRefreshToken(ctx context.Context, oldTokenID uint, newT
 	return nil
 }
 
+func (m *mockRepo) FindAll(ctx context.Context, page, limit int) ([]*user.User, int64, error) {
+	users := make([]*user.User, 0, len(m.users))
+	for _, u := range m.users {
+		users = append(users, u)
+	}
+	return users, int64(len(users)), nil
+}
+
+func (m *mockRepo) Update(ctx context.Context, u *user.User) error {
+	for email, existing := range m.users {
+		if existing.ID == u.ID {
+			delete(m.users, email)
+			m.users[u.Email] = u
+			return nil
+		}
+	}
+	return errors.New("user not found")
+}
+
+func (m *mockRepo) Delete(ctx context.Context, id uint) error {
+	for email, u := range m.users {
+		if u.ID == id {
+			delete(m.users, email)
+			return nil
+		}
+	}
+	return errors.New("user not found")
+}
+
 func TestService_Register(t *testing.T) {
 	repo := newMockRepo()
 	svc := user.NewService(repo)

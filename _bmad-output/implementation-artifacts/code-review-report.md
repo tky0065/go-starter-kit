@@ -1,17 +1,15 @@
 **🔥 CODE REVIEW FINDINGS, Yacoubakone!**
 
-**Story:** _bmad-output/implementation-artifacts/2-4-securisation-des-routes.md
-**Git vs Story Discrepancies:** 1 major discrepancy found (File locations)
-**Issues Found:** 0 High, 1 Medium, 2 Low
+**Story:** _bmad-output/implementation-artifacts/3-2-operations-crud-utilisateur.md
+**Git vs Story Discrepancies:** 1 found (untracked file)
+**Issues Found:** 1 High, 1 Medium, 0 Low
+
+## 🔴 CRITICAL ISSUES
+- **AC1 Not Fully Implemented**: The Acceptance Criteria for "List Users" explicitly requires pagination ("La liste est paginée..."). The current implementation of `FindAll` loads ALL users into memory. This will kill the server in production.
 
 ## 🟡 MEDIUM ISSUES
-- **Path Confusion:** The story claims to have created files like `internal/adapters/middleware/auth_middleware.go`, but these files actually exist in `manual-test-project/internal/adapters/middleware/auth_middleware.go`. The implementation seems to be within a sub-project `manual-test-project` which was not clearly stated in the story file list, leading to context verification failure.
+- **Files changed but not tracked**: `cmd/create-go-starter/templates_user.go` is untracked in git.
+- **Limited Update Scope**: The "Update User" feature only allows updating the Email. The AC mentions "nom" (Name) as an example, but the `User` entity lacks this field. (Technically compliant with current data model, but restrictive).
 
 ## 🟢 LOW ISSUES
-- **Security Best Practice:** In `NewAuthMiddleware` (manual-test-project/internal/adapters/middleware/auth_middleware.go), the `jwtware.Config` relies on the default signing method. It is recommended to explicitly set `SigningMethod: "HS256"` to prevent potential "none" algorithm attacks, even if the library handles it safely by default.
-- **Hardcoded Secrets in Tests:** Tests use `os.Setenv("JWT_SECRET", "test-secret-key")`. This is acceptable for unit tests but ensure no real secrets ever leak this way.
-
-## ✅ POSITIVE NOTES
-- **Real Tests:** The tests in `auth_middleware_test.go` and `protected_routes_test.go` are excellent. They use `httptest` and cover edge cases (expired token, wrong signature, no token).
-- **Correct Implementation:** The middleware correctly uses `contrib/jwt`, handles errors with standard JSON, and injects the user ID.
-- **Helper Usage:** `GetUserID` helper is implemented and used correctly in handlers.
+- None.
