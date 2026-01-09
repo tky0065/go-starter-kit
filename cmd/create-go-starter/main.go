@@ -77,6 +77,36 @@ func createProjectStructure(projectPath string) error {
 	return nil
 }
 
+// copyEnvFile copies the generated .env.example to .env if .env doesn't already exist.
+func copyEnvFile(projectPath string) error {
+	envExamplePath := filepath.Join(projectPath, ".env.example")
+	envPath := filepath.Join(projectPath, ".env")
+
+	// Check if .env.example exists
+	if _, err := os.Stat(envExamplePath); os.IsNotExist(err) {
+		return fmt.Errorf(".env.example not found: %w", err)
+	}
+
+	// Check if .env already exists
+	if _, err := os.Stat(envPath); err == nil {
+		// .env already exists, skip copying
+		return nil
+	}
+
+	// Read .env.example
+	content, err := os.ReadFile(envExamplePath)
+	if err != nil {
+		return fmt.Errorf("failed to read .env.example: %w", err)
+	}
+
+	// Write to .env
+	if err := os.WriteFile(envPath, content, 0644); err != nil {
+		return fmt.Errorf("failed to create .env file: %w", err)
+	}
+
+	return nil
+}
+
 func main() {
 	// Parse flags
 	help := flag.Bool("help", false, "Show help message")
@@ -137,6 +167,15 @@ func main() {
 
 	// Display success message
 	fmt.Println(Green("✅ Fichiers générés avec succès"))
+
+	// Copy .env.example to .env
+	fmt.Println("🔑 Configuration de l'environnement...")
+	if err := copyEnvFile(projectPath); err != nil {
+		fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("Error: %v", err)))
+		os.Exit(1)
+	}
+
+	// Display success message
 	fmt.Printf("\n🎉 Projet '%s' créé avec succès!\n", Green(projectName))
 	fmt.Printf("\nProchaines étapes:\n")
 	fmt.Printf("  cd %s\n", projectName)
