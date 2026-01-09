@@ -5,16 +5,16 @@ status: active
 
 epics:
   epic-1:
-    status: in-progress
+    status: done
     title: "Project Initialization & Core Infrastructure"
   epic-2:
-    status: in-progress
+    status: done
     title: "Authentication & Security Foundation"
   epic-3:
-    status: in-progress
+    status: done
     title: "User Management Logic"
   epic-4:
-    status: backlog
+    status: done
     title: "Production Readiness & Developer Experience"
 
 development_status:
@@ -31,6 +31,6 @@ development_status:
   3-2-operations-crud-utilisateur: done
   4-1-standardisation-des-api: done
   4-2-gestion-centralisee-des-erreurs: done
-  4-3-documentation-interactive: review
-  4-4-automatisation-de-la-qualite: review
-  4-5-integration-continue: review
+  4-3-documentation-interactive: done
+  4-4-automatisation-de-la-qualite: done
+  4-5-integration-continue: done
