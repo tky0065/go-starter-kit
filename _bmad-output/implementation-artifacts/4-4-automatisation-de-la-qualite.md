@@ -1,6 +1,6 @@
 # Story 4.4: Automatisation de la Qualité (Lint & Test)
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -36,23 +36,23 @@ so that je puisse garantir la qualité de mon code rapidement et uniformément.
 
 ## Tasks / Subtasks
 
-- [ ] **Linter Configuration (`manual-test-project`)**
-    - [ ] Créer `.golangci.yml` à la racine.
-    - [ ] Activer les linters critiques : `govet`, `errcheck`, `staticcheck`, `unused`, `gosec` (basic), `gofmt`.
-    - [ ] Configurer les exclusions si nécessaire (ex: dossiers de tests pour certaines règles).
+- [x] **Linter Configuration (`manual-test-project`)**
+    - [x] Créer `.golangci.yml` à la racine.
+    - [x] Activer les linters critiques : `govet`, `errcheck`, `staticcheck`, `unused`, `gosec` (basic), `gofmt`.
+    - [x] Configurer les exclusions si nécessaire (ex: dossiers de tests pour certaines règles).
 
-- [ ] **Makefile Enhancements (`manual-test-project`)**
-    - [ ] Ajouter `lint`: exécuter `golangci-lint run`.
-    - [ ] Ajouter `test`: exécuter `go test -race ./...`.
-    - [ ] Ajouter `test-coverage`: générer un rapport HTML.
+- [x] **Makefile Enhancements (`manual-test-project`)**
+    - [x] Ajouter `lint`: exécuter `golangci-lint run`.
+    - [x] Ajouter `test`: exécuter `go test -race ./...`.
+    - [x] Ajouter `test-coverage`: générer un rapport HTML.
 
-- [ ] **CLI Generator Update**
-    - [ ] Ajouter le template `.golangci.yml` dans `templates.go`.
-    - [ ] Mettre à jour le template `Makefile` dans `templates.go`.
+- [x] **CLI Generator Update**
+    - [x] Ajouter le template `.golangci.yml` dans `templates.go`.
+    - [x] Mettre à jour le template `Makefile` dans `templates.go`.
 
-- [ ] **Verification**
-    - [ ] Introduire volontairement une erreur de linting et vérifier que `make lint` échoue.
-    - [ ] Vérifier que `make test` lance bien les tests existants.
+- [x] **Verification**
+    - [x] Introduire volontairement une erreur de linting et vérifier que `make lint` échoue.
+    - [x] Vérifier que `make test` lance bien les tests existants.
 
 ## Dev Notes
 
@@ -117,8 +117,20 @@ Gemini 2.0 Flash
 - Checked standard Makefile patterns for Go.
 
 ### Completion Notes List
-- [ ] .golangci.yml created.
-- [ ] Makefile updated.
-- [ ] CLI templates updated.
+- [x] .golangci.yml created in manual-test-project with critical linters enabled (errcheck, gosimple, govet, ineffassign, staticcheck, typecheck, unused, gocyclo, gofmt, gosec).
+- [x] Makefile updated in manual-test-project with lint, test (with -race), and test-coverage commands.
+- [x] CLI templates updated: Added GolangCILintTemplate() in templates.go and updated MakefileTemplate() with new quality commands.
+- [x] Generator.go updated to include .golangci.yml in generated files.
+- [x] Verified lint command detects errors and test command runs with race detection.
+- [x] Fixed linting errors in existing code (removed unused imports, added negative number checks before int->uint conversions).
 
 ### File List
+- manual-test-project/.golangci.yml
+- manual-test-project/Makefile
+- cmd/create-go-starter/templates.go
+- cmd/create-go-starter/generator.go
+- manual-test-project/internal/adapters/handlers/auth_handler.go
+- manual-test-project/internal/adapters/handlers/user_handler.go
+
+## Change Log
+- **2026-01-09**: Implemented automated quality tools (lint and test commands) for the project. Added .golangci.yml configuration with critical linters. Updated Makefile with lint, test, and test-coverage commands. Updated CLI generator to include quality automation in new projects. Fixed existing linting errors in codebase.

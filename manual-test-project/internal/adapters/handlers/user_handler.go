@@ -148,7 +148,7 @@ type UpdateUserRequest struct {
 func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	// Parse user ID from path
 	userID, err := c.ParamsInt("id")
-	if err != nil {
+	if err != nil || userID < 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status": "error",
 			"error":  "Invalid user ID",
@@ -221,7 +221,7 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	// Parse user ID from path
 	userID, err := c.ParamsInt("id")
-	if err != nil {
+	if err != nil || userID < 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status": "error",
 			"error":  "Invalid user ID",

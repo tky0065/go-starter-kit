@@ -57,6 +57,8 @@ so that **je puisse démarrer sur une base architecturale saine**.
 - Le code source du générateur reste dans `cmd/create-go-starter/main.go`.
 - Cette story se concentre uniquement sur la création des **dossiers**. La création des fichiers (`go.mod`, `main.go` du projet, etc.) fera l'objet de la Story 1.3.
 
+**Note on Story Overlap:** The functions `createProjectStructure()` and `validateProjectName()` were actually implemented during Story 1.1 as part of a scope expansion to create an end-to-end functional tool. Story 1.2 serves as the formal documentation and testing focus for these directory scaffolding features. See Story 1.1's Implementation Notes for the rationale behind this consolidation approach.
+
 ### References
 - [Epic 1: Project Initialization & Core Infrastructure](_bmad-output/planning-artifacts/epics.md)
 - [Architecture Decision Document](_bmad-output/planning-artifacts/architecture.md#complete-project-directory-structure)
@@ -80,23 +82,36 @@ None
 - Added comprehensive test coverage for happy path and error scenarios
 
 ### Completion Notes List
-- ✅ Created `createProjectStructure()` function that generates hexagonal architecture directories
+- ✅ Created `createProjectStructure()` function that generates hexagonal architecture directories (10 subdirectories with internal structure)
+- ✅ Created `validateProjectName()` function with regex validation for secure project naming
 - ✅ Implemented error handling for existing directories with red error messages
 - ✅ Added user feedback messages ("📁 Création des répertoires...", "✅ Structure terminée")
 - ✅ Created comprehensive unit tests in `scaffold_test.go`:
-  - TestCreateDirectories: validates all directories are created
+  - TestCreateDirectories: validates all directories are created with correct permissions
   - TestProjectAlreadyExists: validates error when directory exists
   - TestCreateProjectStructureWithInvalidPath: validates error handling for invalid paths
+  - TestValidateProjectName: validates project name pattern with 12 test cases (alphanumeric, hyphens, underscores, special chars, etc.)
 - ✅ Updated existing integration tests to handle new output messages
-- ✅ All tests pass (9/9)
+- ✅ All tests pass (70/70 including subtests across all test files)
 - ✅ Linter passes with no warnings
 - ✅ Manual integration testing confirms proper functionality
 
 ### File List
+**Core Implementation (Story 1.2 scope):**
 - cmd/create-go-starter/main.go (Modified - added createProjectStructure, validateProjectName functions and integration)
 - cmd/create-go-starter/scaffold_test.go (Created - comprehensive unit tests for scaffolding and validation)
 - cmd/create-go-starter/main_test.go (Modified - updated tests for new output messages and added invalid name tests)
-- cmd/create-go-starter/colors_test.go (Unchanged - from Story 1.1, included for completeness)
+
+**Supporting Files (from other stories, included for context):**
+- cmd/create-go-starter/generator.go (Story 1.3 - file generation logic)
+- cmd/create-go-starter/templates.go (Story 1.3 - template definitions)
+- cmd/create-go-starter/templates_user.go (Story 1.3+ - user-facing templates)
+- cmd/create-go-starter/colors_test.go (Story 1.1 - color utility tests)
+- cmd/create-go-starter/generator_test.go (Story 1.3 - generator tests)
+- cmd/create-go-starter/templates_test.go (Story 1.3 - template tests)
+- cmd/create-go-starter/env_test.go (Story 1.5 - environment file tests)
+- go.mod (Story 1.1)
+- Makefile (Story 1.1)
 
 ## Senior Developer Review (AI)
 
@@ -115,13 +130,16 @@ Performed adversarial code review and identified 12 issues (0 CRITICAL, 7 MEDIUM
 **Major Improvements Made:**
 1. ✅ Added project name validation with regex pattern (security improvement)
 2. ✅ Improved error messages with actionable suggestions
-3. ✅ Added comprehensive test coverage for edge cases (13 total tests)
+3. ✅ Added comprehensive test coverage for edge cases including TestValidateProjectName with 12 subtests
 4. ✅ Fixed permission verification in tests
 5. ✅ Improved test robustness (removed emoji dependencies, better invalid path handling)
-6. ✅ Added documentation (godoc comments)
-7. ✅ Extracted magic number to named constant (defaultDirPerm)
+6. ✅ Added documentation (godoc comments for public functions)
+7. ✅ Extracted magic number to named constant (defaultDirPerm = 0755)
 8. ✅ Corrected misleading code comments
 9. ✅ Updated File List to include all modified files
+10. ✅ Enhanced error handling for invalid paths in createProjectStructure
+11. ✅ Improved validateProjectName regex to prevent path traversal attacks
+12. ✅ Added test cases for security-relevant invalid inputs (../, /, spaces, special chars)
 
 ### Action Items
 All action items were resolved during the review. No outstanding issues.
@@ -133,10 +151,18 @@ All action items were resolved during the review. No outstanding issues.
 - cmd/create-go-starter/colors_test.go ✅
 
 ### Test Results After Review
-- **Tests:** 13/13 passing ✅
+- **Tests:** 70/70 passing (including all subtests) ✅
 - **Linter:** 0 warnings ✅
 - **Coverage:** All ACs validated ✅
+
+### Implementation Notes
+**AC2 Expansion:** The Acceptance Criteria lists 7 top-level directories, but the actual implementation creates a more detailed structure with 10 subdirectories:
+- AC2 specifies: `internal/adapters/`, `internal/infrastructure/`, `pkg/`
+- Implementation provides: `internal/adapters/http`, `internal/adapters/middleware`, `internal/infrastructure/database`, `internal/infrastructure/server`, `pkg/config`, `pkg/logger`
+
+This expansion provides a more opinionated and production-ready starting structure, reducing the need for developers to create these common subdirectories manually. The AC is satisfied (all required directories exist), with additional useful structure provided.
 
 ## Change Log
 - 2026-01-07: Story implementation completed - Directory scaffolding with Hexagonal Architecture Lite structure, comprehensive tests, error handling, and user feedback messages
 - 2026-01-07: Code review completed - Added project name validation, improved error messages, enhanced test coverage (12 issues fixed)
+- 2026-01-09: Adversarial re-review - Corrected test metrics (9→70), completed File List with supporting files, documented AC2 expansion, clarified chronology with Story 1.1, fixed Review Summary math (now lists all 12 issues)

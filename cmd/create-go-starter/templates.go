@@ -83,9 +83,38 @@ CMD ["./` + t.projectName + `"]
 `
 }
 
+// GolangCILintTemplate returns the .golangci.yml file content
+func (t *ProjectTemplates) GolangCILintTemplate() string {
+	return `run:
+  timeout: 5m
+  tests: false # Don't lint test files strictly
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck      # Check for unchecked errors
+    - gosimple      # Simplify code
+    - govet         # Vet examines Go source code
+    - ineffassign   # Detect ineffectual assignments
+    - staticcheck   # Advanced Go linter
+    - typecheck     # Type-check Go code
+    - unused        # Check for unused constants, variables, functions and types
+    - gocyclo       # Compute cyclomatic complexities
+    - gofmt         # Check formatting
+    - gosec         # Security-focused linter (basic)
+
+linters-settings:
+  gocyclo:
+    min-complexity: 15
+  gosec:
+    excludes:
+      - G404 # Allow weak random number generator in non-crypto contexts
+`
+}
+
 // MakefileTemplate returns the Makefile content
 func (t *ProjectTemplates) MakefileTemplate() string {
-	return `.PHONY: help build run test clean dev
+	return `.PHONY: help build run test clean dev lint test-coverage
 
 # Binary name
 BINARY_NAME=` + t.projectName + `
@@ -107,9 +136,19 @@ dev: ## Run the application with air for hot reload
 	@echo "Starting development server with hot reload..."
 	@air
 
-test: ## Run tests
+lint: ## Run linter
+	@echo "Running linter..."
+	@golangci-lint run ./...
+
+test: ## Run tests with race detection
 	@echo "Running tests..."
-	@go test -v ./...
+	@go test -v -race ./...
+
+test-coverage: ## Run tests with coverage report
+	@echo "Running tests with coverage..."
+	@go test -v -race -coverprofile=coverage.out ./...
+	@go tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage report generated: coverage.html"
 
 clean: ## Clean build artifacts
 	@echo "Cleaning..."
@@ -189,6 +228,69 @@ Thumbs.db
 # Temporary files
 tmp/
 temp/
+`
+}
+
+// DockerComposeTemplate returns the docker-compose.yml file content
+func (t *ProjectTemplates) DockerComposeTemplate() string {
+	return `version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: ` + t.projectName + `_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ` + t.projectName + `
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ` + t.projectName + `_network
+
+  # Application API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ` + t.projectName + `_api
+    environment:
+      APP_NAME: ` + t.projectName + `
+      APP_ENV: development
+      APP_PORT: 8080
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: ` + t.projectName + `
+      DB_SSLMODE: disable
+      JWT_SECRET: dev-secret-change-in-production
+      JWT_EXPIRY: 24h
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ` + t.projectName + `_network
+    volumes:
+      - .:/app
+    command: /app/` + t.projectName + `
+
+volumes:
+  postgres_data:
+
+networks:
+  ` + t.projectName + `_network:
+    driver: bridge
 `
 }
 
@@ -517,5 +619,74 @@ func main() {
 		server.Module,
 	).Run()
 }
+`
+}
+
+// GitHubActionsWorkflowTemplate returns the .github/workflows/ci.yml file content
+func (t *ProjectTemplates) GitHubActionsWorkflowTemplate() string {
+	return `name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  quality:
+    name: Quality & Security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: false # golangci-lint-action handles its own caching
+
+      - name: Run Linter
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.60
+          args: --timeout=5m
+
+  test:
+    name: Test & Build
+    runs-on: ubuntu-latest
+    needs: quality # Run tests only if lint passes
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ` + t.projectName + `
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      - name: Run Tests
+        run: make test
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: ` + t.projectName + `
+          DB_SSLMODE: disable
+
+      - name: Build Check
+        run: go build -v ./...
 `
 }

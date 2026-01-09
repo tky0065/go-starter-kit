@@ -29,8 +29,8 @@ development_status:
   2-4-securisation-des-routes: done
   3-1-gestion-du-profil-utilisateur: done
   3-2-operations-crud-utilisateur: done
-  4-1-standardisation-des-api: "done"
-  4-2-gestion-centralisee-des-erreurs: "done"
-  4-3-documentation-interactive: "pending"
-  4-4-automatisation-de-la-qualite: ready-for-dev
-  4-5-integration-continue: ready-for-dev
+  4-1-standardisation-des-api: done
+  4-2-gestion-centralisee-des-erreurs: done
+  4-3-documentation-interactive: review
+  4-4-automatisation-de-la-qualite: review
+  4-5-integration-continue: review

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"time"
 
 	"github.com/go-playground/validator/v10"

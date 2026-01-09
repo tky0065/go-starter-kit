@@ -1,0 +1,24 @@
+run:
+  timeout: 5m
+  tests: false # Don't lint test files strictly
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck      # Check for unchecked errors
+    - gosimple      # Simplify code
+    - govet         # Vet examines Go source code
+    - ineffassign   # Detect ineffectual assignments
+    - staticcheck   # Advanced Go linter
+    - typecheck     # Type-check Go code
+    - unused        # Check for unused constants, variables, functions and types
+    - gocyclo       # Compute cyclomatic complexities
+    - gofmt         # Check formatting
+    - gosec         # Security-focused linter (basic)
+
+linters-settings:
+  gocyclo:
+    min-complexity: 15
+  gosec:
+    excludes:
+      - G404 # Allow weak random number generator in non-crypto contexts

@@ -95,6 +95,10 @@ func generateProjectFiles(projectPath, projectName string) error {
 			Content: templates.DockerfileTemplate(),
 		},
 		{
+			Path:    filepath.Join(projectPath, "docker-compose.yml"),
+			Content: templates.DockerComposeTemplate(),
+		},
+		{
 			Path:    filepath.Join(projectPath, "Makefile"),
 			Content: templates.MakefileTemplate(),
 		},
@@ -105,6 +109,14 @@ func generateProjectFiles(projectPath, projectName string) error {
 		{
 			Path:    filepath.Join(projectPath, ".gitignore"),
 			Content: templates.GitignoreTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, ".golangci.yml"),
+			Content: templates.GolangCILintTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, ".github", "workflows", "ci.yml"),
+			Content: templates.GitHubActionsWorkflowTemplate(),
 		},
 		{
 			Path:    filepath.Join(projectPath, "README.md"),

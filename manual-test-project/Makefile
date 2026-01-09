@@ -1,4 +1,4 @@
-.PHONY: help build run test clean dev
+.PHONY: help build run test clean dev lint test-coverage
 
 # Binary name
 BINARY_NAME=manual-test-project
@@ -20,9 +20,19 @@ dev: ## Run the application with air for hot reload
 	@echo "Starting development server with hot reload..."
 	@air
 
-test: ## Run tests
+lint: ## Run linter
+	@echo "Running linter..."
+	@golangci-lint run ./...
+
+test: ## Run tests with race detection
 	@echo "Running tests..."
-	@go test -v ./...
+	@go test -v -race ./...
+
+test-coverage: ## Run tests with coverage report
+	@echo "Running tests with coverage..."
+	@go test -v -race -coverprofile=coverage.out ./...
+	@go tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage report generated: coverage.html"
 
 clean: ## Clean build artifacts
 	@echo "Cleaning..."

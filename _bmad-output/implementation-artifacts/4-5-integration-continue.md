@@ -1,6 +1,6 @@
 # Story 4.5: Intégration Continue (GitHub Actions)
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -35,27 +35,27 @@ so that je puisse éviter les régressions et maintenir la qualité du code lors
 
 ## Tasks / Subtasks
 
-- [ ] **Workflow Setup (`manual-test-project`)**
-    - [ ] Créer le répertoire `.github/workflows/`.
-    - [ ] Créer le fichier `.github/workflows/ci.yml`.
-    - [ ] Configurer les triggers: `push` sur main, `pull_request` sur main.
+- [x] **Workflow Setup (`manual-test-project`)**
+    - [x] Créer le répertoire `.github/workflows/`.
+    - [x] Créer le fichier `.github/workflows/ci.yml`.
+    - [x] Configurer les triggers: `push` sur main, `pull_request` sur main.
 
-- [ ] **Job Definition**
-    - [ ] **Job `lint`:**
+- [x] **Job Definition**
+    - [x] **Job `lint`:**
         -   Utiliser `actions/checkout@v4`.
         -   Utiliser `actions/setup-go@v5` (Go 1.25.x).
         -   Utiliser `golangci/golangci-lint-action@v6` (ou exécuter `make lint`).
-    - [ ] **Job `test`:**
+    - [x] **Job `test`:**
         -   Utiliser `actions/checkout@v4`.
         -   Utiliser `actions/setup-go@v5`.
         -   Installer les dépendances (si non géré par `go test`).
         -   Lancer `make test`.
-    - [ ] **Job `build` (Optional):**
+    - [x] **Job `build` (Optional):**
         -   Lancer `go build ./...` ou `docker build .`.
 
-- [ ] **CLI Generator Update**
-    - [ ] Mettre à jour `templates.go` pour inclure `.github/workflows/ci.yml` dans les projets générés.
-    - [ ] S'assurer que le contenu du fichier YAML est correct (indentation, variables).
+- [x] **CLI Generator Update**
+    - [x] Mettre à jour `templates.go` pour inclure `.github/workflows/ci.yml` dans les projets générés.
+    - [x] S'assurer que le contenu du fichier YAML est correct (indentation, variables).
 
 ## Dev Notes
 
@@ -144,10 +144,18 @@ Gemini 2.0 Flash
 - Validated standard GitHub Actions versions (Checkout v4, Setup-Go v5).
 
 ### Completion Notes List
-- [ ] Workflow file created.
-- [ ] Triggers configured.
-- [ ] Linter job configured.
-- [ ] Test job configured with DB service.
-- [ ] CLI generator updated.
+- [x] Workflow file created at .github/workflows/ci.yml in manual-test-project.
+- [x] Triggers configured for push and pull_request on main branch.
+- [x] Linter job configured using golangci-lint-action@v6 with Go 1.25.
+- [x] Test job configured with PostgreSQL 16-alpine service container, health checks, and environment variables.
+- [x] Build check step added to verify compilation with go build -v ./...
+- [x] CLI generator updated: Added GitHubActionsWorkflowTemplate() in templates.go.
+- [x] Generator.go updated to include .github/workflows/ci.yml in generated projects.
 
 ### File List
+- manual-test-project/.github/workflows/ci.yml
+- cmd/create-go-starter/templates.go
+- cmd/create-go-starter/generator.go
+
+## Change Log
+- **2026-01-09**: Implemented GitHub Actions CI/CD workflow with automated linting, testing, and build checks. Configured quality job with golangci-lint and test job with PostgreSQL service container. Updated CLI generator to include CI workflow in new projects.

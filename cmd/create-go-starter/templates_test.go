@@ -302,6 +302,89 @@ func TestReadmeTemplate(t *testing.T) {
 	}
 }
 
+func TestDockerComposeTemplate(t *testing.T) {
+	projectName := "my-api-project"
+	templates := NewProjectTemplates(projectName)
+	content := templates.DockerComposeTemplate()
+
+	// Check version
+	if !strings.Contains(content, "version:") {
+		t.Error("DockerComposeTemplate() should contain version declaration")
+	}
+
+	// Check services
+	requiredServices := []string{"db:", "api:"}
+	for _, service := range requiredServices {
+		if !strings.Contains(content, service) {
+			t.Errorf("DockerComposeTemplate() should contain service '%s'", service)
+		}
+	}
+
+	// Check PostgreSQL configuration
+	if !strings.Contains(content, "postgres") {
+		t.Error("DockerComposeTemplate() should use postgres image")
+	}
+
+	// Check project name in container names
+	expectedDBContainer := projectName + "_db"
+	if !strings.Contains(content, expectedDBContainer) {
+		t.Errorf("DockerComposeTemplate() should contain db container name '%s'", expectedDBContainer)
+	}
+
+	expectedAPIContainer := projectName + "_api"
+	if !strings.Contains(content, expectedAPIContainer) {
+		t.Errorf("DockerComposeTemplate() should contain api container name '%s'", expectedAPIContainer)
+	}
+
+	// Check database name uses project name
+	expectedDBName := "POSTGRES_DB: " + projectName
+	if !strings.Contains(content, expectedDBName) {
+		t.Errorf("DockerComposeTemplate() should set POSTGRES_DB to '%s'", projectName)
+	}
+
+	// Check healthcheck for database
+	if !strings.Contains(content, "healthcheck:") {
+		t.Error("DockerComposeTemplate() should include healthcheck for database")
+	}
+
+	// Check depends_on with health condition
+	if !strings.Contains(content, "depends_on:") {
+		t.Error("DockerComposeTemplate() should have depends_on for api service")
+	}
+
+	if !strings.Contains(content, "condition: service_healthy") {
+		t.Error("DockerComposeTemplate() should wait for db to be healthy")
+	}
+
+	// Check ports exposed
+	if !strings.Contains(content, "5432:5432") {
+		t.Error("DockerComposeTemplate() should expose PostgreSQL port 5432")
+	}
+
+	if !strings.Contains(content, "8080:8080") {
+		t.Error("DockerComposeTemplate() should expose API port 8080")
+	}
+
+	// Check volumes
+	if !strings.Contains(content, "postgres_data:") {
+		t.Error("DockerComposeTemplate() should define postgres_data volume")
+	}
+
+	// Check network
+	expectedNetwork := projectName + "_network"
+	if !strings.Contains(content, expectedNetwork) {
+		t.Errorf("DockerComposeTemplate() should define network '%s'", expectedNetwork)
+	}
+
+	// Check environment variables for API
+	envVars := []string{"APP_NAME:", "DB_HOST:", "DB_USER:", "JWT_SECRET:"}
+	for _, envVar := range envVars {
+		if !strings.Contains(content, envVar) {
+			t.Errorf("DockerComposeTemplate() should contain environment variable '%s'", envVar)
+		}
+	}
+}
+
 // Story 1.4: Tests for Fiber, fx, GORM, and zerolog templates
 
 func TestConfigTemplate(t *testing.T) {

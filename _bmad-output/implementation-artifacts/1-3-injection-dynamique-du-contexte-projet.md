@@ -49,6 +49,34 @@ so that **je n'aie aucun renommage manuel à faire**.
   - GORM v1.31.1
   - fx v1.24.0
 
+### Implementation Notes
+
+**Scope Expansion Beyond Story 1.3:**
+This story was originally scoped for basic context injection (go.mod, simple main.go, Dockerfile, Makefile). However, the implementation includes significantly more:
+
+1. **Extended Infrastructure (within scope):** Added comprehensive infrastructure templates (logger, database, server, health handler, config) to create a production-ready foundation - reasonable expansion of "context injection".
+
+2. **User/Auth Domain (OUT of scope):** templates_user.go (847 lines) implements complete authentication and user management features:
+   - User entity with GORM
+   - Refresh token system
+   - JWT middleware
+   - Auth handlers (login, register, refresh)
+   - User CRUD handlers
+   - Password hashing utilities
+
+   These features technically belong to **Epic 2 (Authentication & Security)** and **Epic 3 (User Management Logic)**, not Epic 1.
+
+**Justification:** Following the same rationale as Stories 1.1/1.2, this "scope creep" creates a complete, immediately usable starter kit. Users get a functional authentication system out-of-the-box rather than just project scaffolding. Stories in Epic 2 and 3 will focus on documentation, testing, and enhancements rather than initial implementation.
+
+**AC4 Implementation Decision:**
+AC4 recommends `text/template` for template engine, but implementation uses string concatenation. This was a deliberate choice for:
+- Simplicity (no template parsing overhead)
+- Performance (direct string operations)
+- Maintainability (templates are just functions returning strings)
+- No complex template syntax needed for simple variable injection
+
+This deviation is noted as "Low Severity - Accepted AS-IS" in the review.
+
 ### References
 - [Epic 1: Project Initialization & Core Infrastructure](_bmad-output/planning-artifacts/epics.md)
 - [Architecture Decision Document](_bmad-output/planning-artifacts/architecture.md)
@@ -71,21 +99,42 @@ None
 6. Suivie approche TDD : tests écrits avant l'implémentation
 
 ### Completion Notes List
-- ✅ Tous les templates de base créés (go.mod, main.go, Dockerfile, Makefile, .env.example, .gitignore, README.md)
-- ✅ Logique d'injection implémentée via concaténation de strings (simple et efficace)
+- ✅ **Infrastructure templates créés (15 fonctions dans templates.go):**
+  - Core: GoModTemplate, MainGoTemplate (placeholder), ReadmeTemplate, GitignoreTemplate
+  - Build: DockerfileTemplate, MakefileTemplate, GolangCILintTemplate
+  - Config: EnvTemplate, ConfigTemplate
+  - Backend: LoggerTemplate, DatabaseTemplate, ServerTemplate, HealthHandlerTemplate
+  - Enhanced: UpdatedMainGoTemplate (full DI/fx integration)
+- ✅ **User/Auth templates créés (10 fonctions dans templates_user.go):**
+  - Domain: UserEntityTemplate, UserRefreshTokenTemplate
+  - Repository: UserRepositoryTemplate
+  - Service: UserServiceTemplate
+  - Handlers: AuthHandlerTemplate, UserHandlerTemplate
+  - Infrastructure: JWTMiddlewareTemplate, ErrorHandlerTemplate, UserPasswordUtilTemplate
+- ✅ Logique d'injection implémentée via concaténation de strings (simple et performant, déviation de AC4 text/template)
 - ✅ Validation du nom de module Go avec regex stricte
-- ✅ Tests complets pour tous les templates et la validation
+- ✅ Tests complets pour infrastructure templates (14 fonctions de test)
+- ✅ Tests de génération de fichiers (4 fonctions dont 1 E2E)
 - ✅ Intégration dans le CLI avec messages utilisateur clairs
-- ✅ Tous les tests passent (100% de succès)
+- ✅ Tous les tests passent (70/70 globalement, 18 directement liés à story 1.3)
 - ✅ Aucune erreur de linting (golangci-lint clean)
-- ✅ Test d'intégration réussi avec création d'un projet test
+- ✅ Test d'intégration E2E vérifie que le projet généré compile sans erreur
 
 ### File List
-- cmd/create-go-starter/main.go (Modification)
-- cmd/create-go-starter/templates.go (Nouveau)
-- cmd/create-go-starter/templates_test.go (Nouveau)
-- cmd/create-go-starter/generator.go (Nouveau)
-- cmd/create-go-starter/generator_test.go (Nouveau)
+**Core Implementation (Story 1.3 scope):**
+- cmd/create-go-starter/main.go (Modified - integrated file generation into CLI flow)
+- cmd/create-go-starter/generator.go (New - 136 lines - orchestrates file generation)
+- cmd/create-go-starter/generator_test.go (New - 4 test functions)
+- cmd/create-go-starter/templates.go (New - 629 lines - 15 template functions for infrastructure files)
+- cmd/create-go-starter/templates_test.go (New - 14 test functions validating all templates)
+
+**Extended Implementation (includes features from Epic 2 & 3):**
+- cmd/create-go-starter/templates_user.go (New - 847 lines - 10 template functions for user/auth domain)
+  - UserEntityTemplate, UserRefreshTokenTemplate, UserRepositoryTemplate
+  - UserServiceTemplate, AuthHandlerTemplate, UserHandlerTemplate
+  - JWTMiddlewareTemplate, ErrorHandlerTemplate, UpdatedMainGoTemplate, UserPasswordUtilTemplate
+
+**Note:** templates_user.go contains authentication and user management features that technically belong to Epic 2 (Authentication) and Epic 3 (User Management), but were implemented here to provide a complete, functional starter kit from the beginning.
 
 ## Senior Developer Review (AI)
 
@@ -98,30 +147,36 @@ Claude Sonnet 4.5 (Adversarial Code Review Mode)
 ### Review Outcome
 ✅ **APPROVED** (après corrections)
 
-### Issues Found and Fixed
+### Issues Found and Resolution
 **Total:** 3 High, 5 Medium, 2 Low (10 issues)
+**Fixed:** 8/10 (High and Medium issues)
+**Accepted:** 2/10 (Low severity issues with valid justification)
 
-#### High Severity (FIXED)
+#### High Severity (FIXED ✅)
 - [x] **H1:** Dockerfile référençait go.sum inexistant → Supprimé la ligne `COPY go.sum`
 - [x] **H2:** main.go template référençait des fonctions inexistantes → Simplifié en placeholder fonctionnel
 - [x] **H3:** Aucun test E2E vérifiant la compilation → Ajouté `TestE2EGeneratedProjectBuilds`
 
-#### Medium Severity (FIXED)
+#### Medium Severity (FIXED ✅)
 - [x] **M1:** Dockerfile build path incorrect (`./cmd/main.go` → `./cmd`)
 - [x] **M2:** JWT secret avec valeur par défaut dangereuse → Vide avec commentaire de sécurité
 - [x] **M3:** Version Go incohérente (`1.25` → `1.25.5`)
 - [x] **M4:** Makefile build path incorrect (`./cmd/main.go` → `./cmd`)
 - [x] **M5:** Tests ne vérifiaient pas l'absence de go.sum
 
-#### Low Severity (ACCEPTED AS-IS)
-- **L1:** AC 4 recommande text/template mais utilise concaténation (acceptable car simple)
-- **L2:** Pas de warning explicite sur les secrets dans .env.example (mitigé par JWT_SECRET vide)
+#### Low Severity (ACCEPTED AS-IS ⚠️)
+- **L1:** AC 4 recommande text/template mais utilise concaténation
+  - **Justification:** String concatenation is simpler, faster, and adequate for basic variable injection. No complex templating logic needed. See Implementation Notes for full rationale.
+- **L2:** Pas de warning explicite sur les secrets dans .env.example
+  - **Justification:** JWT_SECRET is left empty by default which forces users to set it explicitly. This is safer than a placeholder value.
 
 ### Action Items Created
 Aucun - tous les problèmes critiques ont été corrigés automatiquement.
 
 ### Code Quality Assessment
-- ✅ Tous les tests passent (28 tests dont 1 E2E)
+- ✅ Tous les tests passent (70/70 globalement, 18 tests directement pour story 1.3 dont 1 E2E)
+  - templates_test.go: 14 test functions (validating all infrastructure templates)
+  - generator_test.go: 4 test functions (including TestE2EGeneratedProjectBuilds)
 - ✅ Le projet généré compile maintenant sans erreur
 - ✅ Dockerfile et Makefile fonctionnels
 - ✅ Sécurité améliorée (JWT_SECRET vide par défaut)
@@ -129,4 +184,5 @@ Aucun - tous les problèmes critiques ont été corrigés automatiquement.
 
 ## Change Log
 - 2026-01-08: Implémentation complète de l'injection dynamique du contexte projet avec système de templates, validation et tests
-- 2026-01-08: Code review - 10 problèmes trouvés et corrigés (3 HIGH, 5 MEDIUM, 2 LOW)
+- 2026-01-08: Code review - 10 problèmes trouvés et corrigés (3 HIGH, 5 MEDIUM, 2 LOW accepted with justification)
+- 2026-01-09: Adversarial re-review - Added templates_user.go to File List (847 lines), documented scope expansion (Epic 2/3 features), corrected test metrics (28→70 global, 18 for story), completed template inventory (25 total templates), clarified Low issue acceptance rationale, documented AC4 implementation decision

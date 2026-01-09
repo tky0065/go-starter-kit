@@ -166,7 +166,7 @@ Apprennent Go et veulent des exemples de code professionnel. go-starter-kit leur
 #### Phase 2 : Onboarding (Les 5 premières minutes)
 **Installation :** Une commande CLI unique (inspirée de `create-next-app`) génère le projet complet.
 ```bash
-go install github.com/yourorg/create-go-starter@latest
+go install github.com/tky0065/create-go-starter@latest
 create-go-starter my-api
 cd my-api
 make dev
@@ -327,7 +327,7 @@ Le MVP de **go-starter-kit** se concentre sur une expérience parfaite pour l'es
 #### 1. CLI de Génération de Projet
 
 **Commande unique de scaffolding :**
-- Installation simple : `go install github.com/yourorg/create-go-starter@latest`
+- Installation simple : `go install github.com/tky0065/create-go-starter@latest`
 - Génération de projet : `create-go-starter my-api`
 - Expérience inspirée de `create-next-app` : rapide, sans friction, fiable
 - Analytics optionnels pour tracking d'adoption (opt-in, respectueux de la vie privée)
