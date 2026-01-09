@@ -49,9 +49,9 @@ func setupIntegrationTest(t *testing.T) (*fiber.App, *user.Service, *gorm.DB) {
 
 	// Create Fiber app
 	app := fiber.New()
-	app.Post("/api/v1/auth/register", handler.Register)
-	app.Post("/api/v1/auth/login", handler.Login)
-	app.Post("/api/v1/auth/refresh", handler.Refresh)
+	api := app.Group("/api")
+	v1 := api.Group("/v1")
+	handlers.RegisterAuthRoutes(v1, handler)
 
 	return app, service, db
 }

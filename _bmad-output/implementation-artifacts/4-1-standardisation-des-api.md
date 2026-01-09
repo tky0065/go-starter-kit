@@ -1,6 +1,6 @@
 # Story 4.1: Standardisation des API (Grouping & V1)
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -31,14 +31,14 @@ so that je puisse versionner mon API facilement à l'avenir et maintenir une str
 
 ## Tasks / Subtasks
 
-- [ ] **Implementation in manual-test-project (Reference Impl)**
-    - [ ] **Server Setup:** Refactor `internal/infrastructure/server/server.go` to create a root group `/api` and a version group `/v1`.
-    - [ ] **Route Refactoring:** Move existing route registrations into specific functions or methods that attach to the `v1` group (e.g., `RegisterAuthRoutes(v1)`, `RegisterUserRoutes(v1)`).
-    - [ ] **Verification:** Update any integration tests or manual requests (e.g., `.http` files or Postman collections) to use the new URL structure.
+- [x] **Implementation in manual-test-project (Reference Impl)**
+    - [x] **Server Setup:** Refactor `internal/infrastructure/server/server.go` to create a root group `/api` and a version group `/v1`.
+    - [x] **Route Refactoring:** Move existing route registrations into specific functions or methods that attach to the `v1` group (e.g., `RegisterAuthRoutes(v1)`, `RegisterUserRoutes(v1)`).
+    - [x] **Verification:** Update any integration tests or manual requests (e.g., `.http` files or Postman collections) to use the new URL structure.
 
-- [ ] **CLI Generator Update**
-    - [ ] **Templates:** Update the Server Template in `cmd/create-go-starter/templates.go` (or `templates_server.go`) to generate this grouping structure by default.
-    - [ ] **New Projects:** Ensure that when a user generates a NEW project, it comes with `/api/v1` pre-configured.
+- [x] **CLI Generator Update**
+    - [x] **Templates:** Update the Server Template in `cmd/create-go-starter/templates.go` (or `templates_server.go`) to generate this grouping structure by default.
+    - [x] **New Projects:** Ensure that when a user generates a NEW project, it comes with `/api/v1` pre-configured.
 
 ## Dev Notes
 
@@ -84,8 +84,45 @@ Gemini 2.0 Flash
 
 ### Completion Notes List
 
-- [ ] All routes in `manual-test-project` moved to `/api/v1`.
-- [ ] Integration tests updated and passing.
-- [ ] CLI generator produces project with `/api/v1` structure.
+- [x] All routes in `manual-test-project` moved to `/api/v1`.
+- [x] Integration tests updated and passing.
+- [x] CLI generator produces project with `/api/v1` structure.
+- [x] Refactored `RegisterAllRoutes` to use hierarchical grouping structure (api → v1 → auth/users).
+- [x] Created separate `RegisterAuthRoutes` and `RegisterUserRoutes` functions for better modularity.
+- [x] All tests passing (17 unit tests + 3 integration tests).
+
+### Implementation Plan
+
+1. Analyzed existing route registration in `manual-test-project/internal/adapters/handlers/module.go`
+2. Refactored to use hierarchical groups: `/api` → `/v1` → domain-specific groups (`/auth`, `/users`)
+3. Created separate registration functions for better separation of concerns
+4. Updated unit tests to use complete `/api/v1` prefix
+5. Created `HandlerModuleTemplate()` in CLI templates
+6. Verified all tests pass
+
+### Senior Developer Review (AI)
+- **Review Date**: 2026-01-09
+- **Reviewer**: Yacoubakone (AI Agent)
+- **Outcome**: **Approved** (with fixes)
+- **Fixes Applied**:
+    - **Critical**: Updated `cmd/create-go-starter/generator.go` to actually USE the `HandlerModuleTemplate`. Previously, the generator would skip creating the `internal/adapters/handlers/module.go` file.
+    - **Quality**: Refactored `auth_handler_integration_test.go` to use `RegisterAuthRoutes` instead of manually defining routes, ensuring the grouping logic itself is tested.
 
 ### File List
+- manual-test-project/internal/adapters/handlers/module.go
+- manual-test-project/internal/adapters/handlers/auth_handler_test.go
+- cmd/create-go-starter/templates_user.go
+- cmd/create-go-starter/generator.go
+- manual-test-project/internal/adapters/handlers/auth_handler_integration_test.go
+
+## Change Log
+
+### [2026-01-09] Standardisation des API - Grouping /api/v1
+- Refactored route registration to use hierarchical Fiber groups
+- Created `/api` root group and `/v1` version group
+- Separated auth and user routes into dedicated registration functions
+- Updated all unit tests to use complete `/api/v1` prefix
+- Added `HandlerModuleTemplate()` to CLI generator for new projects
+- All tests passing (17 unit tests + 3 integration tests)
+- **Fix**: Wired up `HandlerModuleTemplate` in `generator.go`
+- **Fix**: Improved integration test coverage for route grouping

@@ -52,6 +52,7 @@ func createProjectStructure(projectPath string) error {
 	directories := []string{
 		"cmd",
 		"internal/adapters/http",
+		"internal/adapters/middleware",
 		"internal/domain",
 		"internal/interfaces",
 		"internal/infrastructure/database",

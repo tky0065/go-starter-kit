@@ -52,37 +52,22 @@ type RegisterResponse struct {
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	var req RegisterRequest
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid JSON format",
-		})
+		return domain.NewBadRequestError("Invalid JSON format", "INVALID_JSON", nil)
 	}
 
 	if err := h.validate.Struct(req); err != nil {
-		// Parse validation errors for user-friendly messages
 		validationErrors := err.(validator.ValidationErrors)
-		errorMessages := make([]string, 0, len(validationErrors))
+		details := make(map[string]string)
 		for _, fieldErr := range validationErrors {
-			errorMessages = append(errorMessages, formatValidationError(fieldErr))
+			details[fieldErr.Field()] = formatValidationError(fieldErr)
 		}
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error":  "Validation failed",
-			"fields": errorMessages,
-		})
+		return domain.NewBadRequestError("Validation failed", "VALIDATION_FAILED", details)
 	}
 
 	// Register user
 	newUser, err := h.service.Register(c.Context(), req.Email, req.Password)
 	if err != nil {
-		if errors.Is(err, domain.ErrEmailAlreadyRegistered) {
-			return c.Status(fiber.StatusConflict).JSON(fiber.Map{
-				"status": "error",
-				"error":  "Email already registered",
-			})
-		}
-		// Internal server error for unexpected errors
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to create user account",
-		})
+		return err // Handled by middleware
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
@@ -122,37 +107,22 @@ type LoginResponse struct {
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	var req LoginRequest
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid JSON format",
-		})
+		return domain.NewBadRequestError("Invalid JSON format", "INVALID_JSON", nil)
 	}
 
 	if err := h.validate.Struct(req); err != nil {
-		// Parse validation errors for user-friendly messages
 		validationErrors := err.(validator.ValidationErrors)
-		errorMessages := make([]string, 0, len(validationErrors))
+		details := make(map[string]string)
 		for _, fieldErr := range validationErrors {
-			errorMessages = append(errorMessages, formatValidationError(fieldErr))
+			details[fieldErr.Field()] = formatValidationError(fieldErr)
 		}
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error":  "Validation failed",
-			"fields": errorMessages,
-		})
+		return domain.NewBadRequestError("Validation failed", "VALIDATION_FAILED", details)
 	}
 
 	// Authenticate user
 	authResponse, err := h.service.Authenticate(c.Context(), req.Email, req.Password)
 	if err != nil {
-		if errors.Is(err, domain.ErrInvalidCredentials) {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"status": "error",
-				"error":  "Invalid email or password",
-			})
-		}
-		// Internal server error for unexpected errors
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Authentication failed",
-		})
+		return err // Handled by middleware
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -184,47 +154,16 @@ type RefreshTokenRequest struct {
 func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 	var req RefreshTokenRequest
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid JSON format",
-		})
+		return domain.NewBadRequestError("Invalid JSON format", "INVALID_JSON", nil)
 	}
 
 	if err := h.validate.Struct(req); err != nil {
-		// Parse validation errors for user-friendly messages
-		validationErrors := err.(validator.ValidationErrors)
-		errorMessages := make([]string, 0, len(validationErrors))
-		for _, fieldErr := range validationErrors {
-			errorMessages = append(errorMessages, formatValidationError(fieldErr))
-		}
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error":  "Validation failed",
-			"fields": errorMessages,
-		})
+		return domain.NewBadRequestError("Refresh token is required", "VALIDATION_FAILED", nil)
 	}
 
 	authResponse, err := h.service.RefreshToken(c.Context(), req.RefreshToken)
 	if err != nil {
-		switch {
-		case errors.Is(err, domain.ErrInvalidRefreshToken):
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"status": "error",
-				"error":  "Invalid refresh token",
-			})
-		case errors.Is(err, domain.ErrRefreshTokenExpired):
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"status": "error",
-				"error":  "Refresh token expired",
-			})
-		case errors.Is(err, domain.ErrRefreshTokenRevoked):
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"status": "error",
-				"error":  "Refresh token revoked",
-			})
-		default:
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Failed to refresh token",
-			})
-		}
+		return err // Handled by middleware
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -249,10 +188,7 @@ func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 func (h *AuthHandler) GetCurrentUser(c *fiber.Ctx) error {
 	userID, err := auth.GetUserID(c)
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"status": "error",
-			"error":  "Unable to extract user information",
-		})
+		return domain.NewUnauthorizedError("Unable to extract user information", "UNAUTHORIZED")
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{

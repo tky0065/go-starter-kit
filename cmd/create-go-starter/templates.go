@@ -404,6 +404,7 @@ import (
 
 	"` + t.projectName + `/pkg/config"
 	httphandlers "` + t.projectName + `/internal/adapters/http"
+	"` + t.projectName + `/internal/adapters/middleware"
 )
 
 // Module provides the Fiber server dependency via fx
@@ -415,10 +416,11 @@ var Module = fx.Module("server",
 // NewServer creates and configures a new Fiber application
 func NewServer(logger zerolog.Logger, db *gorm.DB) *fiber.App {
 	app := fiber.New(fiber.Config{
-		AppName: "` + t.projectName + `",
+		AppName:      "` + t.projectName + `",
+		ErrorHandler: middleware.ErrorHandler,
 	})
 
-	logger.Info().Msg("Fiber server initialized")
+	logger.Info().Msg("Fiber server initialized with centralized error handler")
 
 	// Register routes
 	httphandlers.RegisterHealthRoutes(app)

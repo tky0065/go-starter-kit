@@ -131,10 +131,10 @@ func TestAuthHandler_Register(t *testing.T) {
 			app := fiber.New()
 			mockSvc := &MockService{ShouldReturnError: tt.serviceError}
 			h := handlers.NewAuthHandler(mockSvc)
-			app.Post("/register", h.Register)
+			app.Post("/api/v1/auth/register", h.Register)
 
 			jsonBody, _ := json.Marshal(tt.body)
-			req, _ := http.NewRequest("POST", "/register", bytes.NewReader(jsonBody))
+			req, _ := http.NewRequest("POST", "/api/v1/auth/register", bytes.NewReader(jsonBody))
 			req.Header.Set("Content-Type", "application/json")
 
 			resp, err := app.Test(req)

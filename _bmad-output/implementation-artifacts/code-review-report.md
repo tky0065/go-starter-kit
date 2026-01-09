@@ -1,15 +1,25 @@
-**🔥 CODE REVIEW FINDINGS, Yacoubakone!**
+# Code Review Report - 2026-01-09
 
-**Story:** _bmad-output/implementation-artifacts/3-2-operations-crud-utilisateur.md
-**Git vs Story Discrepancies:** 1 found (untracked file)
-**Issues Found:** 1 High, 1 Medium, 0 Low
+## Story 4.2: Gestion centralisée des erreurs
+**Status:** ✅ APPROVED & FIXED
 
-## 🔴 CRITICAL ISSUES
-- **AC1 Not Fully Implemented**: The Acceptance Criteria for "List Users" explicitly requires pagination ("La liste est paginée..."). The current implementation of `FindAll` loads ALL users into memory. This will kill the server in production.
+### Findings Summary
+The initial implementation had several critical gaps regarding security and architecture compliance. These were automatically fixed during the review process.
 
-## 🟡 MEDIUM ISSUES
-- **Files changed but not tracked**: `cmd/create-go-starter/templates_user.go` is untracked in git.
-- **Limited Update Scope**: The "Update User" feature only allows updating the Email. The AC mentions "nom" (Name) as an example, but the `User` entity lacks this field. (Technically compliant with current data model, but restrictive).
+#### 🔴 Critical Issues (Fixed)
+- **Security Vulnerability (AC3):** The error handler was leaking internal database/system messages. Fixed by implementing `APP_ENV` checks to return generic "Internal server error" in production.
+- **Architectural Violation:** Handlers were bypassing the centralized error handler by returning manual JSON responses. Fixed by refactoring all handlers to return Go errors.
+- **Incomplete Domain Integration:** Domain errors were resulting in 500 status codes. Fixed by adding a mapping layer in the middleware.
 
-## 🟢 LOW ISSUES
-- None.
+#### 🟡 Medium Issues (Fixed)
+- **Logging Gaps:** Integrated `zerolog` for proper error tracking with request context.
+- **CLI Template Desync:** Updated generator templates to match the new standardized error patterns.
+
+### Verified Files
+- `manual-test-project/internal/adapters/middleware/error_handler.go`
+- `manual-test-project/internal/adapters/handlers/auth_handler.go`
+- `manual-test-project/internal/infrastructure/server/error_handler_integration_test.go`
+- `cmd/create-go-starter/templates_user.go`
+
+---
+*Reviewer: BMad (Adversarial AI Reviewer)*

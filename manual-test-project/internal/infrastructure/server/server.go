@@ -23,10 +23,11 @@ var Module = fx.Module("server",
 // NewServer creates and configures a new Fiber application
 func NewServer(logger zerolog.Logger, db *gorm.DB) *fiber.App {
 	app := fiber.New(fiber.Config{
-		AppName: "manual-test-project",
+		AppName:      "manual-test-project",
+		ErrorHandler: middleware.ErrorHandler,
 	})
 
-	logger.Info().Msg("Fiber server initialized")
+	logger.Info().Msg("Fiber server initialized with centralized error handler")
 
 	// Register routes
 	httphandlers.RegisterHealthRoutes(app)

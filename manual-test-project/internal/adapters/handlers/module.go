@@ -18,16 +18,28 @@ var Module = fx.Module("handlers",
 
 // RegisterAllRoutes registers all application routes with public and protected groups
 func RegisterAllRoutes(authHandler *AuthHandler, userHandler *UserHandler, app *fiber.App, authMiddleware fiber.Handler) {
-	// Public routes (no authentication required)
-	public := app.Group("/api/v1")
-	public.Post("/auth/register", authHandler.Register)
-	public.Post("/auth/login", authHandler.Login)
-	public.Post("/auth/refresh", authHandler.Refresh)
+	// Create API group hierarchy for versioning
+	api := app.Group("/api")
+	v1 := api.Group("/v1")
 
-	// Protected routes (authentication required)
-	protected := app.Group("/api/v1", authMiddleware)
-	protected.Get("/users/me", userHandler.GetMe)
-	protected.Get("/users", userHandler.GetAllUsers)
-	protected.Put("/users/:id", userHandler.UpdateUser)
-	protected.Delete("/users/:id", userHandler.DeleteUser)
+	// Register domain-specific routes
+	RegisterAuthRoutes(v1, authHandler)
+	RegisterUserRoutes(v1, userHandler, authMiddleware)
+}
+
+// RegisterAuthRoutes registers authentication-related routes (public)
+func RegisterAuthRoutes(v1 fiber.Router, authHandler *AuthHandler) {
+	authGroup := v1.Group("/auth")
+	authGroup.Post("/register", authHandler.Register)
+	authGroup.Post("/login", authHandler.Login)
+	authGroup.Post("/refresh", authHandler.Refresh)
+}
+
+// RegisterUserRoutes registers user-related routes (protected)
+func RegisterUserRoutes(v1 fiber.Router, userHandler *UserHandler, authMiddleware fiber.Handler) {
+	userGroup := v1.Group("/users", authMiddleware)
+	userGroup.Get("/me", userHandler.GetMe)
+	userGroup.Get("", userHandler.GetAllUsers)
+	userGroup.Put("/:id", userHandler.UpdateUser)
+	userGroup.Delete("/:id", userHandler.DeleteUser)
 }

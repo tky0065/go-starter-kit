@@ -67,12 +67,24 @@ func generateProjectFiles(projectPath, projectName string) error {
 			Content: templates.LoggerTemplate(),
 		},
 		{
+			Path:    filepath.Join(projectPath, "internal", "domain", "errors.go"),
+			Content: templates.DomainErrorsTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "adapters", "middleware", "error_handler.go"),
+			Content: templates.ErrorHandlerMiddlewareTemplate(),
+		},
+		{
 			Path:    filepath.Join(projectPath, "internal", "infrastructure", "database", "database.go"),
 			Content: templates.DatabaseTemplate(),
 		},
 		{
 			Path:    filepath.Join(projectPath, "internal", "infrastructure", "server", "server.go"),
 			Content: templates.ServerTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "adapters", "handlers", "module.go"),
+			Content: templates.HandlerModuleTemplate(),
 		},
 		{
 			Path:    filepath.Join(projectPath, "internal", "adapters", "http", "health.go"),
@@ -102,6 +114,11 @@ func generateProjectFiles(projectPath, projectName string) error {
 
 	// Write all files
 	for _, file := range files {
+		// Ensure the directory exists
+		if err := os.MkdirAll(filepath.Dir(file.Path), 0755); err != nil {
+			return fmt.Errorf("failed to create directory for %s: %w", file.Path, err)
+		}
+
 		if err := os.WriteFile(file.Path, []byte(file.Content), 0644); err != nil {
 			return fmt.Errorf("failed to write file %s: %w", file.Path, err)
 		}

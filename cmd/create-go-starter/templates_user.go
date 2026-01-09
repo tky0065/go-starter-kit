@@ -257,7 +257,84 @@ func (r *UserRepository) RotateRefreshToken(ctx context.Context, oldTokenID uint
 func (t *ProjectTemplates) DomainErrorsTemplate() string {
 	return `package domain
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+// AppError represents a structured application error with HTTP status and details.
+type AppError struct {
+	Code    string ` + "`json:\"code\"`" + `
+	Message string ` + "`json:\"message\"`" + `
+	Status  int    ` + "`json:\"-\"`" + ` // HTTP Status, not serialized in JSON
+	Details any    ` + "`json:\"details,omitempty\"`" + `
+}
+
+// Error implements the error interface.
+func (e *AppError) Error() string {
+	return e.Message
+}
+
+// NewNotFoundError creates a 404 error.
+func NewNotFoundError(msg string, code string) *AppError {
+	return &AppError{
+		Code:    code,
+		Message: msg,
+		Status:  fiber.StatusNotFound,
+		Details: nil,
+	}
+}
+
+// NewBadRequestError creates a 400 error with optional validation details.
+func NewBadRequestError(msg string, code string, details any) *AppError {
+	return &AppError{
+		Code:    code,
+		Message: msg,
+		Status:  fiber.StatusBadRequest,
+		Details: details,
+	}
+}
+
+// NewInternalError creates a 500 error.
+func NewInternalError(msg string, code string) *AppError {
+	return &AppError{
+		Code:    code,
+		Message: msg,
+		Status:  fiber.StatusInternalServerError,
+		Details: nil,
+	}
+}
+
+// NewUnauthorizedError creates a 401 error.
+func NewUnauthorizedError(msg string, code string) *AppError {
+	return &AppError{
+		Code:    code,
+		Message: msg,
+		Status:  fiber.StatusUnauthorized,
+		Details: nil,
+	}
+}
+
+// NewForbiddenError creates a 403 error.
+func NewForbiddenError(msg string, code string) *AppError {
+	return &AppError{
+		Code:    code,
+		Message: msg,
+		Status:  fiber.StatusForbidden,
+		Details: nil,
+	}
+}
+
+// NewConflictError creates a 409 error.
+func NewConflictError(msg string, code string) *AppError {
+	return &AppError{
+		Code:    code,
+		Message: msg,
+		Status:  fiber.StatusConflict,
+		Details: nil,
+	}
+}
 
 // Domain-wide errors
 var (
@@ -268,6 +345,105 @@ var (
 	ErrRefreshTokenExpired    = errors.New("refresh token expired")
 	ErrRefreshTokenRevoked    = errors.New("refresh token has been revoked")
 )
+`
+}
+
+// ErrorHandlerMiddlewareTemplate returns the internal/adapters/middleware/error_handler.go file content
+func (t *ProjectTemplates) ErrorHandlerMiddlewareTemplate() string {
+	return `package middleware
+
+import (
+	"errors"
+	"os"
+
+	"` + t.projectName + `/internal/domain"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog/log"
+)
+
+// ErrorHandler is a centralized error handler for Fiber that formats all errors
+// into a consistent JSON structure following the API standardization requirements.
+func ErrorHandler(c *fiber.Ctx, err error) error {
+	// Default to 500 Internal Server Error
+	code := fiber.StatusInternalServerError
+	resp := fiber.Map{
+		"status":  "error",
+		"code":    "INTERNAL_SERVER_ERROR",
+		"message": "Internal server error",
+		"details": nil,
+	}
+
+	// Flag to check if we should mask the error message (Production)
+	isProd := os.Getenv("APP_ENV") == "production"
+
+	// 1. Handle Domain standard errors (map standard errors to AppErrors)
+	if errors.Is(err, domain.ErrEmailAlreadyRegistered) {
+		err = domain.NewConflictError("Email already registered", "EMAIL_ALREADY_REGISTERED")
+	} else if errors.Is(err, domain.ErrInvalidCredentials) {
+		err = domain.NewUnauthorizedError("Invalid email or password", "INVALID_CREDENTIALS")
+	} else if errors.Is(err, domain.ErrUserNotFound) {
+		err = domain.NewNotFoundError("User not found", "USER_NOT_FOUND")
+	} else if errors.Is(err, domain.ErrInvalidRefreshToken) || errors.Is(err, domain.ErrRefreshTokenExpired) || errors.Is(err, domain.ErrRefreshTokenRevoked) {
+		err = domain.NewUnauthorizedError(err.Error(), "AUTH_TOKEN_ERROR")
+	}
+
+	// 2. Handle Fiber Errors (including 404, 405, etc.)
+	var fiberErr *fiber.Error
+	if errors.As(err, &fiberErr) {
+		code = fiberErr.Code
+		resp["message"] = fiberErr.Message
+		resp["code"] = mapHTTPStatusToCode(code)
+	}
+
+	// 3. Handle Domain AppErrors (business logic errors)
+	var appErr *domain.AppError
+	if errors.As(err, &appErr) {
+		code = appErr.Status
+		resp["message"] = appErr.Message
+		resp["code"] = appErr.Code
+		resp["details"] = appErr.Details
+	}
+
+	// AC3: Mask internal error messages in production
+	if code == fiber.StatusInternalServerError && isProd {
+		resp["message"] = "Internal server error"
+	}
+
+	// Logging with context
+	log.Error().
+		Err(err).
+		Int("status", code).
+		Str("method", c.Method()).
+		Str("path", c.Path()).
+		Msg("API Error")
+
+	return c.Status(code).JSON(resp)
+}
+
+// mapHTTPStatusToCode maps HTTP status codes to readable error codes.
+func mapHTTPStatusToCode(status int) string {
+	switch status {
+	case fiber.StatusBadRequest:
+		return "BAD_REQUEST"
+	case fiber.StatusUnauthorized:
+		return "UNAUTHORIZED"
+	case fiber.StatusForbidden:
+		return "FORBIDDEN"
+	case fiber.StatusNotFound:
+		return "NOT_FOUND"
+	case fiber.StatusMethodNotAllowed:
+		return "METHOD_NOT_ALLOWED"
+	case fiber.StatusConflict:
+		return "CONFLICT"
+	case fiber.StatusUnprocessableEntity:
+		return "UNPROCESSABLE_ENTITY"
+	case fiber.StatusInternalServerError:
+		return "INTERNAL_SERVER_ERROR"
+	default:
+		return "HTTP_ERROR"
+	}
+}
 `
 }
 
@@ -579,24 +755,12 @@ type ProfileResponse struct {
 func (h *UserHandler) GetMe(c *fiber.Ctx) error {
 	userID, err := auth.GetUserID(c)
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"status": "error",
-			"error":  "Unable to extract user information",
-		})
+		return domain.NewUnauthorizedError("Unable to extract user information", "UNAUTHORIZED")
 	}
 
 	u, err := h.service.GetProfile(c.Context(), userID)
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotFound) {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-				"status": "error",
-				"error":  "User not found",
-			})
-		}
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status": "error",
-			"error":  "Failed to retrieve user profile",
-		})
+		return err // Handled by middleware
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -625,10 +789,7 @@ func (h *UserHandler) GetAllUsers(c *fiber.Ctx) error {
 
 	users, total, err := h.service.GetAll(c.Context(), page, limit)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status": "error",
-			"error":  "Failed to retrieve users",
-		})
+		return err // Handled by middleware
 	}
 
 	userResponses := make([]ProfileResponse, len(users))
@@ -673,45 +834,21 @@ type UpdateUserRequest struct {
 func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	userID, err := c.ParamsInt("id")
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status": "error",
-			"error":  "Invalid user ID",
-		})
+		return domain.NewBadRequestError("Invalid user ID", "INVALID_ID", nil)
 	}
 
 	var req UpdateUserRequest
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status": "error",
-			"error":  "Invalid request body",
-		})
+		return domain.NewBadRequestError("Invalid request body", "INVALID_JSON", nil)
 	}
 
 	if err := h.validate.Struct(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status": "error",
-			"error":  "Validation failed: " + err.Error(),
-		})
+		return domain.NewBadRequestError("Validation failed: "+err.Error(), "VALIDATION_FAILED", nil)
 	}
 
 	u, err := h.service.UpdateUser(c.Context(), uint(userID), req.Email)
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotFound) {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-				"status": "error",
-				"error":  "User not found",
-			})
-		}
-		if errors.Is(err, domain.ErrEmailAlreadyRegistered) {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"status": "error",
-				"error":  "Email already in use",
-			})
-		}
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status": "error",
-			"error":  "Failed to update user",
-		})
+		return err // Handled by middleware
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -740,24 +877,12 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	userID, err := c.ParamsInt("id")
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status": "error",
-			"error":  "Invalid user ID",
-		})
+		return domain.NewBadRequestError("Invalid user ID", "INVALID_ID", nil)
 	}
 
 	err = h.service.DeleteUser(c.Context(), uint(userID))
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotFound) {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-				"status": "error",
-				"error":  "User not found",
-			})
-		}
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status": "error",
-			"error":  "Failed to delete user",
-		})
+		return err // Handled by middleware
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -765,6 +890,56 @@ func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 		"message": "User deleted successfully",
 		"meta":    fiber.Map{},
 	})
+}
+`
+}
+
+// HandlerModuleTemplate returns the internal/adapters/handlers/module.go file content
+func (t *ProjectTemplates) HandlerModuleTemplate() string {
+	return `package handlers
+
+import (
+	"github.com/gofiber/fiber/v2"
+	"go.uber.org/fx"
+	"` + t.projectName + `/internal/domain/user"
+)
+
+var Module = fx.Module("handlers",
+	fx.Provide(func(s *user.Service) *AuthHandler {
+		return NewAuthHandler(s)
+	}),
+	fx.Provide(func(s *user.Service) *UserHandler {
+		return NewUserHandler(s)
+	}),
+	fx.Invoke(RegisterAllRoutes),
+)
+
+// RegisterAllRoutes registers all application routes with public and protected groups
+func RegisterAllRoutes(authHandler *AuthHandler, userHandler *UserHandler, app *fiber.App, authMiddleware fiber.Handler) {
+	// Create API group hierarchy for versioning
+	api := app.Group("/api")
+	v1 := api.Group("/v1")
+
+	// Register domain-specific routes
+	RegisterAuthRoutes(v1, authHandler)
+	RegisterUserRoutes(v1, userHandler, authMiddleware)
+}
+
+// RegisterAuthRoutes registers authentication-related routes (public)
+func RegisterAuthRoutes(v1 fiber.Router, authHandler *AuthHandler) {
+	authGroup := v1.Group("/auth")
+	authGroup.Post("/register", authHandler.Register)
+	authGroup.Post("/login", authHandler.Login)
+	authGroup.Post("/refresh", authHandler.Refresh)
+}
+
+// RegisterUserRoutes registers user-related routes (protected)
+func RegisterUserRoutes(v1 fiber.Router, userHandler *UserHandler, authMiddleware fiber.Handler) {
+	userGroup := v1.Group("/users", authMiddleware)
+	userGroup.Get("/me", userHandler.GetMe)
+	userGroup.Get("", userHandler.GetAllUsers)
+	userGroup.Put("/:id", userHandler.UpdateUser)
+	userGroup.Delete("/:id", userHandler.DeleteUser)
 }
 `
 }
