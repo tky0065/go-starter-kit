@@ -1,6 +1,6 @@
 # Story 2.4: Sécurisation des routes (Auth Middleware)
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -94,17 +94,24 @@ None
 - Le helper `GetUserID` extrait le `sub` claim et le parse en uint
 
 ### File List
-- internal/adapters/middleware/auth_middleware.go (NEW)
-- internal/adapters/middleware/auth_middleware_test.go (NEW)
-- internal/adapters/handlers/module.go (MODIFIED)
-- internal/adapters/handlers/auth_handler.go (MODIFIED - added GetCurrentUser)
-- internal/adapters/handlers/protected_routes_test.go (NEW)
-- internal/adapters/handlers/auth_handler_login_test.go (MODIFIED - removed RegisterRoutes calls)
-- internal/adapters/handlers/auth_handler_integration_test.go (MODIFIED - removed RegisterRoutes calls)
-- internal/infrastructure/server/server.go (MODIFIED - added middleware import)
-- pkg/auth/context.go (NEW)
-- go.mod (MODIFIED - added gofiber/contrib/jwt dependency)
-- go.sum (MODIFIED)
+- manual-test-project/internal/adapters/middleware/auth_middleware.go (NEW)
+- manual-test-project/internal/adapters/middleware/auth_middleware_test.go (NEW)
+- manual-test-project/internal/adapters/handlers/module.go (MODIFIED)
+- manual-test-project/internal/adapters/handlers/auth_handler.go (MODIFIED - added GetCurrentUser)
+- manual-test-project/internal/adapters/handlers/protected_routes_test.go (NEW)
+- manual-test-project/internal/adapters/handlers/auth_handler_login_test.go (MODIFIED - removed RegisterRoutes calls)
+- manual-test-project/internal/adapters/handlers/auth_handler_integration_test.go (MODIFIED - removed RegisterRoutes calls)
+- manual-test-project/internal/infrastructure/server/server.go (MODIFIED - added middleware import)
+- manual-test-project/pkg/auth/context.go (NEW)
+- manual-test-project/go.mod (MODIFIED - added gofiber/contrib/jwt dependency)
+- manual-test-project/go.sum (MODIFIED)
+
+## Senior Developer Review (AI)
+
+**Date: 2026-01-09**
+- **Issue Fixed:** Explicitly added `SigningMethod: "HS256"` to `NewAuthMiddleware` configuration to enforce secure signing algorithm, mitigating potential "none" algorithm attacks.
+- **Documentation Update:** Corrected file paths in the "File List" to accurately reflect the `manual-test-project` directory structure.
+- **Verification:** Middleware logic verified correct, and tests provide excellent coverage for both success and error scenarios.
 
 ## Change Log
 
@@ -115,3 +122,5 @@ None
 - Implémenté la route protégée `/api/v1/users/me` comme exemple
 - Créé 10 tests d'intégration couvrant tous les cas d'usage du middleware
 - Tous les acceptance criteria sont satisfaits et validés par les tests
+- Review & Fix: Ajout explicite de HS256 et correction des chemins de fichiers
+

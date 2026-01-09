@@ -15,7 +15,8 @@ func NewAuthMiddleware() fiber.Handler {
 	}
 
 	return jwtware.New(jwtware.Config{
-		SigningKey: jwtware.SigningKey{Key: []byte(secret)},
+		SigningKey:    jwtware.SigningKey{Key: []byte(secret)},
+		SigningMethod: "HS256",
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
 			// Return standard error format
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
