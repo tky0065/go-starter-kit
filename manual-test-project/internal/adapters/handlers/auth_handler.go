@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"manual-test-project/internal/domain/user"
 	"manual-test-project/internal/interfaces"
+	"manual-test-project/pkg/auth"
 )
 
 // AuthHandler handles authentication-related HTTP requests
@@ -22,13 +23,6 @@ func NewAuthHandler(service interfaces.AuthService) *AuthHandler {
 		service:  service,
 		validate: validator.New(),
 	}
-}
-
-// RegisterRoutes registers authentication routes with the Fiber app
-func (h *AuthHandler) RegisterRoutes(app *fiber.App) {
-	app.Post("/api/v1/auth/register", h.Register)
-	app.Post("/api/v1/auth/login", h.Login)
-	app.Post("/api/v1/auth/refresh", h.Refresh)
 }
 
 // RegisterRequest represents the user registration request payload
@@ -228,6 +222,33 @@ func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 			AccessToken:  authResponse.AccessToken,
 			RefreshToken: authResponse.RefreshToken,
 			ExpiresIn:    authResponse.ExpiresIn,
+		},
+	})
+}
+
+// GetCurrentUser godoc
+// @Summary Get current user information
+// @Description Get the current authenticated user's information
+// @Tags auth
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]string
+// @Router /api/v1/users/me [get]
+// @Security BearerAuth
+func (h *AuthHandler) GetCurrentUser(c *fiber.Ctx) error {
+	userID, err := auth.GetUserID(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"status": "error",
+			"error":  "Unable to extract user information",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status": "success",
+		"data": fiber.Map{
+			"user_id": userID,
+			"message": "You are authenticated",
 		},
 	})
 }

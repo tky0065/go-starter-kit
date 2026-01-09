@@ -51,7 +51,7 @@ func TestAuthHandler_Login_Success(t *testing.T) {
 	}
 
 	handler := NewAuthHandler(mockService)
-	handler.RegisterRoutes(app)
+	app.Post("/api/v1/auth/login", handler.Login)
 
 	reqBody := map[string]string{
 		"email":    "test@example.com",
@@ -95,7 +95,7 @@ func TestAuthHandler_Login_InvalidCredentials(t *testing.T) {
 	}
 
 	handler := NewAuthHandler(mockService)
-	handler.RegisterRoutes(app)
+	app.Post("/api/v1/auth/login", handler.Login)
 
 	reqBody := map[string]string{
 		"email":    "test@example.com",
@@ -129,7 +129,7 @@ func TestAuthHandler_Login_ValidationError(t *testing.T) {
 
 	mockService := &mockAuthService{}
 	handler := NewAuthHandler(mockService)
-	handler.RegisterRoutes(app)
+	app.Post("/api/v1/auth/login", handler.Login)
 
 	tests := []struct {
 		name    string
@@ -186,7 +186,7 @@ func TestAuthHandler_Login_InvalidJSON(t *testing.T) {
 
 	mockService := &mockAuthService{}
 	handler := NewAuthHandler(mockService)
-	handler.RegisterRoutes(app)
+	app.Post("/api/v1/auth/login", handler.Login)
 
 	req := httptest.NewRequest("POST", "/api/v1/auth/login", bytes.NewReader([]byte("invalid-json")))
 	req.Header.Set("Content-Type", "application/json")
@@ -211,7 +211,7 @@ func TestAuthHandler_Login_ServiceError(t *testing.T) {
 	}
 
 	handler := NewAuthHandler(mockService)
-	handler.RegisterRoutes(app)
+	app.Post("/api/v1/auth/login", handler.Login)
 
 	reqBody := map[string]string{
 		"email":    "test@example.com",

@@ -26,7 +26,7 @@ development_status:
   2-1-inscription-des-utilisateurs: done
   2-2-authentification: done
   2-3-renouvellement-de-session: done
-  2-4-securisation-des-routes: ready-for-dev
+  2-4-securisation-des-routes: review
   3-1-gestion-du-profil-utilisateur: ready-for-dev
   3-2-operations-crud-utilisateur: backlog
   4-1-standardisation-des-api: backlog

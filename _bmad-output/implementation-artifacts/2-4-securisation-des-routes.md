@@ -1,6 +1,6 @@
 # Story 2.4: Sécurisation des routes (Auth Middleware)
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -30,19 +30,19 @@ so that **seuls les utilisateurs authentifiés puissent y accéder**.
 
 ## Tasks / Subtasks
 
-- [ ] Créer le package middleware dans `internal/adapters/middleware/auth_middleware.go` (AC: 1, 2, 3)
-    - [ ] Fonction `NewAuthMiddleware(secret string) fiber.Handler`
-    - [ ] Configurer `jwtware.Config` avec `SigningKey`, `SigningMethod` ("HS256")
-    - [ ] Implémenter `ErrorHandler` pour retourner le JSON standard 401
-    - [ ] Configurer `SuccessHandler` (optionnel) pour mapper les claims vers un struct contextuel si nécessaire
-- [ ] Mettre à jour `internal/infrastructure/server/server.go` (AC: 4)
-    - [ ] Injecter le middleware via `fx`
-    - [ ] Appliquer le middleware aux routes protégées (stratégie : soit middleware global avec `Filter` pour routes publiques, soit application spécifique sur les groupes `protected`)
-    - [ ] *Recommandation :* Créer deux groupes dans `RegisterHandlers` : `public` et `protected`
-- [ ] Tester la protection (AC: 2, 3)
-    - [ ] Test d'intégration : Appel sans token -> 401
-    - [ ] Test d'intégration : Appel avec token invalide -> 401
-    - [ ] Test d'intégration : Appel avec token valide -> 200 + Accès UserID
+- [x] Créer le package middleware dans `internal/adapters/middleware/auth_middleware.go` (AC: 1, 2, 3)
+    - [x] Fonction `NewAuthMiddleware(secret string) fiber.Handler`
+    - [x] Configurer `jwtware.Config` avec `SigningKey`, `SigningMethod` ("HS256")
+    - [x] Implémenter `ErrorHandler` pour retourner le JSON standard 401
+    - [x] Configurer `SuccessHandler` (optionnel) pour mapper les claims vers un struct contextuel si nécessaire
+- [x] Mettre à jour `internal/infrastructure/server/server.go` (AC: 4)
+    - [x] Injecter le middleware via `fx`
+    - [x] Appliquer le middleware aux routes protégées (stratégie : soit middleware global avec `Filter` pour routes publiques, soit application spécifique sur les groupes `protected`)
+    - [x] *Recommandation :* Créer deux groupes dans `RegisterHandlers` : `public` et `protected`
+- [x] Tester la protection (AC: 2, 3)
+    - [x] Test d'intégration : Appel sans token -> 401
+    - [x] Test d'intégration : Appel avec token invalide -> 401
+    - [x] Test d'intégration : Appel avec token valide -> 200 + Accès UserID
 
 ## Dev Notes
 
@@ -67,17 +67,51 @@ so that **seuls les utilisateurs authentifiés puissent y accéder**.
 ## Dev Agent Record
 
 ### Agent Model Used
-Gemini 2.0 Flash
+Claude Sonnet 4.5
 
 ### Debug Log References
 None
 
 ### Completion Notes List
-- Confirmed usage of `gofiber/contrib/jwt`.
-- Specified error handling requirements to match project standard.
-- Defined integration strategy via `fx` and route grouping.
+- ✅ Ajouté la dépendance `github.com/gofiber/contrib/jwt` v1.1.2
+- ✅ Créé le middleware d'authentification dans `internal/adapters/middleware/auth_middleware.go`
+- ✅ Implémenté le helper `GetUserID` dans `pkg/auth/context.go` pour extraire l'ID utilisateur du contexte
+- ✅ Mis à jour `internal/adapters/handlers/module.go` pour créer des groupes de routes publiques et protégées
+- ✅ Ajouté la route protégée `/api/v1/users/me` pour tester le middleware
+- ✅ Créé des tests d'intégration complets couvrant tous les scénarios (6 tests dans auth_middleware_test.go, 4 tests dans protected_routes_test.go)
+- ✅ Tous les tests passent (100% success rate)
+- ✅ Le linting passe sans erreur
+- ✅ Les routes publiques (/auth/register, /auth/login, /auth/refresh) restent accessibles sans token
+- ✅ Le middleware retourne le format d'erreur standard `{"status": "error", ...}` pour les 401
+
+### Implementation Plan
+**Approche retenue :** Création de deux groupes de routes distincts (public et protected) dans le module handlers, avec injection du middleware via fx.
+
+**Détails techniques :**
+- Le middleware utilise `jwtware.Config` avec `SigningKey` pour valider les tokens JWT HS256
+- L'ErrorHandler personnalisé retourne le format JSON standard du projet
+- Le token est automatiquement stocké dans `c.Locals("user")` par le middleware
+- Le helper `GetUserID` extrait le `sub` claim et le parse en uint
 
 ### File List
-- internal/adapters/middleware/auth_middleware.go
-- internal/infrastructure/server/server.go
-- pkg/auth/context.go (Optional helper)
+- internal/adapters/middleware/auth_middleware.go (NEW)
+- internal/adapters/middleware/auth_middleware_test.go (NEW)
+- internal/adapters/handlers/module.go (MODIFIED)
+- internal/adapters/handlers/auth_handler.go (MODIFIED - added GetCurrentUser)
+- internal/adapters/handlers/protected_routes_test.go (NEW)
+- internal/adapters/handlers/auth_handler_login_test.go (MODIFIED - removed RegisterRoutes calls)
+- internal/adapters/handlers/auth_handler_integration_test.go (MODIFIED - removed RegisterRoutes calls)
+- internal/infrastructure/server/server.go (MODIFIED - added middleware import)
+- pkg/auth/context.go (NEW)
+- go.mod (MODIFIED - added gofiber/contrib/jwt dependency)
+- go.sum (MODIFIED)
+
+## Change Log
+
+**Date: 2026-01-09**
+- Implémenté le middleware d'authentification JWT utilisant `gofiber/contrib/jwt`
+- Créé le système de groupes de routes (public/protected) dans le module handlers
+- Ajouté le helper `GetUserID` pour extraire l'ID utilisateur du contexte
+- Implémenté la route protégée `/api/v1/users/me` comme exemple
+- Créé 10 tests d'intégration couvrant tous les cas d'usage du middleware
+- Tous les acceptance criteria sont satisfaits et validés par les tests

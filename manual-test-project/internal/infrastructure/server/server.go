@@ -10,11 +10,13 @@ import (
 	"gorm.io/gorm"
 
 	httphandlers "manual-test-project/internal/adapters/http"
+	"manual-test-project/internal/adapters/middleware"
 )
 
 // Module provides the Fiber server dependency via fx
 var Module = fx.Module("server",
 	fx.Provide(NewServer),
+	fx.Provide(middleware.NewAuthMiddleware),
 	fx.Invoke(registerHooks),
 )
 
