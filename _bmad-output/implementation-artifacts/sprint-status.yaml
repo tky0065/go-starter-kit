@@ -8,10 +8,10 @@ epics:
     status: in-progress
     title: "Project Initialization & Core Infrastructure"
   epic-2:
-    status: backlog
+    status: in-progress
     title: "Authentication & Security Foundation"
   epic-3:
-    status: backlog
+    status: in-progress
     title: "User Management Logic"
   epic-4:
     status: backlog
@@ -22,12 +22,12 @@ development_status:
   1-2-generation-de-la-structure-de-base: done
   1-3-injection-dynamique-du-contexte-projet: done
   1-4-initialisation-du-serveur-fiber-di-fx-et-db: done
-  1-5-environnement-de-developpement-dotenv-makefile-docker: ready-for-dev
-  2-1-inscription-des-utilisateurs: backlog
-  2-2-authentification: backlog
-  2-3-renouvellement-de-session: backlog
-  2-4-securisation-des-routes: backlog
-  3-1-gestion-du-profil-utilisateur: backlog
+  1-5-environnement-de-developpement-dotenv-makefile-docker: done
+  2-1-inscription-des-utilisateurs: done
+  2-2-authentification: done
+  2-3-renouvellement-de-session: done
+  2-4-securisation-des-routes: ready-for-dev
+  3-1-gestion-du-profil-utilisateur: ready-for-dev
   3-2-operations-crud-utilisateur: backlog
   4-1-standardisation-des-api: backlog
   4-2-gestion-centralisee-des-erreurs: backlog
