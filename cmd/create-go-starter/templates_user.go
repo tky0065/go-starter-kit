@@ -172,13 +172,16 @@ func (r *UserRepository) FindByID(ctx context.Context, id uint) (*user.User, err
 func (r *UserRepository) FindAll(ctx context.Context, page, limit int) ([]*user.User, int64, error) {
 	var users []*user.User
 	var total int64
-	
-	if err := r.db.WithContext(ctx).Model(&user.User{}).Count(&total).Error; err != nil {
+
+	// Use the same query base for both Count and Find to ensure consistency
+	query := r.db.WithContext(ctx).Model(&user.User{})
+
+	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
 	offset := (page - 1) * limit
-	err := r.db.WithContext(ctx).Limit(limit).Offset(offset).Find(&users).Error
+	err := query.Limit(limit).Offset(offset).Find(&users).Error
 	if err != nil {
 		return nil, 0, err
 	}
@@ -187,7 +190,7 @@ func (r *UserRepository) FindAll(ctx context.Context, page, limit int) ([]*user.
 
 // Update updates an existing user in the database
 func (r *UserRepository) Update(ctx context.Context, u *user.User) error {
-	return r.db.WithContext(ctx).Save(u).Error
+	return r.db.WithContext(ctx).Updates(u).Error
 }
 
 // Delete performs a soft delete on the user (sets deleted_at)
@@ -775,9 +778,11 @@ func (h *UserHandler) GetMe(c *fiber.Ctx) error {
 
 // GetAllUsers godoc
 // @Summary Get all users
-// @Description Get a list of all users
+// @Description Get a list of all users with pagination. Maximum limit is 100 users per page.
 // @Tags users
 // @Produce json
+// @Param page query int false "Page number (default: 1)"
+// @Param limit query int false "Users per page (default: 10, max: 100)"
 // @Success 200 {object} map[string]interface{} "Standard JSON Envelope with data"
 // @Failure 500 {object} map[string]string
 // @Router /api/v1/users [get]
@@ -832,7 +837,7 @@ type UpdateUserRequest struct {
 // @Security BearerAuth
 func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	userID, err := c.ParamsInt("id")
-	if err != nil {
+	if err != nil || userID <= 0 {
 		return domain.NewBadRequestError("Invalid user ID", "INVALID_ID", nil)
 	}
 
@@ -875,7 +880,7 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 // @Security BearerAuth
 func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	userID, err := c.ParamsInt("id")
-	if err != nil {
+	if err != nil || userID <= 0 {
 		return domain.NewBadRequestError("Invalid user ID", "INVALID_ID", nil)
 	}
 

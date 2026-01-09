@@ -799,6 +799,11 @@ func TestUserHandlerTemplate(t *testing.T) {
 		"auth.GetUserID",
 		"validator.New()",
 		projectName + "/pkg/auth",
+		// Response format validation
+		`"page":  page`,
+		`"limit": limit`,
+		`"total": total`,
+		`"message": "User deleted successfully"`,
 	}
 
 	for _, required := range requiredContent {
