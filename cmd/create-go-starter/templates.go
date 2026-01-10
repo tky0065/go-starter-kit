@@ -310,85 +310,293 @@ networks:
 func (t *ProjectTemplates) ReadmeTemplate() string {
 	return `# ` + t.projectName + `
 
-A Go application scaffolded with create-go-starter.
+Application backend Go générée avec create-go-starter. Architecture hexagonale complète avec authentification JWT, API REST, et intégration PostgreSQL.
+
+## Fonctionnalités
+
+- **Architecture hexagonale** (Ports & Adapters) - Séparation claire des responsabilités
+- **Authentification JWT** - Access tokens + Refresh tokens avec rotation sécurisée
+- **API REST** avec Fiber v2 - Framework web haute performance
+- **Base de données** - GORM avec PostgreSQL et migrations automatiques
+- **Injection de dépendances** - uber-go/fx pour architecture modulaire
+- **Tests complets** - Tests unitaires et d'intégration
+- **Documentation Swagger** - API documentée automatiquement avec OpenAPI
+- **Docker** - Build multi-stage optimisé
+- **CI/CD** - Pipeline GitHub Actions pré-configuré
+- **Logging structuré** - rs/zerolog pour logs professionnels
+
+## Prérequis
+
+- **Go 1.25+** - [Télécharger](https://golang.org/dl/)
+- **PostgreSQL** - Base de données (peut être lancée via Docker)
+- **Docker** (optionnel) - Pour containerisation
+- **Make** - Pour les commandes de build
+
+## Installation rapide
+
+### 1. Installer les dépendances
+
+` + "```bash" + `
+go mod download
+` + "```" + `
+
+### 2. Configurer l'environnement
+
+Le fichier ` + "`.env`" + ` a déjà été créé depuis ` + "`.env.example`" + `. Éditez-le pour ajouter votre JWT secret:
+
+` + "```bash" + `
+# Générer un JWT secret sécurisé
+openssl rand -base64 32
+
+# Éditer .env et ajouter le secret
+nano .env
+` + "```" + `
+
+Ajoutez dans ` + "`.env`" + `:
+` + "```" + `
+JWT_SECRET=<votre_secret_généré>
+` + "```" + `
+
+### 3. Lancer PostgreSQL
+
+**Option A: Docker (recommandé)**
+
+` + "```bash" + `
+docker run -d \
+  --name postgres \
+  -e POSTGRES_DB=` + t.projectName + ` \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:16-alpine
+` + "```" + `
+
+**Option B: PostgreSQL local**
+
+` + "```bash" + `
+# macOS
+brew install postgresql
+brew services start postgresql
+createdb ` + t.projectName + `
+
+# Linux
+sudo apt install postgresql
+sudo systemctl start postgresql
+sudo -u postgres createdb ` + t.projectName + `
+` + "```" + `
+
+### 4. Lancer l'application
+
+` + "```bash" + `
+make run
+` + "```" + `
+
+L'API sera disponible sur ` + "`http://localhost:8080`" + `
+
+### 5. Tester
+
+` + "```bash" + `
+# Health check
+curl http://localhost:8080/health
+
+# Register un utilisateur
+curl -X POST http://localhost:8080/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123"}'
+
+# Login
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123"}'
+` + "```" + `
+
+## Documentation
+
+Pour plus de détails, consultez la documentation complète dans le dossier ` + "`docs/`" + `:
+
+- **[Quick Start](./docs/quick-start.md)** - Démarrage en 5 minutes
+- **[Documentation complète](./docs/)** - Guides complets
 
 ## Architecture
 
-This project follows Hexagonal Architecture (Ports and Adapters) pattern:
-
-- **cmd/**: Application entry points
-- **internal/adapters/**: External adapters (HTTP handlers, etc.)
-- **internal/domain/**: Core business logic
-- **internal/interfaces/**: Port definitions
-- **internal/infrastructure/**: Infrastructure concerns (DB, config, etc.)
-- **pkg/**: Public libraries
-
-## Prerequisites
-
-- Go 1.25 or later
-- Docker (optional, for containerized deployment)
-- PostgreSQL (or use Docker Compose)
-
-## Getting Started
-
-1. Install dependencies:
-   ` + "```bash" + `
-   go mod download
-   ` + "```" + `
-
-2. Copy environment file:
-   ` + "```bash" + `
-   cp .env.example .env
-   ` + "```" + `
-
-3. Run the application:
-   ` + "```bash" + `
-   make run
-   ` + "```" + `
-
-## Development
-
-### Available Commands
-
-` + "```bash" + `
-make help          # Show all available commands
-make build         # Build the binary
-make run           # Run the application
-make test          # Run tests
-make clean         # Clean build artifacts
-make docker-build  # Build Docker image
-make docker-run    # Run Docker container
-` + "```" + `
-
-### Running Tests
-
-` + "```bash" + `
-go test ./...
-` + "```" + `
-
-## Project Structure
+Ce projet suit l'architecture hexagonale (Ports and Adapters):
 
 ` + "```" + `
 ` + t.projectName + `/
-├── cmd/
-│   └── main.go              # Application entry point
+├── cmd/                     # Point d'entrée
+│   └── main.go              # Bootstrap avec fx
 ├── internal/
-│   ├── adapters/            # HTTP, gRPC adapters
-│   ├── domain/              # Business logic
-│   ├── interfaces/          # Port definitions
-│   └── infrastructure/      # DB, config, logging
-├── pkg/                     # Public libraries
-├── deployments/             # Docker, K8s configs
-├── .env.example             # Environment template
-├── Dockerfile               # Docker build config
-├── Makefile                 # Build automation
-├── go.mod                   # Go modules
-└── README.md                # This file
+│   ├── domain/              # Logique métier (cœur)
+│   │   ├── user/            # Domaine User
+│   │   │   ├── entity.go    # Entités
+│   │   │   └── service.go   # Logique métier
+│   │   └── errors.go        # Erreurs métier
+│   ├── adapters/            # Adapters (HTTP, DB)
+│   │   ├── handlers/        # HTTP handlers
+│   │   ├── middleware/      # Middleware Fiber
+│   │   └── repository/      # Implémentation GORM
+│   ├── infrastructure/      # Infrastructure
+│   │   ├── database/        # Configuration DB
+│   │   └── server/          # Configuration Fiber
+│   └── interfaces/          # Ports (interfaces)
+├── pkg/                     # Packages réutilisables
+│   ├── auth/                # JWT utilities
+│   ├── config/              # Configuration
+│   └── logger/              # Logger
+├── .env                     # Configuration (créé automatiquement)
+├── .env.example             # Template
+├── Dockerfile               # Build Docker
+├── Makefile                 # Commandes
+└── go.mod                   # Dépendances
 ` + "```" + `
 
-## License
+**Principe**: Le domaine (` + "`internal/domain`" + `) ne dépend de rien. Toutes les dépendances pointent vers le domaine via des interfaces (` + "`internal/interfaces`" + `).
+
+## API Endpoints
+
+### Authentication (Public)
+
+- ` + "`POST /api/v1/auth/register`" + ` - Créer un compte
+- ` + "`POST /api/v1/auth/login`" + ` - Se connecter
+- ` + "`POST /api/v1/auth/refresh`" + ` - Rafraîchir le token
+
+### Users (Protected - JWT required)
+
+- ` + "`GET /api/v1/users`" + ` - Liste des utilisateurs
+- ` + "`GET /api/v1/users/:id`" + ` - Détails d'un utilisateur
+- ` + "`PUT /api/v1/users/:id`" + ` - Mettre à jour
+- ` + "`DELETE /api/v1/users/:id`" + ` - Supprimer (soft delete)
+
+### Health
+
+- ` + "`GET /health`" + ` - Health check
+
+## Développement
+
+### Commandes Make
+
+| Commande | Description |
+|----------|-------------|
+| ` + "`make help`" + ` | Afficher l'aide |
+| ` + "`make run`" + ` | Lancer l'application |
+| ` + "`make build`" + ` | Compiler le binaire |
+| ` + "`make test`" + ` | Tests avec race detector |
+| ` + "`make test-coverage`" + ` | Tests + rapport HTML |
+| ` + "`make lint`" + ` | golangci-lint |
+| ` + "`make clean`" + ` | Nettoyer artifacts |
+| ` + "`make docker-build`" + ` | Build image Docker |
+| ` + "`make docker-run`" + ` | Run conteneur Docker |
+
+### Tests
+
+` + "```bash" + `
+# Tous les tests
+make test
+
+# Tests avec coverage
+make test-coverage
+
+# Ouvrir le rapport
+open coverage.html  # macOS
+xdg-open coverage.html  # Linux
+` + "```" + `
+
+### Linting
+
+` + "```bash" + `
+make lint
+` + "```" + `
+
+## Stack technique
+
+| Composant | Bibliothèque | Description |
+|-----------|-------------|-------------|
+| Web Framework | [Fiber](https://gofiber.io/) v2 | Framework HTTP rapide |
+| ORM | [GORM](https://gorm.io/) | ORM avec PostgreSQL |
+| DI | [fx](https://uber-go.github.io/fx/) | Dependency injection |
+| Logging | [zerolog](https://github.com/rs/zerolog) | Logger structuré |
+| JWT | [golang-jwt](https://github.com/golang-jwt/jwt) v5 | Authentification |
+| Validation | [validator](https://github.com/go-playground/validator) v10 | Validation |
+| Swagger | [swaggo](https://github.com/swaggo/swag) | Documentation API |
+
+## Variables d'environnement
+
+Fichier ` + "`.env`" + `:
+
+` + "```bash" + `
+# Application
+APP_NAME=` + t.projectName + `
+APP_ENV=development
+APP_PORT=8080
+
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=` + t.projectName + `
+DB_SSLMODE=disable
+
+# JWT
+JWT_SECRET=                  # À REMPLIR!
+JWT_EXPIRY=15m               # 15 minutes
+REFRESH_TOKEN_EXPIRY=168h    # 7 jours
+` + "```" + `
+
+## Déploiement
+
+### Docker
+
+` + "```bash" + `
+# Build
+make docker-build
+
+# Run
+docker run -p 8080:8080 \
+  -e DB_HOST=host.docker.internal \
+  -e JWT_SECRET=<secret> \
+  ` + t.projectName + `:latest
+` + "```" + `
+
+### Docker Compose
+
+Si disponible:
+
+` + "```bash" + `
+docker-compose up -d
+` + "```" + `
+
+## Contribuer
+
+1. Fork le projet
+2. Créer une branche (` + "`git checkout -b feature/ma-fonctionnalite`" + `)
+3. Commit (` + "`git commit -m 'feat: ajouter fonctionnalité'`" + `)
+4. Push (` + "`git push origin feature/ma-fonctionnalite`" + `)
+5. Ouvrir une Pull Request
+
+## Sécurité
+
+- ✅ JWT avec secrets forts
+- ✅ Passwords hashés avec bcrypt
+- ✅ Validation des entrées
+- ✅ Soft deletes
+- ✅ GORM prévient SQL injection
+- ✅ Error handling centralisé
+
+**Production checklist**:
+- [ ] Générer JWT_SECRET fort (` + "`openssl rand -base64 32`" + `)
+- [ ] HTTPS/TLS activé
+- [ ] DB_SSLMODE=require
+- [ ] Rate limiting configuré
+- [ ] CORS configuré
+- [ ] Secrets dans gestionnaire de secrets
+
+## Licence
 
 MIT
+
+---
+
+**Généré avec [create-go-starter](https://github.com/tky0065/go-starter-kit)** 🚀
 `
 }
 
@@ -748,5 +956,256 @@ jobs:
 
       - name: Build Check
         run: go build -v ./...
+`
+}
+
+// DocsReadmeTemplate returns the docs/README.md file content (navigation hub)
+func (t *ProjectTemplates) DocsReadmeTemplate() string {
+	return `# Documentation ` + t.projectName + `
+
+Documentation complète pour le projet ` + t.projectName + `.
+
+## Table des matières
+
+1. [Démarrage rapide](./quick-start.md)
+
+## Aide rapide
+
+- **Lancer le projet**: ` + "`make run`" + `
+- **Tests**: ` + "`make test`" + `
+- **API Health**: ` + "`http://localhost:8080/health`" + `
+
+## Ressources
+
+- [create-go-starter Documentation](https://github.com/tky0065/go-starter-kit)
+- [Fiber Documentation](https://docs.gofiber.io/)
+- [GORM Documentation](https://gorm.io/docs/)
+`
+}
+
+// QuickStartTemplate returns the docs/quick-start.md file content
+func (t *ProjectTemplates) QuickStartTemplate() string {
+	return `# Démarrage rapide
+
+Guide pour lancer ` + t.projectName + ` en 5 minutes.
+
+## Prérequis
+
+- Go 1.25+
+- PostgreSQL (ou Docker)
+
+## Installation
+
+### 1. Installer les dépendances
+
+` + "```bash" + `
+go mod download
+` + "```" + `
+
+### 2. Configurer la base de données
+
+**Option A: PostgreSQL local**
+
+` + "```bash" + `
+# macOS
+brew install postgresql
+brew services start postgresql
+createdb ` + t.projectName + `
+
+# Linux
+sudo apt install postgresql
+sudo systemctl start postgresql
+sudo -u postgres createdb ` + t.projectName + `
+` + "```" + `
+
+**Option B: Docker (recommandé)**
+
+` + "```bash" + `
+docker run -d \
+  --name postgres \
+  -e POSTGRES_DB=` + t.projectName + ` \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:16-alpine
+` + "```" + `
+
+### 3. Configurer l'environnement
+
+Le fichier ` + "`.env`" + ` a déjà été créé. Générez un JWT secret:
+
+` + "```bash" + `
+# Générer un secret fort
+openssl rand -base64 32
+
+# Éditer .env
+nano .env
+` + "```" + `
+
+Ajoutez dans ` + "`.env`" + `:
+` + "```bash" + `
+JWT_SECRET=<secret_généré_ci-dessus>
+` + "```" + `
+
+### 4. Lancer l'application
+
+` + "```bash" + `
+make run
+` + "```" + `
+
+L'API sera disponible sur ` + "`http://localhost:8080`" + `
+
+### 5. Tester
+
+` + "```bash" + `
+# Health check
+curl http://localhost:8080/health
+# {"status":"ok"}
+` + "```" + `
+
+## Premier utilisateur
+
+### Register
+
+` + "```bash" + `
+curl -X POST http://localhost:8080/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"password123"}'
+` + "```" + `
+
+Réponse (exemple):
+` + "```json" + `
+{
+  "status": "success",
+  "data": {
+    "access_token": "eyJhbGc...",
+    "refresh_token": "eyJhbGc...",
+    "token_type": "Bearer",
+    "expires_in": 900
+  }
+}
+` + "```" + `
+
+### Login
+
+` + "```bash" + `
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"password123"}'
+` + "```" + `
+
+### Utiliser l'access token
+
+` + "```bash" + `
+# Sauvegarder le token (remplacez par votre token)
+TOKEN="eyJhbGc..."
+
+# Lister les utilisateurs
+curl -X GET http://localhost:8080/api/v1/users \
+  -H "Authorization: Bearer $TOKEN"
+` + "```" + `
+
+## Endpoints disponibles
+
+### Public (sans auth)
+
+- ` + "`GET /health`" + ` - Health check
+- ` + "`POST /api/v1/auth/register`" + ` - Créer un compte
+- ` + "`POST /api/v1/auth/login`" + ` - Se connecter
+- ` + "`POST /api/v1/auth/refresh`" + ` - Rafraîchir le token
+
+### Protected (JWT required)
+
+- ` + "`GET /api/v1/users`" + ` - Liste des utilisateurs
+- ` + "`GET /api/v1/users/:id`" + ` - Détails d'un utilisateur
+- ` + "`PUT /api/v1/users/:id`" + ` - Mettre à jour
+- ` + "`DELETE /api/v1/users/:id`" + ` - Supprimer (soft delete)
+
+## Développement
+
+### Commandes utiles
+
+` + "```bash" + `
+# Lancer l'app
+make run
+
+# Tests
+make test
+
+# Tests avec coverage
+make test-coverage
+
+# Linting
+make lint
+
+# Build
+make build
+
+# Docker
+make docker-build
+make docker-run
+` + "```" + `
+
+### Structure du projet
+
+` + "```" + `
+` + t.projectName + `/
+├── cmd/main.go                  # Point d'entrée (fx bootstrap)
+├── internal/
+│   ├── domain/                  # Logique métier
+│   │   ├── user/                # Domaine User
+│   │   └── errors.go            # Erreurs métier
+│   ├── adapters/                # HTTP handlers, middleware, repository
+│   ├── infrastructure/          # DB, server config
+│   └── interfaces/              # Ports (interfaces)
+├── pkg/                         # Packages réutilisables (auth, config, logger)
+├── .env                         # Configuration
+└── Makefile                     # Commandes
+` + "```" + `
+
+## Dépannage
+
+### Erreur: "connection refused" sur DB
+
+Vérifiez que PostgreSQL est démarré:
+
+` + "```bash" + `
+# Docker
+docker ps | grep postgres
+
+# Local
+brew services list  # macOS
+systemctl status postgresql  # Linux
+` + "```" + `
+
+### Erreur: "Invalid JWT secret"
+
+Assurez-vous que ` + "`JWT_SECRET`" + ` est défini dans ` + "`.env`" + `:
+
+` + "```bash" + `
+cat .env | grep JWT_SECRET
+` + "```" + `
+
+Si vide, générez-en un:
+
+` + "```bash" + `
+echo "JWT_SECRET=$(openssl rand -base64 32)" >> .env
+` + "```" + `
+
+### Port 8080 déjà utilisé
+
+Changez ` + "`APP_PORT`" + ` dans ` + "`.env`" + `:
+
+` + "```bash" + `
+APP_PORT=3000
+` + "```" + `
+
+## Prochaines étapes
+
+- Lisez le README principal pour plus de détails
+- Consultez le code dans ` + "`internal/domain/user/`" + ` pour comprendre la structure
+- Ajoutez vos propres domaines en suivant le pattern User
+- Déployez avec Docker: ` + "`make docker-build && make docker-run`" + `
+
+Bon développement! 🚀
 `
 }

@@ -174,6 +174,14 @@ func generateProjectFiles(projectPath, projectName string) error {
 			Path:    filepath.Join(projectPath, "README.md"),
 			Content: templates.ReadmeTemplate(),
 		},
+		{
+			Path:    filepath.Join(projectPath, "docs", "README.md"),
+			Content: templates.DocsReadmeTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "docs", "quick-start.md"),
+			Content: templates.QuickStartTemplate(),
+		},
 	}
 
 	// Write all files
