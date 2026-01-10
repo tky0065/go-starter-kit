@@ -52,11 +52,24 @@ go run ./cmd/create-go-starter <project-name>
 
 ## Project Structure
 
+### CLI Tool Structure (this repository)
 - `cmd/create-go-starter/` - Main CLI application entry point
   - `main.go` - CLI implementation with flag parsing and color utilities
+  - `generator.go` - File generation orchestrator
+  - `templates.go` - Core templates (config, server, domain)
+  - `templates_user.go` - User domain specific templates
   - `colors_test.go` - Tests for ANSI color formatting functions
 - `go.mod` - Go module definition (requires Go 1.25.0)
 - `_bmad/` - BMAD workflow automation system (not part of core application)
+
+### Generated Project Structure (projects created by the CLI)
+When you run `create-go-starter my-project`, the following structure is generated:
+- `internal/models/` - Shared domain entities (User, RefreshToken, AuthResponse). Prevents circular dependencies.
+- `internal/domain/` - Business logic (services, not entities)
+- `internal/interfaces/` - Port definitions (Hexagonal Architecture)
+- `internal/adapters/` - HTTP handlers, middleware, repository implementations
+- `internal/infrastructure/` - Database, server configuration
+- `pkg/` - Shared libraries (config, logger, auth)
 
 ## Architecture Notes
 

@@ -29,7 +29,8 @@
 ### Generated Project Structure (Boilerplate)
 - `cmd/main.go`: Application entry point using `fx` for dependency injection.
 - `internal/`:
-    - `domain/`: Core business logic and entities.
+    - `models/`: Shared domain entities (User, RefreshToken, AuthResponse). Prevents circular dependencies.
+    - `domain/`: Core business logic (services, not entities).
     - `adapters/`: External interfaces (HTTP handlers, Middleware).
     - `infrastructure/`: Infrastructure concerns (Database connection, Server configuration).
     - `interfaces/`: Port definitions (Ports in Hexagonal Architecture).

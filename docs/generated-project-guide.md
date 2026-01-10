@@ -37,15 +37,22 @@ Les projets générés suivent l'architecture hexagonale, également appelée "P
                         │
                         ▼
 ┌─────────────────────────────────────────────────────────┐
-│                    Domain Layer                         │
-│                  domain/user + interfaces               │
-│  • User Entity (business rules)                         │
-│  • RefreshToken Entity                                  │
-│  • UserService (business logic)                         │
-│  • Interfaces/Ports (UserService, UserRepository)       │
-└───────────────────────┬─────────────────────────────────┘
-                        │
-                        ▼
+│              Shared Entities Layer                      │
+│                   models/                               │
+│  • User (entity with GORM tags)                         │
+│  • RefreshToken (entity with GORM tags)                 │
+│  • AuthResponse (DTO)                                   │
+└──────────┬───────────────────────────┬──────────────────┘
+           │                           │
+           ▼                           ▼
+┌──────────────────────┐  ┌──────────────────────────────┐
+│   Interfaces Layer   │  │      Domain Layer            │
+│   interfaces/        │  │      domain/user             │
+│  • UserRepository    │  │  • UserService (logic)       │
+│    (port)            │  │  • Business rules            │
+└──────────┬───────────┘  └──────────────────────────────┘
+           │
+           ▼
 ┌─────────────────────────────────────────────────────────┐
 │              Infrastructure Layer                       │
 │         database + repository + server                  │
@@ -129,7 +136,7 @@ db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 })
 
 // Auto-migration
-db.AutoMigrate(&domain.User{}, &domain.RefreshToken{})
+db.AutoMigrate(&models.User{}, &models.RefreshToken{})
 ```
 
 **Patterns utilisés**:
@@ -277,6 +284,75 @@ func main() {
 
 **Principe**: Composition de modules, pas de logique métier.
 
+#### `/internal/models`
+
+**Models**: Entités de domaine partagées utilisées à travers toute l'application.
+
+**Rôle**: Centraliser les définitions des structures de données (entities) pour éviter les dépendances circulaires.
+
+##### `user.go`
+
+Définit les entités User, RefreshToken et AuthResponse:
+
+```go
+package models
+
+import (
+    "time"
+    "gorm.io/gorm"
+)
+
+// User represents the domain entity for a user
+type User struct {
+    ID           uint           `gorm:"primaryKey" json:"id"`
+    Email        string         `gorm:"uniqueIndex;not null" json:"email"`
+    PasswordHash string         `gorm:"not null" json:"-"`
+    CreatedAt    time.Time      `gorm:"autoCreateTime" json:"created_at"`
+    UpdatedAt    time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+    DeletedAt    gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+}
+
+// RefreshToken represents a refresh token for session management
+type RefreshToken struct {
+    ID        uint      `gorm:"primaryKey" json:"id"`
+    UserID    uint      `gorm:"not null;index" json:"user_id"`
+    Token     string    `gorm:"uniqueIndex;not null" json:"token"`
+    ExpiresAt time.Time `gorm:"not null" json:"expires_at"`
+    Revoked   bool      `gorm:"not null;default:false" json:"revoked"`
+    CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
+    UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`
+}
+
+func (rt *RefreshToken) IsExpired() bool {
+    return time.Now().After(rt.ExpiresAt)
+}
+
+func (rt *RefreshToken) IsRevoked() bool {
+    return rt.Revoked
+}
+
+// AuthResponse represents the authentication response with tokens
+type AuthResponse struct {
+    AccessToken  string `json:"access_token"`
+    RefreshToken string `json:"refresh_token"`
+    ExpiresIn    int64  `json:"expires_in"`
+}
+```
+
+**Principes**:
+
+- **Entités GORM**: Tags GORM pour configuration base de données
+- **Serialization JSON**: Tags json pour contrôler l'API (ex: `json:"-"` cache PasswordHash)
+- **Méthodes utilitaires**: IsExpired(), IsRevoked() pour la logique de validation
+- **Pas de dépendances**: Aucun import de domain ou interfaces
+- **Utilisable partout**: Importé par interfaces, domain, repository, handlers
+
+**Pourquoi un package séparé?**
+
+- **Évite les cycles**: Avant, `interfaces` → `domain/user` → `interfaces` (❌ cycle!)
+- **Maintenant**: `interfaces` → `models` ← `domain/user` (✅ pas de cycle)
+- **Clarté**: Séparation entre entities (models) et business logic (domain)
+
 #### `/internal/domain`
 
 **Domaine**: Logique métier pure, indépendante de l'infrastructure.
@@ -307,45 +383,28 @@ if user == nil {
 }
 ```
 
-##### `user/entity.go`
-
-Entité User avec validations et méthodes:
-
-```go
-type User struct {
-    ID        uint      `gorm:"primarykey" json:"id"`
-    CreatedAt time.Time `json:"created_at"`
-    UpdatedAt time.Time `json:"updated_at"`
-    DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
-
-    Email    string `gorm:"uniqueIndex;not null" json:"email"`
-    Password string `gorm:"not null" json:"-"`
-}
-
-func (u *User) HashPassword() error
-func (u *User) ComparePassword(password string) error
-```
-
-**Principes**:
-
-- `json:"-"` cache le password dans les réponses
-- GORM tags pour configuration DB
-- Méthodes de l'entité pour hashage bcrypt
-
 ##### `user/service.go`
 
 Logique métier:
 
 ```go
+package user
+
+import (
+    "context"
+    "mon-projet/internal/models"
+    "mon-projet/internal/interfaces"
+)
+
 type Service struct {
     repo   interfaces.UserRepository
     logger zerolog.Logger
 }
 
-func (s *Service) Register(ctx context.Context, email, password string) (*User, error)
-func (s *Service) Login(ctx context.Context, email, password string) (*User, error)
-func (s *Service) GetByID(ctx context.Context, id uint) (*User, error)
-func (s *Service) Update(ctx context.Context, id uint, email string) (*User, error)
+func (s *Service) Register(ctx context.Context, email, password string) (*models.User, error)
+func (s *Service) Login(ctx context.Context, email, password string) (*models.User, error)
+func (s *Service) GetByID(ctx context.Context, id uint) (*models.User, error)
+func (s *Service) Update(ctx context.Context, id uint, email string) (*models.User, error)
 func (s *Service) Delete(ctx context.Context, id uint) error
 ```
 
@@ -355,6 +414,7 @@ func (s *Service) Delete(ctx context.Context, id uint) error
 - Hashage de password (Register)
 - Vérification de password (Login)
 - Orchestration d'appels repository
+- **Utilise `models.User`**: Importe le package models pour les entités
 
 #### `/internal/adapters`
 
@@ -495,12 +555,12 @@ type userRepositoryGORM struct {
     db *gorm.DB
 }
 
-func (r *userRepositoryGORM) Create(ctx context.Context, user *domain.User) error {
+func (r *userRepositoryGORM) Create(ctx context.Context, user *models.User) error {
     return r.db.WithContext(ctx).Create(user).Error
 }
 
-func (r *userRepositoryGORM) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
-    var user domain.User
+func (r *userRepositoryGORM) FindByEmail(ctx context.Context, email string) (*models.User, error) {
+    var user models.User
     err := r.db.WithContext(ctx).Where("email = ?", email).First(&user).Error
     if err == gorm.ErrRecordNotFound {
         return nil, domain.NewNotFoundError("User not found", "USER_NOT_FOUND", err)
@@ -524,7 +584,7 @@ func NewDatabase(config *config.Config, logger zerolog.Logger) (*gorm.DB, error)
     db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
     // AutoMigrate
-    db.AutoMigrate(&domain.User{}, &domain.RefreshToken{})
+    db.AutoMigrate(&models.User{}, &models.RefreshToken{})
 
     return db, nil
 }
@@ -838,22 +898,19 @@ make lint
 
 **Exemple**: Ajouter une entité "Product"
 
-#### Étape 1: Créer le domaine
+#### Étape 1: Ajouter l'entité dans models
 
-```bash
-mkdir -p internal/domain/product
-```
-
-**`internal/domain/product/entity.go`**:
+**`internal/models/product.go`**:
 
 ```go
-package product
+package models
 
 import (
     "time"
     "gorm.io/gorm"
 )
 
+// Product represents a product in the catalog
 type Product struct {
     ID          uint           `gorm:"primarykey" json:"id"`
     CreatedAt   time.Time      `json:"created_at"`
@@ -867,6 +924,12 @@ type Product struct {
 }
 ```
 
+#### Étape 2: Créer le service (business logic)
+
+```bash
+mkdir -p internal/domain/product
+```
+
 **`internal/domain/product/service.go`**:
 
 ```go
@@ -874,6 +937,7 @@ package product
 
 import (
     "context"
+    "mon-projet/internal/models"
     "mon-projet/internal/interfaces"
     "github.com/rs/zerolog"
 )
@@ -887,8 +951,8 @@ func NewService(repo interfaces.ProductRepository, logger zerolog.Logger) *Servi
     return &Service{repo: repo, logger: logger}
 }
 
-func (s *Service) Create(ctx context.Context, name, description string, price float64, stock int) (*Product, error) {
-    product := &Product{
+func (s *Service) Create(ctx context.Context, name, description string, price float64, stock int) (*models.Product, error) {
+    product := &models.Product{
         Name:        name,
         Description: description,
         Price:       price,
@@ -903,12 +967,12 @@ func (s *Service) Create(ctx context.Context, name, description string, price fl
     return product, nil
 }
 
-func (s *Service) GetByID(ctx context.Context, id uint) (*Product, error) {
+func (s *Service) GetByID(ctx context.Context, id uint) (*models.Product, error) {
     return s.repo.FindByID(ctx, id)
 }
 ```
 
-#### Étape 2: Créer l'interface (port)
+#### Étape 3: Créer l'interface (port)
 
 **`internal/interfaces/product_repository.go`**:
 
@@ -917,38 +981,21 @@ package interfaces
 
 import (
     "context"
-    "mon-projet/internal/domain/product"
+    "mon-projet/internal/models"
 )
 
 type ProductRepository interface {
-    Create(ctx context.Context, product *product.Product) error
-    FindByID(ctx context.Context, id uint) (*product.Product, error)
-    FindAll(ctx context.Context) ([]*product.Product, error)
-    Update(ctx context.Context, product *product.Product) error
+    Create(ctx context.Context, product *models.Product) error
+    FindByID(ctx context.Context, id uint) (*models.Product, error)
+    FindAll(ctx context.Context) ([]*models.Product, error)
+    Update(ctx context.Context, product *models.Product) error
     Delete(ctx context.Context, id uint) error
 }
 ```
 
-**`internal/interfaces/product_service.go`**:
+**Note**: Les interfaces référencent maintenant `models.Product` (entités partagées) au lieu de `product.Product` pour éviter les dépendances circulaires.
 
-```go
-package interfaces
-
-import (
-    "context"
-    "mon-projet/internal/domain/product"
-)
-
-type ProductService interface {
-    Create(ctx context.Context, name, description string, price float64, stock int) (*product.Product, error)
-    GetByID(ctx context.Context, id uint) (*product.Product, error)
-    List(ctx context.Context) ([]*product.Product, error)
-    Update(ctx context.Context, id uint, name, description string, price float64, stock int) (*product.Product, error)
-    Delete(ctx context.Context, id uint) error
-}
-```
-
-#### Étape 3: Implémenter le repository
+#### Étape 4: Implémenter le repository
 
 **`internal/adapters/repository/product_repository.go`**:
 
@@ -959,23 +1006,24 @@ import (
     "context"
     "gorm.io/gorm"
     "mon-projet/internal/domain"
-    "mon-projet/internal/domain/product"
+    "mon-projet/internal/models"
+    "mon-projet/internal/interfaces"
 )
 
 type productRepositoryGORM struct {
     db *gorm.DB
 }
 
-func NewProductRepository(db *gorm.DB) *productRepositoryGORM {
+func NewProductRepository(db *gorm.DB) interfaces.ProductRepository {
     return &productRepositoryGORM{db: db}
 }
 
-func (r *productRepositoryGORM) Create(ctx context.Context, product *product.Product) error {
+func (r *productRepositoryGORM) Create(ctx context.Context, product *models.Product) error {
     return r.db.WithContext(ctx).Create(product).Error
 }
 
-func (r *productRepositoryGORM) FindByID(ctx context.Context, id uint) (*product.Product, error) {
-    var p product.Product
+func (r *productRepositoryGORM) FindByID(ctx context.Context, id uint) (*models.Product, error) {
+    var p models.Product
     err := r.db.WithContext(ctx).First(&p, id).Error
     if err == gorm.ErrRecordNotFound {
         return nil, domain.NewNotFoundError("Product not found", "PRODUCT_NOT_FOUND", err)
@@ -984,7 +1032,7 @@ func (r *productRepositoryGORM) FindByID(ctx context.Context, id uint) (*product
 }
 ```
 
-#### Étape 4: Créer le handler
+#### Étape 5: Créer le handler
 
 **`internal/adapters/handlers/product_handler.go`**:
 
@@ -994,12 +1042,12 @@ package handlers
 import (
     "github.com/gofiber/fiber/v2"
     "github.com/go-playground/validator/v10"
-    "mon-projet/internal/interfaces"
+    "mon-projet/internal/domain/product"
     "strconv"
 )
 
 type ProductHandler struct {
-    service  interfaces.ProductService
+    service  *product.Service
     validate *validator.Validate
 }
 
@@ -1142,8 +1190,8 @@ import (
 func NewDatabase(...) {
     // ...
     db.AutoMigrate(
-        &domain.User{},
-        &domain.RefreshToken{},
+        &models.User{},
+        &models.RefreshToken{},
         &product.Product{},  // Nouvelle entité
     )
     // ...
@@ -1192,8 +1240,8 @@ Le middleware error_handler convertit automatiquement en réponses HTTP.
 ```go
 // Interface (port)
 type UserRepository interface {
-    Create(ctx context.Context, user *domain.User) error
-    FindByEmail(ctx context.Context, email string) (*domain.User, error)
+    Create(ctx context.Context, user *models.User) error
+    FindByEmail(ctx context.Context, email string) (*models.User, error)
 }
 
 // Implémentation (adapter)
@@ -1657,7 +1705,7 @@ func TestAuthHandler_RegisterIntegration(t *testing.T) {
     db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
     require.NoError(t, err)
 
-    db.AutoMigrate(&domain.User{})
+    db.AutoMigrate(&models.User{})
 
     // Create real dependencies
     repo := repository.NewUserRepository(db)
@@ -1786,8 +1834,8 @@ Le projet utilise GORM AutoMigrate pour simplifier les migrations en développem
 ```go
 // internal/infrastructure/database/database.go
 db.AutoMigrate(
-    &domain.User{},
-    &domain.RefreshToken{},
+    &models.User{},
+    &models.RefreshToken{},
 )
 ```
 
@@ -1862,7 +1910,7 @@ type User struct {
 #### Pagination
 
 ```go
-var users []domain.User
+var users []models.User
 limit := 10
 offset := 20
 
@@ -1912,10 +1960,10 @@ db.Preload("RefreshTokens").Find(&users)
 ```go
 // Count
 var count int64
-db.Model(&domain.User{}).Count(&count)
+db.Model(&models.User{}).Count(&count)
 
 // With where
-db.Model(&domain.User{}).Where("created_at > ?", yesterday).Count(&count)
+db.Model(&models.User{}).Where("created_at > ?", yesterday).Count(&count)
 ```
 
 #### Transactions
@@ -1940,7 +1988,7 @@ err := db.Transaction(func(tx *gorm.DB) error {
 
 ```go
 // Raw query
-var users []domain.User
+var users []models.User
 db.Raw("SELECT * FROM users WHERE email LIKE ?", "%@example.com").Scan(&users)
 
 // Exec
@@ -2187,30 +2235,55 @@ type Request struct {
 bcrypt (golang.org/x/crypto/bcrypt):
 
 ```go
-// internal/domain/user/entity.go
+// internal/domain/user/service.go
 
-func (u *User) HashPassword() error {
-    hashed, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+import "golang.org/x/crypto/bcrypt"
+
+func (s *Service) Register(ctx context.Context, email, password string) (*models.User, error) {
+    // Hash the password
+    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
     if err != nil {
-        return err
+        return nil, err
     }
-    u.Password = string(hashed)
-    return nil
+
+    // Create user with hashed password
+    user := &models.User{
+        Email:        email,
+        PasswordHash: string(hashedPassword),
+    }
+
+    if err := s.repo.CreateUser(ctx, user); err != nil {
+        return nil, err
+    }
+
+    return user, nil
 }
 
-func (u *User) ComparePassword(password string) error {
-    return bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+func (s *Service) Login(ctx context.Context, email, password string) (*models.User, error) {
+    user, err := s.repo.GetUserByEmail(ctx, email)
+    if err != nil {
+        return nil, err
+    }
+
+    // Compare password
+    if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
+        return nil, domain.NewUnauthorizedError("Invalid credentials", "INVALID_CREDENTIALS", err)
+    }
+
+    return user, nil
 }
 ```
 
 **DefaultCost** = 10 (2^10 iterations) - Bon équilibre sécurité/performance
 
+**Note**: Le hashage de mot de passe est géré dans le service (business logic), pas dans l'entité. L'entité `models.User` stocke le `PasswordHash` qui est toujours haché.
+
 **Utilisation**:
 
 ```go
-// Register
-user := &User{Email: email, Password: plainPassword}
-if err := user.HashPassword(); err != nil {
+// Register (dans le service)
+user, err := userService.Register(ctx, email, plainPassword)
+if err != nil {
     return err
 }
 db.Create(user)

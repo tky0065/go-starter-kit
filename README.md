@@ -114,10 +114,10 @@ mon-super-projet/
 ├── cmd/
 │   └── main.go                    # Point d'entrée avec fx dependency injection
 ├── internal/
+│   ├── models/                    # Entités de domaine partagées
+│   │   └── user.go                # User, RefreshToken, AuthResponse
 │   ├── domain/                    # Couche domaine (logique métier)
 │   │   ├── user/                  # Domaine User
-│   │   │   ├── entity.go          # Entité User avec validations
-│   │   │   ├── refresh_token.go   # Entité RefreshToken
 │   │   │   ├── service.go         # Logique métier (Register, Login, etc.)
 │   │   │   └── module.go          # Module fx
 │   │   └── errors.go              # Erreurs métier personnalisées
@@ -135,8 +135,6 @@ mon-super-projet/
 │   │   ├── database/              # Configuration DB (GORM, migrations)
 │   │   └── server/                # Configuration Fiber app et routes
 │   └── interfaces/                # Ports (interfaces)
-│       ├── auth_service.go        # Interface AuthService
-│       ├── user_service.go        # Interface UserService
 │       └── user_repository.go     # Interface UserRepository
 ├── pkg/                           # Packages réutilisables
 │   ├── auth/                      # JWT utilities

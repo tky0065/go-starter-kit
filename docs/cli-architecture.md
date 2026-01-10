@@ -132,33 +132,33 @@ func generateProjectFiles(projectPath, projectName string) error {
    - pkg/logger/logger.go, pkg/logger/module.go
    - pkg/auth/jwt.go, pkg/auth/middleware.go, pkg/auth/module.go
 
-4. **Domain** (5 fichiers):
+4. **Models** (1 fichier):
+   - internal/models/user.go (User, RefreshToken, AuthResponse)
+
+5. **Domain** (3 fichiers):
    - internal/domain/errors.go
-   - internal/domain/user/entity.go
-   - internal/domain/user/refresh_token.go
    - internal/domain/user/service.go
    - internal/domain/user/module.go
 
-5. **Interfaces** (2 fichiers):
-   - internal/interfaces/services.go
+6. **Interfaces** (1 fichier):
    - internal/interfaces/user_repository.go
 
-6. **Adapters** (9 fichiers):
+7. **Adapters** (9 fichiers):
    - Handlers: auth_handler.go, user_handler.go, module.go
    - Middleware: error_handler.go
    - Repository: user_repository.go, module.go
    - HTTP: health.go
 
-7. **Infrastructure** (2 fichiers):
+8. **Infrastructure** (2 fichiers):
    - internal/infrastructure/database/database.go
    - internal/infrastructure/server/server.go
 
-8. **Deployment** (3 fichiers):
+9. **Deployment** (3 fichiers):
    - Dockerfile
    - .github/workflows/ci.yml
    - docker-compose.yml
 
-9. **Documentation** (3 fichiers):
+10. **Documentation** (3 fichiers):
    - README.md
    - docs/README.md
    - docs/quick-start.md
@@ -284,20 +284,26 @@ require (
 
 **Responsabilités**:
 - Templates spécifiques au domaine User
-- Entités, services, repositories, handlers
+- Entités (models), services, repositories, handlers
 - Tests (si implémenté)
 
 **Méthodes**:
+
+#### Models (Entités partagées)
+
+```go
+func (t *ProjectTemplates) ModelsUserTemplate() string  // User, RefreshToken, AuthResponse
+```
 
 #### Domain
 
 ```go
 func (t *ProjectTemplates) DomainErrorsTemplate() string
-func (t *ProjectTemplates) UserEntityTemplate() string
-func (t *ProjectTemplates) UserRefreshTokenTemplate() string
-func (t *ProjectTemplates) UserServiceTemplate() string
-func (t *ProjectTemplates) UserModuleTemplate() string
+func (t *ProjectTemplates) UserServiceTemplate() string   // Business logic
+func (t *ProjectTemplates) UserModuleTemplate() string    // fx module
 ```
+
+**Note**: `UserEntityTemplate()` et `UserRefreshTokenTemplate()` sont dépréciés - les entités sont maintenant dans `ModelsUserTemplate()`.
 
 #### Interfaces (Ports)
 
@@ -316,38 +322,60 @@ func (t *ProjectTemplates) UserHandlerTemplate() string     // CRUD endpoints
 func (t *ProjectTemplates) HandlerModuleTemplate() string
 ```
 
-**Contenu typique d'un template** (exemple: UserEntityTemplate):
+**Contenu typique d'un template** (exemple: ModelsUserTemplate):
 
 ```go
-func (t *ProjectTemplates) UserEntityTemplate() string {
-    return `package user
+func (t *ProjectTemplates) ModelsUserTemplate() string {
+    return `package models
 
 import (
     "time"
-    "golang.org/x/crypto/bcrypt"
     "gorm.io/gorm"
 )
 
+// User represents the domain entity for a user
 type User struct {
-    ID        uint           ` + "`gorm:\"primarykey\" json:\"id\"`" + `
-    CreatedAt time.Time      ` + "`json:\"created_at\"`" + `
-    UpdatedAt time.Time      ` + "`json:\"updated_at\"`" + `
-    DeletedAt gorm.DeletedAt ` + "`gorm:\"index\" json:\"-\"`" + `
-
-    Email    string ` + "`gorm:\"uniqueIndex;not null\" json:\"email\"`" + `
-    Password string ` + "`gorm:\"not null\" json:\"-\"`" + `
+    ID           uint           ` + "`gorm:\"primaryKey\" json:\"id\"`" + `
+    Email        string         ` + "`gorm:\"uniqueIndex;not null\" json:\"email\"`" + `
+    PasswordHash string         ` + "`gorm:\"not null\" json:\"-\"`" + `
+    CreatedAt    time.Time      ` + "`gorm:\"autoCreateTime\" json:\"created_at\"`" + `
+    UpdatedAt    time.Time      ` + "`gorm:\"autoUpdateTime\" json:\"updated_at\"`" + `
+    DeletedAt    gorm.DeletedAt ` + "`gorm:\"index\" json:\"deleted_at,omitempty\"`" + `
 }
 
-func (u *User) HashPassword() error {
-    // bcrypt hashing
+// RefreshToken represents a refresh token for session management
+type RefreshToken struct {
+    ID        uint      ` + "`gorm:\"primaryKey\" json:\"id\"`" + `
+    UserID    uint      ` + "`gorm:\"not null;index\" json:\"user_id\"`" + `
+    Token     string    ` + "`gorm:\"uniqueIndex;not null\" json:\"token\"`" + `
+    ExpiresAt time.Time ` + "`gorm:\"not null\" json:\"expires_at\"`" + `
+    Revoked   bool      ` + "`gorm:\"not null;default:false\" json:\"revoked\"`" + `
+    CreatedAt time.Time ` + "`gorm:\"autoCreateTime\" json:\"created_at\"`" + `
+    UpdatedAt time.Time ` + "`gorm:\"autoUpdateTime\" json:\"updated_at\"`" + `
 }
 
-func (u *User) ComparePassword(password string) error {
-    // bcrypt comparison
+func (rt *RefreshToken) IsExpired() bool {
+    return time.Now().After(rt.ExpiresAt)
+}
+
+func (rt *RefreshToken) IsRevoked() bool {
+    return rt.Revoked
+}
+
+// AuthResponse represents the authentication response with tokens
+type AuthResponse struct {
+    AccessToken  string ` + "`json:\"access_token\"`" + `
+    RefreshToken string ` + "`json:\"refresh_token\"`" + `
+    ExpiresIn    int64  ` + "`json:\"expires_in\"`" + `
 }
 `
 }
 ```
+
+**Pourquoi `models` au lieu de `domain/user`?**
+- **Évite les dépendances circulaires**: Les interfaces peuvent référencer les modèles sans créer de cycles
+- **Centralisation**: Les entités sont définies en un seul endroit
+- **Réutilisabilité**: Tous les layers (domain, interfaces, adapters) peuvent importer models sans conflit
 
 ## Patterns et conventions
 
