@@ -1,8 +1,8 @@
 package main
 
-// UserEntityTemplate returns the internal/domain/user/entity.go file content
-func (t *ProjectTemplates) UserEntityTemplate() string {
-	return `package user
+// ModelsUserTemplate returns the internal/models/user.go file content with domain entities
+func (t *ProjectTemplates) ModelsUserTemplate() string {
+	return `package models
 
 import (
 	"time"
@@ -19,14 +19,6 @@ type User struct {
 	UpdatedAt    time.Time      ` + "`gorm:\"autoUpdateTime\" json:\"updated_at\"`" + `
 	DeletedAt    gorm.DeletedAt ` + "`gorm:\"index\" json:\"deleted_at,omitempty\"`" + `
 }
-`
-}
-
-// UserRefreshTokenTemplate returns the internal/domain/user/refresh_token.go file content
-func (t *ProjectTemplates) UserRefreshTokenTemplate() string {
-	return `package user
-
-import "time"
 
 // RefreshToken represents a refresh token for session management
 type RefreshToken struct {
@@ -48,35 +40,29 @@ func (rt *RefreshToken) IsExpired() bool {
 func (rt *RefreshToken) IsRevoked() bool {
 	return rt.Revoked
 }
+
+// AuthResponse represents the authentication response with tokens
+type AuthResponse struct {
+	AccessToken  string ` + "`json:\"access_token\"`" + `
+	RefreshToken string ` + "`json:\"refresh_token\"`" + `
+	ExpiresIn    int64  ` + "`json:\"expires_in\"`" + `
+}
 `
+}
+
+// UserEntityTemplate is deprecated - models are now in the models package
+func (t *ProjectTemplates) UserEntityTemplate() string {
+	return ``
+}
+
+// UserRefreshTokenTemplate is deprecated - models are now in the models package
+func (t *ProjectTemplates) UserRefreshTokenTemplate() string {
+	return ``
 }
 
 // UserInterfacesTemplate returns the internal/interfaces/services.go file content
 func (t *ProjectTemplates) UserInterfacesTemplate() string {
 	return `package interfaces
-
-import (
-	"context"
-
-	"` + t.projectName + `/internal/domain/user"
-)
-
-// AuthService defines the interface for authentication operations.
-// Implemented by internal/domain/user/Service.
-type AuthService interface {
-	Register(ctx context.Context, email, password string) (*user.User, error)
-	Authenticate(ctx context.Context, email, password string) (*user.AuthResponse, error)
-	RefreshToken(ctx context.Context, oldToken string) (*user.AuthResponse, error)
-}
-
-// UserService defines the business logic operations for user management.
-// Implemented by internal/domain/user/Service.
-type UserService interface {
-	GetProfile(ctx context.Context, userID uint) (*user.User, error)
-	GetAll(ctx context.Context, page, limit int) ([]*user.User, int64, error)
-	UpdateUser(ctx context.Context, userID uint, email string) (*user.User, error)
-	DeleteUser(ctx context.Context, userID uint) error
-}
 
 // TokenService defines the interface for token generation.
 // Implemented by pkg/auth/JWTService.
@@ -94,21 +80,21 @@ import (
 	"context"
 	"time"
 
-	"` + t.projectName + `/internal/domain/user"
+	"` + t.projectName + `/internal/models"
 )
 
 // UserRepository defines the interface for user data persistence.
 type UserRepository interface {
-	CreateUser(ctx context.Context, user *user.User) error
-	GetUserByEmail(ctx context.Context, email string) (*user.User, error)
-	FindByID(ctx context.Context, id uint) (*user.User, error)
-	FindAll(ctx context.Context, page, limit int) ([]*user.User, int64, error)
-	Update(ctx context.Context, user *user.User) error
+	CreateUser(ctx context.Context, user *models.User) error
+	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
+	FindByID(ctx context.Context, id uint) (*models.User, error)
+	FindAll(ctx context.Context, page, limit int) ([]*models.User, int64, error)
+	Update(ctx context.Context, user *models.User) error
 	Delete(ctx context.Context, id uint) error
 	SaveRefreshToken(ctx context.Context, UserID uint, token string, expiresAt time.Time) error
-	GetRefreshToken(ctx context.Context, token string) (*user.RefreshToken, error)
+	GetRefreshToken(ctx context.Context, token string) (*models.RefreshToken, error)
 	RevokeRefreshToken(ctx context.Context, tokenID uint) error
-	RotateRefreshToken(ctx context.Context, oldTokenID uint, newToken *user.RefreshToken) error
+	RotateRefreshToken(ctx context.Context, oldTokenID uint, newToken *models.RefreshToken) error
 }
 `
 }
@@ -124,7 +110,7 @@ import (
 
 	"gorm.io/gorm"
 	"` + t.projectName + `/internal/domain"
-	"` + t.projectName + `/internal/domain/user"
+	"` + t.projectName + `/internal/models"
 )
 
 // UserRepository implements user data persistence using GORM
@@ -138,13 +124,13 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 }
 
 // CreateUser creates a new user in the database
-func (r *UserRepository) CreateUser(ctx context.Context, u *user.User) error {
+func (r *UserRepository) CreateUser(ctx context.Context, u *models.User) error {
 	return r.db.WithContext(ctx).Create(u).Error
 }
 
 // GetUserByEmail retrieves a user by email, returns nil if not found
-func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*user.User, error) {
-	var u user.User
+func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	var u models.User
 	err := r.db.WithContext(ctx).Where("email = ?", email).First(&u).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -156,8 +142,8 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*use
 }
 
 // FindByID retrieves a user by ID, returns nil if not found
-func (r *UserRepository) FindByID(ctx context.Context, id uint) (*user.User, error) {
-	var u user.User
+func (r *UserRepository) FindByID(ctx context.Context, id uint) (*models.User, error) {
+	var u models.User
 	err := r.db.WithContext(ctx).Where("id = ?", id).First(&u).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -169,12 +155,12 @@ func (r *UserRepository) FindByID(ctx context.Context, id uint) (*user.User, err
 }
 
 // FindAll retrieves all users from the database (excluding soft-deleted)
-func (r *UserRepository) FindAll(ctx context.Context, page, limit int) ([]*user.User, int64, error) {
-	var users []*user.User
+func (r *UserRepository) FindAll(ctx context.Context, page, limit int) ([]*models.User, int64, error) {
+	var users []*models.User
 	var total int64
 
 	// Use the same query base for both Count and Find to ensure consistency
-	query := r.db.WithContext(ctx).Model(&user.User{})
+	query := r.db.WithContext(ctx).Model(&models.User{})
 
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
@@ -189,18 +175,18 @@ func (r *UserRepository) FindAll(ctx context.Context, page, limit int) ([]*user.
 }
 
 // Update updates an existing user in the database
-func (r *UserRepository) Update(ctx context.Context, u *user.User) error {
+func (r *UserRepository) Update(ctx context.Context, u *models.User) error {
 	return r.db.WithContext(ctx).Updates(u).Error
 }
 
 // Delete performs a soft delete on the user (sets deleted_at)
 func (r *UserRepository) Delete(ctx context.Context, id uint) error {
-	return r.db.WithContext(ctx).Delete(&user.User{}, id).Error
+	return r.db.WithContext(ctx).Delete(&models.User{}, id).Error
 }
 
 // SaveRefreshToken saves a refresh token for the given user
 func (r *UserRepository) SaveRefreshToken(ctx context.Context, userID uint, token string, expiresAt time.Time) error {
-	refreshToken := &user.RefreshToken{
+	refreshToken := &models.RefreshToken{
 		UserID:    userID,
 		Token:     token,
 		ExpiresAt: expiresAt,
@@ -210,8 +196,8 @@ func (r *UserRepository) SaveRefreshToken(ctx context.Context, userID uint, toke
 }
 
 // GetRefreshToken retrieves a refresh token by token string
-func (r *UserRepository) GetRefreshToken(ctx context.Context, token string) (*user.RefreshToken, error) {
-	var rt user.RefreshToken
+func (r *UserRepository) GetRefreshToken(ctx context.Context, token string) (*models.RefreshToken, error) {
+	var rt models.RefreshToken
 	err := r.db.WithContext(ctx).Where("token = ?", token).First(&rt).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -224,16 +210,16 @@ func (r *UserRepository) GetRefreshToken(ctx context.Context, token string) (*us
 
 // RevokeRefreshToken marks a refresh token as revoked
 func (r *UserRepository) RevokeRefreshToken(ctx context.Context, tokenID uint) error {
-	return r.db.WithContext(ctx).Model(&user.RefreshToken{}).
+	return r.db.WithContext(ctx).Model(&models.RefreshToken{}).
 		Where("id = ?", tokenID).
 		Update("revoked", true).Error
 }
 
 // RotateRefreshToken performs atomic token rotation: revocation of old and creation of new
-func (r *UserRepository) RotateRefreshToken(ctx context.Context, oldTokenID uint, newToken *user.RefreshToken) error {
+func (r *UserRepository) RotateRefreshToken(ctx context.Context, oldTokenID uint, newToken *models.RefreshToken) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// 1. Revoke old token with optimistic locking check
-		result := tx.Model(&user.RefreshToken{}).
+		result := tx.Model(&models.RefreshToken{}).
 			Where("id = ? AND revoked = ?", oldTokenID, false).
 			Update("revoked", true)
 
@@ -461,40 +447,23 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 	"` + t.projectName + `/internal/domain"
+	"` + t.projectName + `/internal/interfaces"
+	"` + t.projectName + `/internal/models"
 )
-
-// UserRepository defines the persistence interface required by the service
-type UserRepository interface {
-	CreateUser(ctx context.Context, user *User) error
-	GetUserByEmail(ctx context.Context, email string) (*User, error)
-	FindByID(ctx context.Context, id uint) (*User, error)
-	FindAll(ctx context.Context, page, limit int) ([]*User, int64, error)
-	Update(ctx context.Context, user *User) error
-	Delete(ctx context.Context, id uint) error
-	SaveRefreshToken(ctx context.Context, userID uint, token string, expiresAt time.Time) error
-	GetRefreshToken(ctx context.Context, token string) (*RefreshToken, error)
-	RevokeRefreshToken(ctx context.Context, tokenID uint) error
-	RotateRefreshToken(ctx context.Context, oldTokenID uint, newToken *RefreshToken) error
-}
-
-// TokenService defines the token generation interface required by the service
-type TokenService interface {
-	GenerateTokens(userID uint) (accessToken string, refreshToken string, expiresIn int64, err error)
-}
 
 // Service handles user business logic
 type Service struct {
-	repo         UserRepository
-	tokenService TokenService
+	repo         interfaces.UserRepository
+	tokenService interfaces.TokenService
 }
 
 // NewService creates a new user service
-func NewService(repo UserRepository) *Service {
+func NewService(repo interfaces.UserRepository) *Service {
 	return &Service{repo: repo}
 }
 
 // NewServiceWithJWT creates a new user service with JWT support
-func NewServiceWithJWT(repo UserRepository, tokenService TokenService) *Service {
+func NewServiceWithJWT(repo interfaces.UserRepository, tokenService interfaces.TokenService) *Service {
 	return &Service{
 		repo:         repo,
 		tokenService: tokenService,
@@ -502,7 +471,7 @@ func NewServiceWithJWT(repo UserRepository, tokenService TokenService) *Service 
 }
 
 // Register creates a new user account with the given email and password
-func (s *Service) Register(ctx context.Context, email, password string) (*User, error) {
+func (s *Service) Register(ctx context.Context, email, password string) (*models.User, error) {
 	existing, err := s.repo.GetUserByEmail(ctx, email)
 	if err != nil {
 		return nil, fmt.Errorf("failed to check existing user: %w", err)
@@ -520,7 +489,7 @@ func (s *Service) Register(ctx context.Context, email, password string) (*User, 
 		return nil, fmt.Errorf("password hash generation produced empty result")
 	}
 
-	newUser := &User{
+	newUser := &models.User{
 		Email:        email,
 		PasswordHash: string(hashedBytes),
 	}
@@ -533,15 +502,8 @@ func (s *Service) Register(ctx context.Context, email, password string) (*User, 
 	return newUser, nil
 }
 
-// AuthResponse represents the authentication response with tokens
-type AuthResponse struct {
-	AccessToken  string ` + "`json:\"access_token\"`" + `
-	RefreshToken string ` + "`json:\"refresh_token\"`" + `
-	ExpiresIn    int64  ` + "`json:\"expires_in\"`" + `
-}
-
 // Authenticate validates user credentials and returns JWT tokens
-func (s *Service) Authenticate(ctx context.Context, email, password string) (*AuthResponse, error) {
+func (s *Service) Authenticate(ctx context.Context, email, password string) (*models.AuthResponse, error) {
 	u, err := s.repo.GetUserByEmail(ctx, email)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user: %w", err)
@@ -568,7 +530,7 @@ func (s *Service) Authenticate(ctx context.Context, email, password string) (*Au
 		return nil, fmt.Errorf("failed to save refresh token: %w", err)
 	}
 
-	return &AuthResponse{
+	return &models.AuthResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		ExpiresIn:    expiresIn,
@@ -576,7 +538,7 @@ func (s *Service) Authenticate(ctx context.Context, email, password string) (*Au
 }
 
 // RefreshToken validates an existing refresh token and generates new tokens
-func (s *Service) RefreshToken(ctx context.Context, oldToken string) (*AuthResponse, error) {
+func (s *Service) RefreshToken(ctx context.Context, oldToken string) (*models.AuthResponse, error) {
 	rt, err := s.repo.GetRefreshToken(ctx, oldToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get refresh token: %w", err)
@@ -601,7 +563,7 @@ func (s *Service) RefreshToken(ctx context.Context, oldToken string) (*AuthRespo
 	}
 
 	refreshExpiresAt := time.Now().Add(7 * 24 * time.Hour)
-	newRefreshToken := &RefreshToken{
+	newRefreshToken := &models.RefreshToken{
 		UserID:    rt.UserID,
 		Token:     refreshToken,
 		ExpiresAt: refreshExpiresAt,
@@ -617,7 +579,7 @@ func (s *Service) RefreshToken(ctx context.Context, oldToken string) (*AuthRespo
 		return nil, fmt.Errorf("failed to rotate refresh token: %w", err)
 	}
 
-	return &AuthResponse{
+	return &models.AuthResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		ExpiresIn:    expiresIn,
@@ -625,7 +587,7 @@ func (s *Service) RefreshToken(ctx context.Context, oldToken string) (*AuthRespo
 }
 
 // GetProfile retrieves a user's profile by their ID
-func (s *Service) GetProfile(ctx context.Context, userID uint) (*User, error) {
+func (s *Service) GetProfile(ctx context.Context, userID uint) (*models.User, error) {
 	u, err := s.repo.FindByID(ctx, userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user: %w", err)
@@ -639,7 +601,7 @@ func (s *Service) GetProfile(ctx context.Context, userID uint) (*User, error) {
 }
 
 // GetAll retrieves all users from the database
-func (s *Service) GetAll(ctx context.Context, page, limit int) ([]*User, int64, error) {
+func (s *Service) GetAll(ctx context.Context, page, limit int) ([]*models.User, int64, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -658,7 +620,7 @@ func (s *Service) GetAll(ctx context.Context, page, limit int) ([]*User, int64, 
 }
 
 // UpdateUser updates a user's email address
-func (s *Service) UpdateUser(ctx context.Context, userID uint, email string) (*User, error) {
+func (s *Service) UpdateUser(ctx context.Context, userID uint, email string) (*models.User, error) {
 	u, err := s.repo.FindByID(ctx, userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user: %w", err)
@@ -719,18 +681,18 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"` + t.projectName + `/internal/domain"
-	"` + t.projectName + `/internal/interfaces"
+	"` + t.projectName + `/internal/domain/user"
 	"` + t.projectName + `/pkg/auth"
 )
 
 // UserHandler handles user-related HTTP requests
 type UserHandler struct {
-	service  interfaces.UserService
+	service  *user.Service
 	validate *validator.Validate
 }
 
 // NewUserHandler creates a new UserHandler instance
-func NewUserHandler(service interfaces.UserService) *UserHandler {
+func NewUserHandler(service *user.Service) *UserHandler {
 	return &UserHandler{
 		service:  service,
 		validate: validator.New(),
@@ -959,17 +921,17 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"` + t.projectName + `/internal/domain"
-	"` + t.projectName + `/internal/interfaces"
+	"` + t.projectName + `/internal/domain/user"
 )
 
 // AuthHandler handles authentication-related HTTP requests
 type AuthHandler struct {
-	service  interfaces.AuthService
+	service  *user.Service
 	validate *validator.Validate
 }
 
 // NewAuthHandler creates a new AuthHandler instance
-func NewAuthHandler(service interfaces.AuthService) *AuthHandler {
+func NewAuthHandler(service *user.Service) *AuthHandler {
 	return &AuthHandler{
 		service:  service,
 		validate: validator.New(),

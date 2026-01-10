@@ -55,6 +55,7 @@ func createProjectStructure(projectPath string) error {
 		"internal/adapters/middleware",
 		"internal/domain",
 		"internal/interfaces",
+		"internal/models",
 		"internal/infrastructure/database",
 		"internal/infrastructure/server",
 		"pkg/config",

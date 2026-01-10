@@ -646,7 +646,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"` + t.projectName + `/internal/domain/user"
+	"` + t.projectName + `/internal/models"
 	"` + t.projectName + `/pkg/config"
 )
 
@@ -688,7 +688,7 @@ func NewDatabase(logger zerolog.Logger) (*gorm.DB, error) {
 	sqlDB.SetConnMaxLifetime(5 * 60) // 5 minutes
 
 	// AutoMigrate database schemas
-	if err := db.AutoMigrate(&user.User{}, &user.RefreshToken{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.RefreshToken{}); err != nil {
 		return nil, fmt.Errorf("failed to run database migrations: %w", err)
 	}
 

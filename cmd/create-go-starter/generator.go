@@ -83,12 +83,8 @@ func generateProjectFiles(projectPath, projectName string) error {
 			Content: templates.DomainErrorsTemplate(),
 		},
 		{
-			Path:    filepath.Join(projectPath, "internal", "domain", "user", "entity.go"),
-			Content: templates.UserEntityTemplate(),
-		},
-		{
-			Path:    filepath.Join(projectPath, "internal", "domain", "user", "refresh_token.go"),
-			Content: templates.UserRefreshTokenTemplate(),
+			Path:    filepath.Join(projectPath, "internal", "models", "user.go"),
+			Content: templates.ModelsUserTemplate(),
 		},
 		{
 			Path:    filepath.Join(projectPath, "internal", "domain", "user", "service.go"),
