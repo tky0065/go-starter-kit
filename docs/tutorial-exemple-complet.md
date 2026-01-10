@@ -105,10 +105,10 @@ blog-api/
 ├── cmd/
 │   └── main.go                       # Point d'entrée avec fx DI
 ├── internal/
+│   ├── models/
+│   │   └── user.go                   # Entités: User, RefreshToken, AuthResponse
 │   ├── domain/
 │   │   ├── user/                     # Domaine User (pré-généré)
-│   │   │   ├── entity.go
-│   │   │   ├── refresh_token.go
 │   │   │   ├── service.go
 │   │   │   └── module.go
 │   │   └── errors.go
@@ -125,8 +125,6 @@ blog-api/
 │   │   ├── database/
 │   │   └── server/
 │   └── interfaces/                   # Ports (interfaces)
-│       ├── auth_service.go
-│       ├── user_service.go
 │       └── user_repository.go
 ├── pkg/
 │   ├── auth/                         # JWT utilities
@@ -317,14 +315,10 @@ Nous allons maintenant ajouter notre première fonctionnalité: les articles de 
 
 ### 5.1 Créer l'entité Post
 
-```bash
-mkdir -p internal/domain/post
-```
-
-Créer le fichier `internal/domain/post/entity.go`:
+Créer le fichier `internal/models/post.go`:
 
 ```go
-package post
+package models
 
 import (
 	"strings"
@@ -417,17 +411,17 @@ package interfaces
 import (
 	"context"
 
-	"blog-api/internal/domain/post"
+	"blog-api/internal/models"
 )
 
 // PostService définit les opérations métier sur les articles
 type PostService interface {
-	Create(ctx context.Context, authorID uint, title, content, tags string) (*post.Post, error)
-	GetByID(ctx context.Context, id uint) (*post.Post, error)
-	GetBySlug(ctx context.Context, slug string) (*post.Post, error)
-	List(ctx context.Context, limit, offset int) ([]*post.Post, int64, error)
-	ListByAuthor(ctx context.Context, authorID uint, limit, offset int) ([]*post.Post, int64, error)
-	Update(ctx context.Context, id uint, title, content, tags *string) (*post.Post, error)
+	Create(ctx context.Context, authorID uint, title, content, tags string) (*models.Post, error)
+	GetByID(ctx context.Context, id uint) (*models.Post, error)
+	GetBySlug(ctx context.Context, slug string) (*models.Post, error)
+	List(ctx context.Context, limit, offset int) ([]*models.Post, int64, error)
+	ListByAuthor(ctx context.Context, authorID uint, limit, offset int) ([]*models.Post, int64, error)
+	Update(ctx context.Context, id uint, title, content, tags *string) (*models.Post, error)
 	Publish(ctx context.Context, id uint) error
 	Unpublish(ctx context.Context, id uint) error
 	Delete(ctx context.Context, id uint) error
@@ -444,17 +438,17 @@ package interfaces
 import (
 	"context"
 
-	"blog-api/internal/domain/post"
+	"blog-api/internal/models"
 )
 
 // PostRepository définit les opérations de persistance pour les articles
 type PostRepository interface {
-	Create(ctx context.Context, post *post.Post) error
-	FindByID(ctx context.Context, id uint) (*post.Post, error)
-	FindBySlug(ctx context.Context, slug string) (*post.Post, error)
-	FindAll(ctx context.Context, limit, offset int) ([]*post.Post, int64, error)
-	FindByAuthorID(ctx context.Context, authorID uint, limit, offset int) ([]*post.Post, int64, error)
-	Update(ctx context.Context, post *post.Post) error
+	Create(ctx context.Context, post *models.Post) error
+	FindByID(ctx context.Context, id uint) (*models.Post, error)
+	FindBySlug(ctx context.Context, slug string) (*models.Post, error)
+	FindAll(ctx context.Context, limit, offset int) ([]*models.Post, int64, error)
+	FindByAuthorID(ctx context.Context, authorID uint, limit, offset int) ([]*models.Post, int64, error)
+	Update(ctx context.Context, post *models.Post) error
 	Delete(ctx context.Context, id uint) error
 }
 ```
@@ -632,7 +626,7 @@ package repository
 import (
 	"context"
 
-	"blog-api/internal/domain/post"
+	"blog-api/internal/models"
 	"blog-api/internal/interfaces"
 	"gorm.io/gorm"
 )
@@ -647,12 +641,12 @@ func NewPostRepository(db *gorm.DB) interfaces.PostRepository {
 }
 
 // Create insère un nouvel article dans la base de données
-func (r *postRepository) Create(ctx context.Context, post *post.Post) error {
+func (r *postRepository) Create(ctx context.Context, post *models.Post) error {
 	return r.db.WithContext(ctx).Create(post).Error
 }
 
 // FindByID récupère un article par son ID
-func (r *postRepository) FindByID(ctx context.Context, id uint) (*post.Post, error) {
+func (r *postRepository) FindByID(ctx context.Context, id uint) (*models.Post, error) {
 	var p post.Post
 	err := r.db.WithContext(ctx).First(&p, id).Error
 	if err != nil {
@@ -662,7 +656,7 @@ func (r *postRepository) FindByID(ctx context.Context, id uint) (*post.Post, err
 }
 
 // FindBySlug récupère un article par son slug
-func (r *postRepository) FindBySlug(ctx context.Context, slug string) (*post.Post, error) {
+func (r *postRepository) FindBySlug(ctx context.Context, slug string) (*models.Post, error) {
 	var p post.Post
 	err := r.db.WithContext(ctx).Where("slug = ?", slug).First(&p).Error
 	if err != nil {
@@ -673,12 +667,12 @@ func (r *postRepository) FindBySlug(ctx context.Context, slug string) (*post.Pos
 
 // FindAll récupère tous les articles avec pagination
 // Retourne les posts + le total count
-func (r *postRepository) FindAll(ctx context.Context, limit, offset int) ([]*post.Post, int64, error) {
-	var posts []*post.Post
+func (r *postRepository) FindAll(ctx context.Context, limit, offset int) ([]*models.Post, int64, error) {
+	var posts []*models.Post
 	var total int64
 
 	// Count total
-	if err := r.db.WithContext(ctx).Model(&post.Post{}).Count(&total).Error; err != nil {
+	if err := r.db.WithContext(ctx).Model(&models.Post{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -693,14 +687,14 @@ func (r *postRepository) FindAll(ctx context.Context, limit, offset int) ([]*pos
 }
 
 // FindByAuthorID récupère les articles d'un auteur avec pagination
-func (r *postRepository) FindByAuthorID(ctx context.Context, authorID uint, limit, offset int) ([]*post.Post, int64, error) {
-	var posts []*post.Post
+func (r *postRepository) FindByAuthorID(ctx context.Context, authorID uint, limit, offset int) ([]*models.Post, int64, error) {
+	var posts []*models.Post
 	var total int64
 
 	query := r.db.WithContext(ctx).Where("author_id = ?", authorID)
 
 	// Count total
-	if err := query.Model(&post.Post{}).Count(&total).Error; err != nil {
+	if err := query.Model(&models.Post{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -715,13 +709,13 @@ func (r *postRepository) FindByAuthorID(ctx context.Context, authorID uint, limi
 }
 
 // Update met à jour un article
-func (r *postRepository) Update(ctx context.Context, post *post.Post) error {
+func (r *postRepository) Update(ctx context.Context, post *models.Post) error {
 	return r.db.WithContext(ctx).Save(post).Error
 }
 
 // Delete supprime un article (soft delete avec GORM)
 func (r *postRepository) Delete(ctx context.Context, id uint) error {
-	return r.db.WithContext(ctx).Delete(&post.Post{}, id).Error
+	return r.db.WithContext(ctx).Delete(&models.Post{}, id).Error
 }
 ```
 
@@ -1127,7 +1121,7 @@ package main
 import (
 	"context"
 
-	"blog-api/internal/domain/post"  // Ajouté
+	"blog-api/internal/models"  // Ajouté
 	"blog-api/internal/domain/user"
 	"blog-api/internal/infrastructure/database"
 	"blog-api/internal/infrastructure/server"
@@ -1177,7 +1171,7 @@ Ajouter l'entité Post aux migrations:
 package database
 
 import (
-	"blog-api/internal/domain/post"  // Ajouté
+	"blog-api/internal/models"  // Ajouté
 	"blog-api/internal/domain/user"
 	"github.com/rs/zerolog"
 	"gorm.io/gorm"
@@ -1188,9 +1182,9 @@ func RunMigrations(db *gorm.DB, logger zerolog.Logger) error {
 	logger.Info().Msg("Running database migrations...")
 
 	if err := db.AutoMigrate(
-		&user.User{},
-		&user.RefreshToken{},
-		&post.Post{},  // Ajouté
+		&models.User{},
+		&models.RefreshToken{},
+		&models.Post{},  // Ajouté
 	); err != nil {
 		logger.Error().Err(err).Msg("Failed to run migrations")
 		return err
@@ -1331,10 +1325,10 @@ Maintenant, ajoutons les commentaires sur les articles.
 mkdir -p internal/domain/comment
 ```
 
-Créer `internal/domain/comment/entity.go`:
+Créer `internal/models/comment.go`:
 
 ```go
-package comment
+package models
 
 import (
 	"time"
@@ -1360,7 +1354,7 @@ type Comment struct {
 
 ### 11.2 Créer le service Comment (simplifié)
 
-Créer `internal/interfaces/comment_service.go`:
+Créer `internal/interfaces/comment_repository.go`:
 
 ```go
 package interfaces
@@ -1368,12 +1362,12 @@ package interfaces
 import (
 	"context"
 
-	"blog-api/internal/domain/comment"
+	"blog-api/internal/models"
 )
 
-type CommentService interface {
-	Create(ctx context.Context, postID, authorID uint, content string) (*comment.Comment, error)
-	ListByPost(ctx context.Context, postID uint) ([]*comment.Comment, error)
+type CommentRepository interface {
+	Create(ctx context.Context, comment *models.Comment) error
+	FindByPost(ctx context.Context, postID uint) ([]*models.Comment, error)
 	Delete(ctx context.Context, id uint) error
 }
 ```
@@ -1386,21 +1380,22 @@ package comment
 import (
 	"context"
 
+	"blog-api/internal/models"
 	"blog-api/internal/interfaces"
 	"github.com/rs/zerolog"
 )
 
-type service struct {
+type Service struct {
 	repo   interfaces.CommentRepository
 	logger zerolog.Logger
 }
 
-func NewService(repo interfaces.CommentRepository, logger zerolog.Logger) interfaces.CommentService {
-	return &service{repo: repo, logger: logger}
+func NewService(repo interfaces.CommentRepository, logger zerolog.Logger) *Service {
+	return &Service{repo: repo, logger: logger}
 }
 
-func (s *service) Create(ctx context.Context, postID, authorID uint, content string) (*Comment, error) {
-	comment := &Comment{
+func (s *Service) Create(ctx context.Context, postID, authorID uint, content string) (*models.Comment, error) {
+	comment := &models.Comment{
 		PostID:   postID,
 		AuthorID: authorID,
 		Content:  content,
@@ -1455,7 +1450,7 @@ commentRoutes.Delete("/:id", commentHandler.Delete)
 
 ### 11.5 Mettre à jour les migrations
 
-Dans `migrations.go`, ajouter `&comment.Comment{}`.
+Dans `migrations.go`, ajouter `&models.Comment{}`.
 
 ✅ **Checkpoint 4**: Les commentaires sont fonctionnels!
 
@@ -1474,7 +1469,7 @@ import (
 	"context"
 	"testing"
 
-	"blog-api/internal/domain/post"
+	"blog-api/internal/models"
 	"blog-api/internal/interfaces/mocks"
 	"blog-api/pkg/logger"
 	"github.com/stretchr/testify/assert"
@@ -1487,7 +1482,7 @@ func TestPostService_Create(t *testing.T) {
 	log := logger.New(&config.Config{AppEnv: "test"})
 	service := post.NewService(mockRepo, log)
 
-	mockRepo.On("Create", mock.Anything, mock.AnythingOfType("*post.Post")).
+	mockRepo.On("Create", mock.Anything, mock.AnythingOfType("*models.Post")).
 		Return(nil)
 
 	// Act

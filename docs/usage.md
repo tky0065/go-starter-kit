@@ -77,6 +77,9 @@ mon-projet/
 │   └── main.go                              # Point d'entrée de l'application
 │
 ├── internal/
+│   ├── models/
+│   │   └── user.go                          # Entités partagées: User, RefreshToken, AuthResponse
+│   │
 │   ├── adapters/
 │   │   ├── handlers/
 │   │   │   ├── auth_handler.go              # Endpoints auth (register, login, refresh)
@@ -99,10 +102,6 @@ mon-projet/
 │   │   ├── errors.go                        # Erreurs métier personnalisées
 │   │   ├── errors_test.go                   # Tests erreurs
 │   │   └── user/
-│   │       ├── entity.go                    # Entité User avec validations
-│   │       ├── entity_test.go               # Tests entité User
-│   │       ├── refresh_token.go             # Entité RefreshToken
-│   │       ├── refresh_token_test.go        # Tests RefreshToken
 │   │       ├── service.go                   # Logique métier (Register, Login, etc.)
 │   │       ├── service_test.go              # Tests service
 │   │       └── module.go                    # Module fx pour dependency injection
@@ -168,6 +167,32 @@ mon-projet/
 
 **Pattern**: Un seul fichier minimal qui orchestre les dépendances.
 
+### `/internal/models`
+
+**Rôle**: Entités de domaine partagées (domain entities) utilisées à travers toute l'application.
+
+**Contenu**:
+- `user.go`: Définit toutes les entités liées aux utilisateurs
+  - `User`: Entité principale avec tags GORM (ID, Email, PasswordHash, timestamps)
+  - `RefreshToken`: Entité pour la gestion des refresh tokens JWT
+  - `AuthResponse`: DTO pour les réponses d'authentification
+
+**Pourquoi un package séparé?**
+- **Évite les dépendances circulaires**: Avant, `interfaces` → `domain/user` → `interfaces` créait un cycle
+- **Maintenant**: `interfaces` → `models` ← `domain/user` (pas de cycle!)
+- **Centralisation**: Les entités sont définies en un seul endroit
+- **Réutilisabilité**: Tous les layers (domain, interfaces, adapters) peuvent importer models sans conflit
+
+**Import**:
+```go
+import "mon-projet/internal/models"
+
+user := &models.User{
+    Email: "user@example.com",
+    PasswordHash: hashedPassword,
+}
+```
+
 ### `/internal/domain`
 
 **Rôle**: Couche métier (logique business), cœur de l'architecture hexagonale.
@@ -175,12 +200,10 @@ mon-projet/
 **Contenu**:
 - `errors.go`: Définition des erreurs métier (DomainError, NotFoundError, ValidationError, etc.)
 - `user/`: Domaine User
-  - `entity.go`: Struct User avec tags GORM et validations
-  - `refresh_token.go`: Struct RefreshToken pour gestion des tokens JWT
   - `service.go`: Logique métier (Register, Login, GetUserByID, UpdateUser, DeleteUser)
   - `module.go`: Module fx qui fournit le service
 
-**Principe**: Le domaine ne doit **jamais** importer d'autres packages (adapters, infrastructure). Les dépendances sont inversées via interfaces (ports).
+**Principe**: Le domaine ne doit **jamais** importer d'autres packages (adapters, infrastructure). Les dépendances sont inversées via interfaces (ports). Les entités sont maintenant dans `internal/models` pour éviter les cycles de dépendances.
 
 ### `/internal/adapters`
 
@@ -241,7 +264,7 @@ mon-projet/
 - `database.go`:
   - Connexion PostgreSQL via GORM
   - Configuration du pool de connexions
-  - AutoMigrate des entités (User, RefreshToken)
+  - AutoMigrate des entités (`models.User`, `models.RefreshToken`)
   - Gestion du lifecycle (fermeture connexion)
 
 #### `/internal/infrastructure/server`
@@ -261,11 +284,12 @@ mon-projet/
 **Rôle**: Définition des ports (interfaces) pour l'architecture hexagonale.
 
 **Contenu**:
-- `auth_service.go`: Interface pour les opérations d'authentification
-- `user_service.go`: Interface pour les opérations utilisateur
 - `user_repository.go`: Interface pour la persistance utilisateur
 
-**Principe**: Les adapters dépendent de ces interfaces, pas des implémentations concrètes.
+**Principe**:
+- Les adapters dépendent de ces interfaces, pas des implémentations concrètes
+- Les interfaces référencent `models.*` pour les types de retour/paramètres
+- Exemple: `CreateUser(ctx context.Context, user *models.User) error`
 
 ### `/pkg`
 
