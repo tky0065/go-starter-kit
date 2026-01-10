@@ -55,7 +55,7 @@ cd go-starter-kit/examples/blog-api
 ### 2. Installer les dépendances
 
 ```bash
-go mod download
+go mod tidy
 ```
 
 ### 3. Configurer l'environnement

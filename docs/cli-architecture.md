@@ -644,7 +644,7 @@ Utiliser: `github.com/manifoldco/promptui`
 **Dépendances du CLI**: **AUCUNE** (seulement stdlib)
 
 **Avantages**:
-- Simplicité: Pas de go mod download pour le CLI
+- Simplicité: Pas de go mod tidy pour le CLI
 - Portabilité: Binaire statique sans dépendances
 - Installation légère: `go install` très rapide
 - Maintenance facile: Pas de breaking changes externes
@@ -737,7 +737,7 @@ cat test-project/cmd/main.go
 
 # Test build
 cd test-project
-go mod download
+go mod tidy
 go build ./...
 
 # Nettoyer

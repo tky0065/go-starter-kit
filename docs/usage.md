@@ -440,7 +440,7 @@ JWT_SECRET=le_secret_genere
 ### Étape 3: Installer les dépendances
 
 ```bash
-go mod download
+go mod tidy
 ```
 
 ### Étape 4: Lancer PostgreSQL

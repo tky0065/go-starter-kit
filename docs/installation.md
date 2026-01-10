@@ -370,7 +370,7 @@ Ou autorisez l'application dans:
 go version
 
 # Mettre à jour les dépendances
-go mod download
+go mod tidy
 go mod tidy
 
 # Nettoyer et rebuild

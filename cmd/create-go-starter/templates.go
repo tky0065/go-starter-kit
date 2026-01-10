@@ -47,7 +47,7 @@ func main() {
 	// Infrastructure components (Fiber, GORM, fx) will be added in Story 1.4
 	fmt.Println("` + t.projectName + ` - Project structure initialized")
 	fmt.Println("Next steps:")
-	fmt.Println("  1. Run 'go mod download' to fetch dependencies")
+	fmt.Println("  1. Run 'go mod tidy' to fetch dependencies")
 	fmt.Println("  2. Implement your application logic")
 	fmt.Println("  3. Run 'make build' to build the binary")
 }
@@ -63,7 +63,7 @@ WORKDIR /app
 
 # Copy go mod files
 COPY go.mod ./
-RUN go mod download
+RUN go mod tidy
 
 # Copy source code
 COPY . .
@@ -337,7 +337,7 @@ Application backend Go générée avec create-go-starter. Architecture hexagonal
 ### 1. Installer les dépendances
 
 ` + "```bash" + `
-go mod download
+go mod tidy
 ` + "```" + `
 
 ### 2. Configurer l'environnement
@@ -999,7 +999,7 @@ Guide pour lancer ` + t.projectName + ` en 5 minutes.
 ### 1. Installer les dépendances
 
 ` + "```bash" + `
-go mod download
+go mod tidy
 ` + "```" + `
 
 ### 2. Configurer la base de données

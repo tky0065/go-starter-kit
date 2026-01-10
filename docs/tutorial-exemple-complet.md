@@ -153,7 +153,7 @@ blog-api/
 
 ```bash
 cd blog-api
-go mod download
+go mod tidy
 ```
 
 Cette commande télécharge toutes les dépendances (Fiber, GORM, fx, etc.).

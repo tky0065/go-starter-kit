@@ -80,8 +80,8 @@ Cette commande va:
 ```bash
 cd mon-super-projet
 
-# Installer les dépendances
-go mod download
+# Installer les dépendances et générer go.sum
+go mod tidy
 
 # Configurer le JWT secret dans .env
 # JWT_SECRET=<générer avec: openssl rand -base64 32>

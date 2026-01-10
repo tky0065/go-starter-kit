@@ -189,7 +189,7 @@ make lint
 # Test manuel
 ./create-go-starter test-project
 cd test-project
-go mod download
+go mod tidy
 make run
 ```
 
