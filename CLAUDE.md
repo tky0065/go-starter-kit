@@ -87,3 +87,83 @@ The tool uses a simple command-line interface with:
 ### Testing Approach
 - Unit tests are co-located with source code (e.g., `colors_test.go` alongside `main.go`)
 - Tests use standard Go testing patterns with table-driven tests where appropriate
+
+## Documentation Maintenance
+
+**CRITICAL REQUIREMENT**: Documentation must ALWAYS be updated when making changes to the codebase.
+
+### When to Update Documentation
+
+Update documentation immediately after ANY of the following changes:
+
+1. **Adding new features**:
+   - New templates added → Update `docs/cli-architecture.md`
+   - New generated files → Update `docs/usage.md` and `docs/generated-project-guide.md`
+   - New domain entities → Update all architecture diagrams and examples
+
+2. **Modifying architecture**:
+   - Package structure changes → Update ALL documentation files
+   - Dependency changes → Update architecture diagrams
+   - Pattern changes → Update examples in `docs/generated-project-guide.md`
+
+3. **Changing templates**:
+   - Template modifications → Update corresponding documentation sections
+   - New imports or dependencies → Update code examples throughout docs
+
+4. **Bug fixes that affect structure**:
+   - If the fix changes how generated projects work → Update docs immediately
+
+### Documentation Files to Check
+
+After ANY code change, review and update these files as needed:
+
+- `README.md` - Main project overview and quick start
+- `docs/usage.md` - Usage guide and generated structure
+- `docs/generated-project-guide.md` - Complete guide for generated projects
+- `docs/cli-architecture.md` - CLI tool architecture documentation
+- `CLAUDE.md` - This file (AI context)
+- `GEMINI.md` - Gemini AI context
+
+### Documentation Update Process
+
+1. **Make code changes** (templates, generator, etc.)
+2. **Test the changes** (generate a test project, verify it works)
+3. **Update ALL affected documentation** (use search to find all references)
+4. **Verify documentation** (read through to ensure consistency)
+5. **Commit code AND documentation together** in the same commit or sequential commits
+
+### Example Workflow
+
+```bash
+# 1. Make code changes
+vim cmd/create-go-starter/templates_user.go
+
+# 2. Test changes
+go build -o create-go-starter ./cmd/create-go-starter
+./create-go-starter test-project
+cd test-project && go build ./...
+
+# 3. Update documentation
+vim docs/cli-architecture.md
+vim docs/generated-project-guide.md
+vim docs/usage.md
+
+# 4. Commit together
+git add cmd/ docs/ README.md CLAUDE.md
+git commit -m "feat: add new feature
+
+- Implement feature X in templates
+- Update all documentation to reflect changes
+- Add examples in generated-project-guide.md"
+
+git push origin main
+```
+
+### Why This Matters
+
+- **Users rely on accurate docs**: Out-of-date documentation causes confusion and wastes time
+- **Future contributors**: Need current docs to understand the system
+- **AI assistants**: Use these docs as context for helping with the project
+- **Consistency**: Prevents drift between code and documentation
+
+**Remember**: Code without updated documentation is incomplete work. Always update docs as part of your changes.

@@ -95,3 +95,85 @@
 - `cmd/create-go-starter/templates.go`: Source of truth for the generated boilerplate.
 - `go.mod`: Project dependencies.
 - `_bmad-output/planning-artifacts/prd.md`: High-level product requirements and vision.
+
+---
+
+## Documentation Maintenance Policy
+
+**⚠️ MANDATORY REQUIREMENT**: Documentation MUST be updated whenever code changes are made.
+
+### Update Documentation When:
+
+1. **Adding Features**:
+   - New templates → Update `docs/cli-architecture.md`
+   - New generated files → Update `docs/usage.md` and `docs/generated-project-guide.md`
+   - New entities/models → Update all architecture diagrams and code examples
+
+2. **Modifying Architecture**:
+   - Package restructuring → Update ALL documentation files
+   - Dependency graph changes → Update architecture diagrams
+   - Design pattern changes → Update examples and explanations
+
+3. **Template Changes**:
+   - Any template modification → Update corresponding documentation
+   - Import changes → Update all code examples throughout docs
+
+4. **Bug Fixes**:
+   - If fix changes generated project behavior → Documentation update required
+
+### Critical Documentation Files
+
+Always review these after code changes:
+
+| File | Purpose | Update When |
+|------|---------|-------------|
+| `README.md` | Project overview | Structure or features change |
+| `docs/usage.md` | Usage guide | Generated structure changes |
+| `docs/generated-project-guide.md` | Complete guide | Any template or architecture change |
+| `docs/cli-architecture.md` | CLI internals | Generator or template logic changes |
+| `CLAUDE.md` | AI context (this repo) | Project structure or conventions change |
+| `GEMINI.md` | AI context (this file) | Project structure or conventions change |
+
+### Standard Workflow
+
+```bash
+# Step 1: Code changes
+vim cmd/create-go-starter/templates_user.go
+
+# Step 2: Test thoroughly
+go build -o create-go-starter ./cmd/create-go-starter
+./create-go-starter test-validation-project
+cd test-validation-project && go mod tidy && go build ./...
+
+# Step 3: Update ALL affected docs
+vim docs/cli-architecture.md
+vim docs/generated-project-guide.md
+vim README.md
+
+# Step 4: Verify documentation accuracy
+grep -r "old_pattern" docs/  # Find outdated references
+# Update all found instances
+
+# Step 5: Commit code + docs together
+git add cmd/ docs/ README.md CLAUDE.md GEMINI.md
+git commit -m "feat: implement feature X
+
+- Add feature implementation in templates
+- Update all documentation to reflect changes
+- Add comprehensive examples in docs"
+```
+
+### Why This Is Critical
+
+- **User Trust**: Outdated docs erode confidence in the project
+- **Development Velocity**: Accurate docs enable faster onboarding and contributions
+- **AI Assistance**: LLMs rely on current documentation for context
+- **Maintenance**: Prevents technical debt accumulation
+
+### Enforcement
+
+- Pull requests with code changes but no doc updates will be questioned
+- Documentation updates are NOT optional—they are part of the feature
+- When in doubt, over-document rather than under-document
+
+**Remember**: Undocumented code changes are considered incomplete work.
