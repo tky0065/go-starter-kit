@@ -284,7 +284,7 @@ user := &models.User{
   - Configuration Fiber app
   - Middleware error handler
   - Lifecycle du serveur (start, graceful shutdown)
-  - Note: Les routes sont enregistrées via `handlers.Module` qui appelle `http.RegisterRoutes()`
+  - Note: Les routes sont enregistrées via `server.Module` qui invoque `httpRoutes.RegisterRoutes()` avec `fx.Invoke`
 
 ### `/internal/interfaces`
 

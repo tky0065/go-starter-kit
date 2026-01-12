@@ -822,9 +822,16 @@ func NewDatabase(config *config.Config, logger zerolog.Logger) (*gorm.DB, error)
 
 ##### `server/server.go`
 
-Le serveur crée l'application Fiber et gère le lifecycle. Les routes sont enregistrées via `handlers.Module` qui appelle `http.RegisterRoutes()`.
+Le serveur crée l'application Fiber et gère le lifecycle. Les routes sont enregistrées via `server.Module` qui invoque `httpRoutes.RegisterRoutes()` avec `fx.Invoke`.
 
 ```go
+// Module provides the Fiber server dependency via fx
+var Module = fx.Module("server",
+    fx.Provide(NewServer),
+    fx.Invoke(registerHooks),
+    fx.Invoke(httpRoutes.RegisterRoutes),  // Routes centralisées
+)
+
 func NewServer(logger zerolog.Logger, db *gorm.DB) *fiber.App {
     app := fiber.New(fiber.Config{
         AppName:      "mon-projet",
@@ -832,8 +839,6 @@ func NewServer(logger zerolog.Logger, db *gorm.DB) *fiber.App {
     })
 
     logger.Info().Msg("Fiber server initialized with centralized error handler")
-
-    // Routes are registered via handlers.Module -> http.RegisterRoutes()
 
     return app
 }
