@@ -332,6 +332,10 @@ Application backend Go générée avec create-go-starter. Architecture hexagonal
 - **PostgreSQL** - Base de données (peut être lancée via Docker)
 - **Docker** (optionnel) - Pour containerisation
 - **Make** - Pour les commandes de build
+- **swag** (optionnel) - Pour régénérer la documentation Swagger
+  ` + "```bash" + `
+  go install github.com/swaggo/swag/cmd/swag@latest
+  ` + "```" + `
 
 ## Installation rapide
 
@@ -1376,6 +1380,15 @@ else
     exit 1
 fi
 
+# Install swag CLI silently for Swagger documentation
+if ! command_exists swag; then
+    print_info "Installation de swag (générateur Swagger)..."
+    go install github.com/swaggo/swag/cmd/swag@latest 2>/dev/null
+    if command_exists swag; then
+        print_success "swag installé avec succès"
+    fi
+fi
+
 # ============================================================================
 # STEP 3: Generate JWT Secret
 # ============================================================================
@@ -1496,9 +1509,21 @@ else
 fi
 
 # ============================================================================
-# STEP 5: Run Tests
+# STEP 5: Generate Swagger & Run Tests
 # ============================================================================
-print_step "Étape 5/6: Exécution des tests"
+print_step "Étape 5/6: Génération Swagger & Tests"
+
+# Generate Swagger documentation
+if command_exists swag; then
+    print_info "Génération de la documentation Swagger..."
+    if swag init -g cmd/main.go --output docs 2>/dev/null; then
+        print_success "Documentation Swagger générée"
+    else
+        print_info "Génération Swagger ignorée (exécutez 'make swagger' manuellement)"
+    fi
+else
+    print_info "swag non installé, génération Swagger ignorée"
+fi
 
 print_info "Lancement des tests unitaires..."
 if go test ./... 2>/dev/null; then
@@ -1542,9 +1567,7 @@ echo -e "${GREEN}╚════════════════════
 print_info "Prochaines étapes:"
 echo "  1. Lancer l'application:    make run"
 echo "  2. Vérifier la santé:       curl http://localhost:8080/health"
-echo "  3. Créer un utilisateur:    curl -X POST http://localhost:8080/api/v1/auth/register \\"
-echo "                              -H 'Content-Type: application/json' \\"
-echo "                              -d '{\"email\":\"test@example.com\",\"password\":\"password123\"}'"
+echo "  3. Documentation Swagger:   http://localhost:8080/swagger/index.html"
 echo ""
 print_info "Documentation:"
 echo "  - Guide rapide: docs/quick-start.md"
