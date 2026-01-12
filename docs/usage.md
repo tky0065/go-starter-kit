@@ -147,6 +147,7 @@ mon-projet/
 ├── .golangci.yml                            # Configuration golangci-lint
 ├── Dockerfile                               # Build Docker multi-stage
 ├── Makefile                                 # Commandes utiles (run, test, lint, etc.)
+├── setup.sh                                 # Script de configuration automatique
 ├── go.mod                                   # Module Go et dépendances
 └── README.md                                # Documentation du projet
 ```
@@ -438,7 +439,45 @@ Build multi-stage optimisé:
 
 ## Workflow après génération
 
-Une fois le projet créé, suivez ces étapes:
+Une fois le projet créé, vous avez deux options pour configurer votre projet:
+
+### Option A: Configuration automatique avec setup.sh (Recommandé) 🚀
+
+Le CLI génère automatiquement un script `setup.sh` qui automatise toute la configuration initiale.
+
+**Fonctionnalités du script**:
+- ✅ Vérification des prérequis (Go, OpenSSL, Docker)
+- ✅ Installation des dépendances Go (`go mod tidy`)
+- ✅ Génération automatique du JWT secret
+- ✅ Configuration de PostgreSQL (Docker ou local)
+- ✅ Exécution des tests
+- ✅ Vérification de l'installation
+
+**Utilisation**:
+
+```bash
+cd mon-projet
+./setup.sh
+```
+
+Le script est **interactif** et vous guidera à travers les choix:
+- Docker ou PostgreSQL local
+- Régénération du JWT secret si déjà configuré
+- Validation à chaque étape
+
+**Après l'exécution du script**:
+
+```bash
+make run
+```
+
+C'est tout! Votre application est prête.
+
+---
+
+### Option B: Configuration manuelle
+
+Si vous préférez configurer manuellement ou si le script setup.sh échoue, suivez ces étapes:
 
 ### Étape 1: Naviguer dans le projet
 

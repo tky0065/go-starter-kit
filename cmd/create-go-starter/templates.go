@@ -1209,3 +1209,285 @@ APP_PORT=3000
 Bon développement! 🚀
 `
 }
+
+// SetupScriptTemplate returns the setup.sh file content for automated project setup
+func (t *ProjectTemplates) SetupScriptTemplate() string {
+	return `#!/bin/bash
+
+# setup.sh - Automated setup script for ` + t.projectName + `
+# This script configures your development environment with all required dependencies
+
+set -e  # Exit on error
+
+# Color codes for output
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# Helper functions
+print_success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+print_info() {
+    echo -e "${YELLOW}ℹ️  $1${NC}"
+}
+
+print_error() {
+    echo -e "${RED}❌ $1${NC}"
+}
+
+print_step() {
+    echo -e "\n${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${GREEN}$1${NC}"
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+}
+
+# Check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Welcome message
+echo -e "\n${GREEN}╔════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${GREEN}║  Configuration automatique de ` + t.projectName + `${NC}"
+echo -e "${GREEN}╚════════════════════════════════════════════════════════════════╝${NC}\n"
+
+# ============================================================================
+# STEP 1: Check Prerequisites
+# ============================================================================
+print_step "Étape 1/6: Vérification des prérequis"
+
+MISSING_DEPS=0
+
+# Check Go
+if command_exists go; then
+    GO_VERSION=$(go version | awk '{print $3}')
+    print_success "Go est installé: $GO_VERSION"
+else
+    print_error "Go n'est pas installé. Installez Go 1.25+ depuis https://golang.org/dl/"
+    MISSING_DEPS=1
+fi
+
+# Check openssl
+if command_exists openssl; then
+    print_success "OpenSSL est installé"
+else
+    print_error "OpenSSL n'est pas installé. Installez avec: brew install openssl (macOS) ou apt install openssl (Linux)"
+    MISSING_DEPS=1
+fi
+
+# Check Docker (optional but recommended)
+if command_exists docker; then
+    print_success "Docker est installé"
+    DOCKER_AVAILABLE=1
+else
+    print_info "Docker n'est pas installé (optionnel). PostgreSQL devra être installé localement."
+    DOCKER_AVAILABLE=0
+fi
+
+# Check psql (PostgreSQL client)
+if command_exists psql; then
+    print_success "Client PostgreSQL (psql) est installé"
+    PSQL_AVAILABLE=1
+else
+    print_info "Client PostgreSQL (psql) n'est pas installé (optionnel)"
+    PSQL_AVAILABLE=0
+fi
+
+if [ $MISSING_DEPS -eq 1 ]; then
+    print_error "Des dépendances obligatoires sont manquantes. Installez-les et relancez ce script."
+    exit 1
+fi
+
+# ============================================================================
+# STEP 2: Install Go Dependencies
+# ============================================================================
+print_step "Étape 2/6: Installation des dépendances Go"
+
+print_info "Exécution de 'go mod tidy'..."
+if go mod tidy; then
+    print_success "Dépendances Go installées avec succès"
+else
+    print_error "Échec de l'installation des dépendances Go"
+    exit 1
+fi
+
+# ============================================================================
+# STEP 3: Generate JWT Secret
+# ============================================================================
+print_step "Étape 3/6: Génération du JWT secret"
+
+if [ -f .env ]; then
+    JWT_CURRENT=$(grep "^JWT_SECRET=" .env | cut -d '=' -f2)
+    if [ -n "$JWT_CURRENT" ] && [ "$JWT_CURRENT" != "" ]; then
+        print_info "JWT_SECRET existe déjà dans .env"
+        echo -n "Voulez-vous le régénérer? (y/N): "
+        read -r REGEN_JWT
+        if [[ ! $REGEN_JWT =~ ^[Yy]$ ]]; then
+            print_info "JWT_SECRET conservé"
+            SKIP_JWT=1
+        else
+            SKIP_JWT=0
+        fi
+    else
+        SKIP_JWT=0
+    fi
+else
+    print_error "Fichier .env introuvable. Création depuis .env.example..."
+    if [ -f .env.example ]; then
+        cp .env.example .env
+        print_success "Fichier .env créé"
+    else
+        print_error ".env.example introuvable. Impossible de continuer."
+        exit 1
+    fi
+    SKIP_JWT=0
+fi
+
+if [ $SKIP_JWT -eq 0 ]; then
+    print_info "Génération d'un JWT secret sécurisé..."
+    JWT_SECRET=$(openssl rand -base64 32)
+
+    # Update .env file with JWT secret
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        sed -i '' "s|^JWT_SECRET=.*|JWT_SECRET=$JWT_SECRET|" .env
+    else
+        # Linux
+        sed -i "s|^JWT_SECRET=.*|JWT_SECRET=$JWT_SECRET|" .env
+    fi
+
+    print_success "JWT_SECRET généré et ajouté à .env"
+fi
+
+# ============================================================================
+# STEP 4: Configure PostgreSQL
+# ============================================================================
+print_step "Étape 4/6: Configuration de PostgreSQL"
+
+if [ $DOCKER_AVAILABLE -eq 1 ]; then
+    echo -n "Voulez-vous démarrer PostgreSQL avec Docker? (Y/n): "
+    read -r USE_DOCKER
+    if [[ ! $USE_DOCKER =~ ^[Nn]$ ]]; then
+        # Check if postgres container already exists
+        if docker ps -a --format '{{.Names}}' | grep -q "^postgres$"; then
+            print_info "Conteneur PostgreSQL 'postgres' existe déjà"
+
+            # Check if it's running
+            if docker ps --format '{{.Names}}' | grep -q "^postgres$"; then
+                print_success "PostgreSQL est déjà en cours d'exécution"
+            else
+                print_info "Démarrage du conteneur existant..."
+                docker start postgres
+                sleep 2
+                print_success "PostgreSQL démarré"
+            fi
+        else
+            print_info "Création et démarrage d'un nouveau conteneur PostgreSQL..."
+            docker run -d \
+                --name postgres \
+                -e POSTGRES_DB=` + t.projectName + ` \
+                -e POSTGRES_PASSWORD=postgres \
+                -p 5432:5432 \
+                postgres:16-alpine
+
+            # Wait for PostgreSQL to be ready
+            print_info "Attente du démarrage de PostgreSQL (10 secondes)..."
+            sleep 10
+            print_success "PostgreSQL démarré avec Docker"
+        fi
+
+        POSTGRES_STARTED=1
+    else
+        print_info "Configuration Docker PostgreSQL ignorée"
+        POSTGRES_STARTED=0
+    fi
+else
+    print_info "Docker non disponible. Vérification de PostgreSQL local..."
+    POSTGRES_STARTED=0
+fi
+
+# Try to connect to PostgreSQL to verify it's running
+print_info "Vérification de la connexion PostgreSQL..."
+if [ $PSQL_AVAILABLE -eq 1 ]; then
+    if PGPASSWORD=postgres psql -h localhost -U postgres -d ` + t.projectName + ` -c '\q' 2>/dev/null; then
+        print_success "Connexion PostgreSQL réussie"
+        POSTGRES_STARTED=1
+    else
+        if [ $POSTGRES_STARTED -eq 0 ]; then
+            print_error "Impossible de se connecter à PostgreSQL"
+            print_info "Assurez-vous que PostgreSQL est installé et démarré:"
+            print_info "  macOS: brew install postgresql && brew services start postgresql"
+            print_info "  Linux: sudo apt install postgresql && sudo systemctl start postgresql"
+            print_info "\nPuis créez la base de données:"
+            print_info "  createdb ` + t.projectName + `"
+            exit 1
+        fi
+    fi
+else
+    print_info "Client psql non disponible, impossible de vérifier la connexion"
+    if [ $POSTGRES_STARTED -eq 0 ]; then
+        print_info "Assurez-vous que PostgreSQL est installé et démarré manuellement"
+    fi
+fi
+
+# ============================================================================
+# STEP 5: Run Tests
+# ============================================================================
+print_step "Étape 5/6: Exécution des tests"
+
+print_info "Lancement des tests unitaires..."
+if go test ./... 2>/dev/null; then
+    print_success "Tous les tests passent"
+else
+    print_info "Certains tests ont échoué (normal si la base n'est pas encore configurée)"
+fi
+
+# ============================================================================
+# STEP 6: Verify Installation
+# ============================================================================
+print_step "Étape 6/6: Vérification de l'installation"
+
+print_info "Vérification de la configuration..."
+
+# Check .env file
+if [ -f .env ]; then
+    if grep -q "^JWT_SECRET=..*" .env; then
+        print_success ".env configuré avec JWT_SECRET"
+    else
+        print_error ".env manque JWT_SECRET"
+    fi
+else
+    print_error "Fichier .env manquant"
+fi
+
+# Check go.mod
+if [ -f go.mod ]; then
+    print_success "go.mod présent"
+else
+    print_error "go.mod manquant"
+fi
+
+# ============================================================================
+# Summary and Next Steps
+# ============================================================================
+echo -e "\n${GREEN}╔════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${GREEN}║  ✅ Configuration terminée avec succès!${NC}"
+echo -e "${GREEN}╚════════════════════════════════════════════════════════════════╝${NC}\n"
+
+print_info "Prochaines étapes:"
+echo "  1. Lancer l'application:    make run"
+echo "  2. Vérifier la santé:       curl http://localhost:8080/health"
+echo "  3. Créer un utilisateur:    curl -X POST http://localhost:8080/api/v1/auth/register \\"
+echo "                              -H 'Content-Type: application/json' \\"
+echo "                              -d '{\"email\":\"test@example.com\",\"password\":\"password123\"}'"
+echo ""
+print_info "Documentation:"
+echo "  - Guide rapide: docs/quick-start.md"
+echo "  - README:       README.md"
+echo ""
+print_success "Bon développement! 🚀"
+`
+}

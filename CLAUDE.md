@@ -50,6 +50,45 @@ go vet ./...
 go run ./cmd/create-go-starter <project-name>
 ```
 
+### After Creating a Project
+
+Once you've created a project with `create-go-starter`, you have two setup options:
+
+**Option 1: Automated Setup (Recommended)**
+```bash
+cd <project-name>
+./setup.sh
+make run
+```
+
+The `setup.sh` script automates:
+- Go dependency installation (`go mod tidy`)
+- JWT secret generation (`openssl rand -base64 32`)
+- PostgreSQL configuration (Docker or local)
+- Installation verification
+
+**Option 2: Manual Setup**
+```bash
+cd <project-name>
+
+# Install dependencies
+go mod tidy
+
+# Generate JWT secret and add to .env
+openssl rand -base64 32
+# Edit .env and add: JWT_SECRET=<generated-secret>
+
+# Start PostgreSQL (Docker)
+docker run -d --name postgres \
+  -e POSTGRES_DB=<project-name> \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:16-alpine
+
+# Run the application
+make run
+```
+
 ## Project Structure
 
 ### CLI Tool Structure (this repository)
@@ -59,7 +98,7 @@ go run ./cmd/create-go-starter <project-name>
   - `templates.go` - Core templates (config, server, domain)
   - `templates_user.go` - User domain specific templates
   - `colors_test.go` - Tests for ANSI color formatting functions
-- `go.mod` - Go module definition (requires Go 1.25.0)
+- `go.mod` - Go module definition (requires Go 1.25.5)
 - `_bmad/` - BMAD workflow automation system (not part of core application)
 
 ### Generated Project Structure (projects created by the CLI)

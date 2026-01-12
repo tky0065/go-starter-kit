@@ -62,19 +62,46 @@
 
 ### The Generated Project
 
+**Option 1: Automated Setup (Recommended)**
+```bash
+cd <project-name>
+./setup.sh
+make run
+```
+
+The `setup.sh` script automatically handles:
+- Go dependency installation (`go mod tidy`)
+- JWT secret generation and configuration
+- PostgreSQL setup (Docker or local)
+- Installation verification
+
+**Option 2: Manual Setup**
 1.  **Initialize:**
     ```bash
     cd <project-name>
-    go mod download
-    cp .env.example .env
+    go mod tidy
     ```
-2.  **Run in Development:**
+2.  **Configure Environment:**
+    ```bash
+    # Generate JWT secret
+    openssl rand -base64 32
+    # Edit .env and add: JWT_SECRET=<generated-secret>
+    ```
+3.  **Start PostgreSQL:**
+    ```bash
+    docker run -d --name postgres \
+      -e POSTGRES_DB=<project-name> \
+      -e POSTGRES_PASSWORD=postgres \
+      -p 5432:5432 \
+      postgres:16-alpine
+    ```
+4.  **Run in Development:**
     ```bash
     make run
     # OR with hot-reload (requires air)
     make dev
     ```
-3.  **Run Tests:**
+5.  **Run Tests:**
     ```bash
     make test
     ```

@@ -15,9 +15,9 @@ create-go-starter (CLI)
 ```
 
 **Statistiques**:
-- Lignes de code: ~4,200+
-- Fichiers générés par projet: 45+
-- Templates: 30+ fonctions
+- Lignes de code: ~4,500+
+- Fichiers générés par projet: 46+
+- Templates: 31+ fonctions
 - Dépendances: Standard library uniquement
 
 ## Composants principaux
@@ -251,6 +251,22 @@ func (t *ProjectTemplates) ReadmeTemplate() string
 func (t *ProjectTemplates) DocsReadmeTemplate() string      // docs/README.md
 func (t *ProjectTemplates) QuickStartTemplate() string      // docs/quick-start.md
 ```
+
+#### Setup & Automation
+
+```go
+func (t *ProjectTemplates) SetupScriptTemplate() string     // setup.sh - Automated setup
+```
+
+**SetupScriptTemplate** génère un script bash interactif qui:
+- Vérifie les prérequis (Go, OpenSSL, Docker, psql)
+- Installe les dépendances (`go mod tidy`)
+- Génère et configure le JWT secret dans `.env`
+- Configure PostgreSQL (Docker ou local)
+- Exécute les tests de validation
+- Vérifie l'installation complète
+
+Le script est rendu exécutable automatiquement (`chmod 0755`) par `generator.go`.
 
 **Pattern de template**:
 

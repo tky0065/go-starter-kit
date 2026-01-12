@@ -77,6 +77,22 @@ Cette commande va:
 
 ### Lancer le projet généré
 
+#### Option 1: Configuration automatique (Recommandé) 🚀
+
+```bash
+cd mon-super-projet
+./setup.sh
+make run
+```
+
+Le script `setup.sh` automatise:
+- Installation des dépendances Go
+- Génération du JWT secret
+- Configuration de PostgreSQL (Docker ou local)
+- Vérification de l'installation
+
+#### Option 2: Configuration manuelle
+
 ```bash
 cd mon-super-projet
 
@@ -148,6 +164,7 @@ mon-super-projet/
 ├── .golangci.yml                  # Configuration du linter
 ├── Dockerfile                     # Build multi-stage pour production
 ├── Makefile                       # Commandes utiles (run, test, lint, docker, etc.)
+├── setup.sh                       # Script de configuration automatique
 ├── go.mod                         # Module Go avec dépendances
 └── README.md                      # Documentation du projet
 ```
@@ -191,14 +208,23 @@ go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@latest
 # 2. Créer un projet
 create-go-starter mon-projet
 
-# 3. Configurer et lancer
+# 3. Configuration automatique
+cd mon-projet
+./setup.sh
+
+# 4. Lancer
+make run
+
+# 5. Tester
+curl http://localhost:8080/health
+```
+
+Ou configuration manuelle:
+```bash
 cd mon-projet
 echo "JWT_SECRET=$(openssl rand -base64 32)" >> .env
 docker run -d --name postgres -e POSTGRES_DB=mon-projet -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:16-alpine
 make run
-
-# 4. Tester
-curl http://localhost:8080/health
 ```
 
 ## Exemples d'utilisation de l'API

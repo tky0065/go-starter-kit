@@ -177,10 +177,70 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Display success message
-	fmt.Printf("\n🎉 Projet '%s' créé avec succès!\n", Green(projectName))
-	fmt.Printf("\nProchaines étapes:\n")
-	fmt.Printf("  cd %s\n", projectName)
-	fmt.Printf("  go mod download\n")
-	fmt.Printf("  make run\n")
+	// Display success message with detailed setup instructions
+	fmt.Printf("\n%s\n", Green("════════════════════════════════════════════════════════════════"))
+	fmt.Printf("%s\n", Green("🎉 Projet '"+projectName+"' créé avec succès!"))
+	fmt.Printf("%s\n\n", Green("════════════════════════════════════════════════════════════════"))
+
+	fmt.Println("📋 Prochaines étapes - Configuration initiale:")
+	fmt.Println()
+
+	fmt.Println(Green("OPTION 1: Configuration automatique (Recommandé) 🚀"))
+	fmt.Println("  cd " + projectName)
+	fmt.Println("  ./setup.sh")
+	fmt.Println()
+
+	fmt.Println(Green("OPTION 2: Configuration manuelle"))
+	fmt.Println()
+	fmt.Println("1️⃣  Naviguer vers le projet:")
+	fmt.Println("    cd " + projectName)
+	fmt.Println()
+
+	fmt.Println("2️⃣  Installer les dépendances Go:")
+	fmt.Println("    go mod tidy")
+	fmt.Println()
+
+	fmt.Println("3️⃣  Configurer PostgreSQL (choisir une option):")
+	fmt.Println()
+	fmt.Println("    Option A - Docker (Recommandé):")
+	fmt.Println("    docker run -d --name postgres \\")
+	fmt.Println("      -e POSTGRES_DB=" + projectName + " \\")
+	fmt.Println("      -e POSTGRES_PASSWORD=postgres \\")
+	fmt.Println("      -p 5432:5432 \\")
+	fmt.Println("      postgres:16-alpine")
+	fmt.Println()
+	fmt.Println("    Option B - PostgreSQL local:")
+	fmt.Println("    # macOS: brew install postgresql && brew services start postgresql")
+	fmt.Println("    # Linux: sudo apt install postgresql && sudo systemctl start postgresql")
+	fmt.Println("    createdb " + projectName)
+	fmt.Println()
+
+	fmt.Println("4️⃣  Générer le JWT secret (OBLIGATOIRE):")
+	fmt.Println("    openssl rand -base64 32")
+	fmt.Println()
+	fmt.Println("    Puis éditer .env et ajouter:")
+	fmt.Println("    JWT_SECRET=<le_secret_généré>")
+	fmt.Println()
+
+	fmt.Println("5️⃣  Lancer l'application:")
+	fmt.Println("    make run")
+	fmt.Println()
+
+	fmt.Println("6️⃣  Vérifier l'installation:")
+	fmt.Println("    curl http://localhost:8080/health")
+	fmt.Println("    # Devrait retourner: {\"status\":\"ok\"}")
+	fmt.Println()
+
+	fmt.Println(Green("📚 Documentation complète:"))
+	fmt.Println("   - Guide rapide: " + projectName + "/docs/quick-start.md")
+	fmt.Println("   - README:       " + projectName + "/README.md")
+	fmt.Println()
+
+	fmt.Println(Green("⚠️  IMPORTANT:"))
+	fmt.Println("   • PostgreSQL DOIT être démarré avant de lancer l'application")
+	fmt.Println("   • JWT_SECRET DOIT être configuré dans .env")
+	fmt.Println("   • Le fichier .env a été créé automatiquement depuis .env.example")
+	fmt.Println()
+
+	fmt.Println(Green("✨ Bon développement avec " + projectName + "!"))
 }

@@ -178,6 +178,10 @@ func generateProjectFiles(projectPath, projectName string) error {
 			Path:    filepath.Join(projectPath, "docs", "quick-start.md"),
 			Content: templates.QuickStartTemplate(),
 		},
+		{
+			Path:    filepath.Join(projectPath, "setup.sh"),
+			Content: templates.SetupScriptTemplate(),
+		},
 	}
 
 	// Write all files
@@ -190,6 +194,12 @@ func generateProjectFiles(projectPath, projectName string) error {
 		if err := os.WriteFile(file.Path, []byte(file.Content), 0644); err != nil {
 			return fmt.Errorf("failed to write file %s: %w", file.Path, err)
 		}
+	}
+
+	// Make setup.sh executable
+	setupPath := filepath.Join(projectPath, "setup.sh")
+	if err := os.Chmod(setupPath, 0755); err != nil {
+		return fmt.Errorf("failed to make setup.sh executable: %w", err)
 	}
 
 	return nil
