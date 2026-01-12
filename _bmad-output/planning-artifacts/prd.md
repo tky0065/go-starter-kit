@@ -95,7 +95,7 @@ Transformation en plateforme écosystémique.
 Alex est un développeur JavaScript en reconversion vers Go. Il est enthousiaste mais frustré : ses trois dernières tentatives de créer une API REST propre ont fini en "code spaghetti". Il se perd entre les tutoriels contradictoires sur la structure des dossiers et la configuration de JWT. Il a peur de "mal faire".
 
 Un soir, il découvre `go-starter-kit`. Sceptique, il lance `go install ...` puis `create-go-starter learning-api`. En 15 secondes, le terminal lui affiche "Success". Il suit l'instruction `cd learning-api && make dev`.
-**Le moment clé :** Il voit les logs défiler, la base de données Docker démarrer, et l'API se lancer sur le port 3000. Il ouvre `localhost:3000/swagger` et voit une documentation interactive complète. Il teste l'authentification : ça marche.
+**Le moment clé :** Il voit les logs défiler, la base de données Docker démarrer, et l'API se lancer sur le port 8080. Il ouvre `localhost:8080/swagger` et voit une documentation interactive complète. Il teste l'authentification : ça marche.
 Il ouvre le code. Au lieu d'être effrayé, il trouve des commentaires clairs. Il voit exactement où ajouter son modèle "Todo". En copiant le pattern existant (Service -> Repository -> Handler), il crée son premier endpoint en 30 minutes. Il lance `make test` et voit que les tests passent. Pour la première fois, Alex se sent comme un "vrai" développeur Go professionnel.
 
 ### Journey 2: Sarah - Le Sprint du MVP (Tech Founder)

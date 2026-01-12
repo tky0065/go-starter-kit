@@ -172,7 +172,7 @@ cd my-api
 make dev
 ```
 
-**Premier Contact :** En quelques secondes, l'API tourne sur `localhost:3000`, Swagger UI est accessible, PostgreSQL via Docker fonctionne, un endpoint d'exemple avec JWT est opérationnel.
+**Premier Contact :** En quelques secondes, l'API tourne sur `localhost:8080`, Swagger UI est accessible, PostgreSQL via Docker fonctionne, un endpoint d'exemple avec JWT est opérationnel.
 
 **Moment "Aha!" :** "C'est exactement ce que je cherchais - tout fonctionne immédiatement !"
 

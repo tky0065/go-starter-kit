@@ -847,7 +847,7 @@ func NewServer(logger zerolog.Logger, db *gorm.DB) *fiber.App {
 func registerHooks(lifecycle fx.Lifecycle, app *fiber.App, logger zerolog.Logger) {
     lifecycle.Append(fx.Hook{
         OnStart: func(ctx context.Context) error {
-            port := config.GetEnv("APP_PORT", "3000")
+            port := config.GetEnv("APP_PORT", "8080")
             logger.Info().Str("port", port).Msg("Starting Fiber server")
 
             go func() {

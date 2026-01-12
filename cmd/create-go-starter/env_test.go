@@ -18,7 +18,7 @@ func TestCopyEnvFile(t *testing.T) {
 
 	// Create .env.example file
 	envExamplePath := filepath.Join(projectPath, ".env.example")
-	envExampleContent := "APP_NAME=test\nAPP_PORT=3000\n"
+	envExampleContent := "APP_NAME=test\nAPP_PORT=8080\n"
 	if err := os.WriteFile(envExamplePath, []byte(envExampleContent), 0644); err != nil {
 		t.Fatalf("Failed to create .env.example: %v", err)
 	}

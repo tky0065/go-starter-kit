@@ -69,7 +69,7 @@ so that je puisse comprendre et tester l'API sans lire le code source.
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:3000
+// @host localhost:8080
 // @BasePath /api/v1
 ```
 
@@ -184,7 +184,7 @@ All 4 acceptance criteria satisfied. CLI generator now produces Swagger-ready pr
 - ✅ General API documentation (@title, @version, @host, @BasePath, @securityDefinitions)
 - ✅ Handler-level annotations (already present: @Summary, @Router, @Param, @Success, @Failure)
 - ✅ `make swagger` command to generate docs
-- ✅ Interactive Swagger UI accessible at http://localhost:3000/swagger/index.html
+- ✅ Interactive Swagger UI accessible at http://localhost:8080/swagger/index.html
 
 **Implementation Grade**: A (complete Swagger integration)
 
