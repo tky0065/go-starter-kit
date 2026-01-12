@@ -131,6 +131,10 @@ func generateProjectFiles(projectPath, projectName string) error {
 			Content: templates.HealthHandlerTemplate(),
 		},
 		{
+			Path:    filepath.Join(projectPath, "internal", "adapters", "http", "routes.go"),
+			Content: templates.RoutesTemplate(),
+		},
+		{
 			Path:    filepath.Join(projectPath, "internal", "infrastructure", "database", "database.go"),
 			Content: templates.DatabaseTemplate(),
 		},

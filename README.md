@@ -146,10 +146,12 @@ mon-super-projet/
 │   │   │   └── error_handler.go   # Gestion centralisée des erreurs
 │   │   ├── repository/            # Implémentation des repositories
 │   │   │   └── user_repository.go # GORM implementation
-│   │   └── http/                  # Routes health check
+│   │   └── http/                  # HTTP utilities
+│   │       ├── health.go          # Handler health check
+│   │       └── routes.go          # Routes centralisées
 │   ├── infrastructure/            # Infrastructure
 │   │   ├── database/              # Configuration DB (GORM, migrations)
-│   │   └── server/                # Configuration Fiber app et routes
+│   │   └── server/                # Configuration Fiber app
 │   └── interfaces/                # Ports (interfaces)
 │       └── user_repository.go     # Interface UserRepository
 ├── pkg/                           # Packages réutilisables

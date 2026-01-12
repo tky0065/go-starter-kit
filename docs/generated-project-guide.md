@@ -237,6 +237,10 @@ flowchart TD
                 AuthH["auth_handler.go"]
                 UserH["user_handler.go"]
             end
+            subgraph HttpPkg["http/"]
+                Health["health.go"]
+                Routes["routes.go<br/>Routes centralisees"]
+            end
             subgraph MiddlewarePkg["middleware/"]
                 AuthM["auth_middleware.go"]
                 ErrorM["error_handler.go"]
@@ -262,6 +266,7 @@ flowchart TD
     Main --> Infra
     Main --> Pkg
     HandlersPkg --> Domain
+    HttpPkg --> HandlersPkg
     Domain --> InterfacesPkg
     RepoPkg -.-> InterfacesPkg
     RepoPkg --> Models
@@ -304,25 +309,44 @@ app := fiber.New(fiber.Config{
 })
 ```
 
-**Routes**: Organisées par groupes
+**Routes**: Centralisées dans `internal/adapters/http/routes.go`
 
 ```go
-api := app.Group("/api/v1")
+// routes.go - Toutes les routes de l'application
+func RegisterRoutes(
+    app *fiber.App,
+    authHandler *handlers.AuthHandler,
+    userHandler *handlers.UserHandler,
+    authMiddleware fiber.Handler,
+) {
+    // Health & Swagger
+    RegisterHealthRoutes(app)
+    app.Get("/swagger/*", swagger.WrapHandler)
 
-// Auth endpoints (public)
-auth := api.Group("/auth")
-auth.Post("/register", authHandler.Register)
-auth.Post("/login", authHandler.Login)
-auth.Post("/refresh", authHandler.RefreshToken)
+    // API v1
+    api := app.Group("/api")
+    v1 := api.Group("/v1")
 
-// User endpoints (protected)
-users := api.Group("/users")
-users.Use(authMiddleware.Authenticate())
-users.Get("/", userHandler.List)
-users.Get("/:id", userHandler.GetByID)
-users.Put("/:id", userHandler.Update)
-users.Delete("/:id", userHandler.Delete)
+    // Auth routes (public)
+    auth := v1.Group("/auth")
+    auth.Post("/register", authHandler.Register)
+    auth.Post("/login", authHandler.Login)
+    auth.Post("/refresh", authHandler.Refresh)
+
+    // User routes (protected)
+    users := v1.Group("/users", authMiddleware)
+    users.Get("/me", userHandler.GetMe)
+    users.Get("", userHandler.GetAllUsers)
+    users.Put("/:id", userHandler.UpdateUser)
+    users.Delete("/:id", userHandler.DeleteUser)
+}
 ```
+
+**Avantages de la centralisation des routes**:
+- Vue d'ensemble de toutes les routes API en un seul fichier
+- Facilite la documentation et le versioning de l'API
+- Séparation claire entre la définition des routes et la logique des handlers
+
 
 #### ORM: GORM
 
@@ -798,55 +822,76 @@ func NewDatabase(config *config.Config, logger zerolog.Logger) (*gorm.DB, error)
 
 ##### `server/server.go`
 
+Le serveur crée l'application Fiber et gère le lifecycle. Les routes sont enregistrées via `handlers.Module` qui appelle `http.RegisterRoutes()`.
+
 ```go
-func NewServer(
-    config *config.Config,
-    logger zerolog.Logger,
-    authHandler *handlers.AuthHandler,
-    userHandler *handlers.UserHandler,
-    authMiddleware *middleware.AuthMiddleware,
-    errorHandler *middleware.ErrorHandler,
-    lc fx.Lifecycle,
-) *fiber.App {
+func NewServer(logger zerolog.Logger, db *gorm.DB) *fiber.App {
     app := fiber.New(fiber.Config{
-        ErrorHandler: errorHandler.Handle,
+        AppName:      "mon-projet",
+        ErrorHandler: middleware.ErrorHandler,
     })
 
-    // Health check
-    app.Get("/health", func(c *fiber.Ctx) error {
-        return c.JSON(fiber.Map{"status": "ok"})
-    })
+    logger.Info().Msg("Fiber server initialized with centralized error handler")
 
-    // API routes
-    api := app.Group("/api/v1")
+    // Routes are registered via handlers.Module -> http.RegisterRoutes()
 
-    // Auth (public)
-    auth := api.Group("/auth")
-    auth.Post("/register", authHandler.Register)
-    auth.Post("/login", authHandler.Login)
-    auth.Post("/refresh", authHandler.RefreshToken)
+    return app
+}
 
-    // Users (protected)
-    users := api.Group("/users")
-    users.Use(authMiddleware.Authenticate())
-    users.Get("/", userHandler.List)
-    users.Get("/:id", userHandler.GetByID)
-    users.Put("/:id", userHandler.Update)
-    users.Delete("/:id", userHandler.Delete)
-
-    // Lifecycle
-    lc.Append(fx.Hook{
+// registerHooks registers lifecycle hooks for server startup and shutdown
+func registerHooks(lifecycle fx.Lifecycle, app *fiber.App, logger zerolog.Logger) {
+    lifecycle.Append(fx.Hook{
         OnStart: func(ctx context.Context) error {
-            go app.Listen(":" + config.AppPort)
-            logger.Info().Msg("Server started on :" + config.AppPort)
+            port := config.GetEnv("APP_PORT", "3000")
+            logger.Info().Str("port", port).Msg("Starting Fiber server")
+
+            go func() {
+                if err := app.Listen(":" + port); err != nil {
+                    logger.Error().Err(err).Msg("Server stopped unexpectedly")
+                }
+            }()
+
             return nil
         },
         OnStop: func(ctx context.Context) error {
-            return app.Shutdown()
+            logger.Info().Msg("Shutting down Fiber server gracefully")
+            return app.ShutdownWithContext(ctx)
         },
     })
+}
+```
 
-    return app
+##### `http/routes.go`
+
+Fichier centralisé pour toutes les routes de l'application :
+
+```go
+func RegisterRoutes(
+    app *fiber.App,
+    authHandler *handlers.AuthHandler,
+    userHandler *handlers.UserHandler,
+    authMiddleware fiber.Handler,
+) {
+    // Health & Swagger
+    RegisterHealthRoutes(app)
+    app.Get("/swagger/*", swagger.WrapHandler)
+
+    // API v1
+    api := app.Group("/api")
+    v1 := api.Group("/v1")
+
+    // Auth routes (public)
+    auth := v1.Group("/auth")
+    auth.Post("/register", authHandler.Register)
+    auth.Post("/login", authHandler.Login)
+    auth.Post("/refresh", authHandler.Refresh)
+
+    // User routes (protected)
+    users := v1.Group("/users", authMiddleware)
+    users.Get("/me", userHandler.GetMe)
+    users.Get("", userHandler.GetAllUsers)
+    users.Put("/:id", userHandler.UpdateUser)
+    users.Delete("/:id", userHandler.DeleteUser)
 }
 ```
 
@@ -1801,37 +1846,55 @@ func (h *ProductHandler) Delete(c *fiber.Ctx) error {
 
 #### Etape 7 : Ajouter les Routes
 
-**Modifier : `internal/infrastructure/server/server.go`**
+**Modifier : `internal/adapters/http/routes.go`**
 
 Ajoutez le parametre `productHandler` et les routes :
 
 ```go
-func NewServer(
-    config *config.Config,
-    logger zerolog.Logger,
+func RegisterRoutes(
+    app *fiber.App,
     authHandler *handlers.AuthHandler,
     userHandler *handlers.UserHandler,
     productHandler *handlers.ProductHandler,  // <- AJOUTER
-    authMiddleware *middleware.AuthMiddleware,
-    errorHandler *middleware.ErrorHandler,
-    lc fx.Lifecycle,
-) *fiber.App {
-    // ... configuration existante ...
+    authMiddleware fiber.Handler,
+) {
+    // Health & Swagger
+    RegisterHealthRoutes(app)
+    app.Get("/swagger/*", swagger.WrapHandler)
+
+    // API v1
+    api := app.Group("/api")
+    v1 := api.Group("/v1")
+
+    // Auth routes (public)
+    auth := v1.Group("/auth")
+    auth.Post("/register", authHandler.Register)
+    auth.Post("/login", authHandler.Login)
+    auth.Post("/refresh", authHandler.Refresh)
+
+    // User routes (protected)
+    users := v1.Group("/users", authMiddleware)
+    users.Get("/me", userHandler.GetMe)
+    users.Get("", userHandler.GetAllUsers)
+    users.Put("/:id", userHandler.UpdateUser)
+    users.Delete("/:id", userHandler.DeleteUser)
 
     // ============================================
-    // AJOUTER : Products routes (protected)
+    // AJOUTER : Product routes (protected)
     // ============================================
-    products := api.Group("/products")
-    products.Use(authMiddleware.Authenticate())
-    products.Post("/", productHandler.Create)
-    products.Get("/", productHandler.List)
+    products := v1.Group("/products", authMiddleware)
+    products.Post("", productHandler.Create)
+    products.Get("", productHandler.List)
     products.Get("/:id", productHandler.GetByID)
     products.Put("/:id", productHandler.Update)
     products.Delete("/:id", productHandler.Delete)
-
-    // ... reste du code ...
 }
 ```
+
+**Avantages de cette approche**:
+- Toutes les routes sont visibles en un seul fichier
+- Facile d'ajouter de nouveaux domaines
+- Le versioning de l'API est géré de manière centralisée
 
 ---
 

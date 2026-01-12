@@ -96,7 +96,8 @@ mon-projet/
 │   │   │   └── user_repository_test.go      # Tests repository
 │   │   └── http/
 │   │       ├── health.go                    # Handler health check
-│   │       └── health_test.go               # Tests health check
+│   │       ├── health_test.go               # Tests health check
+│   │       └── routes.go                    # Routes centralisées de l'API
 │   │
 │   ├── domain/
 │   │   ├── errors.go                        # Erreurs métier personnalisées
@@ -112,7 +113,7 @@ mon-projet/
 │   │   │   ├── database_test.go             # Tests database
 │   │   │   └── module.go                    # Module fx pour database
 │   │   └── server/
-│   │       ├── server.go                    # Configuration Fiber et routes
+│   │       ├── server.go                    # Configuration Fiber app
 │   │       ├── server_test.go               # Tests server
 │   │       └── module.go                    # Module fx pour server
 │   │
@@ -248,10 +249,16 @@ user := &models.User{
 
 #### `/internal/adapters/http`
 
-**Rôle**: Handlers HTTP simples (non liés au domaine).
+**Rôle**: Routes HTTP et handlers utilitaires.
 
 **Contenu**:
 - `health.go`: Endpoint GET /health pour monitoring
+- `routes.go`: Configuration centralisée de toutes les routes de l'API
+
+**Avantages de la centralisation des routes**:
+- Vue d'ensemble de toutes les routes en un seul fichier
+- Facilite la documentation et le versioning de l'API
+- Séparation claire entre définition des routes et logique des handlers
 
 ### `/internal/infrastructure`
 
@@ -275,10 +282,9 @@ user := &models.User{
 **Contenu**:
 - `server.go`:
   - Configuration Fiber app
-  - Enregistrement des routes
   - Middleware error handler
-  - Groupes de routes (/api/v1/auth, /api/v1/users)
   - Lifecycle du serveur (start, graceful shutdown)
+  - Note: Les routes sont enregistrées via `handlers.Module` qui appelle `http.RegisterRoutes()`
 
 ### `/internal/interfaces`
 

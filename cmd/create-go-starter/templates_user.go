@@ -865,8 +865,8 @@ func (t *ProjectTemplates) HandlerModuleTemplate() string {
 	return `package handlers
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"go.uber.org/fx"
+
 	"` + t.projectName + `/internal/domain/user"
 )
 
@@ -877,36 +877,7 @@ var Module = fx.Module("handlers",
 	fx.Provide(func(s *user.Service) *UserHandler {
 		return NewUserHandler(s)
 	}),
-	fx.Invoke(RegisterAllRoutes),
 )
-
-// RegisterAllRoutes registers all application routes with public and protected groups
-func RegisterAllRoutes(authHandler *AuthHandler, userHandler *UserHandler, app *fiber.App, authMiddleware fiber.Handler) {
-	// Create API group hierarchy for versioning
-	api := app.Group("/api")
-	v1 := api.Group("/v1")
-
-	// Register domain-specific routes
-	RegisterAuthRoutes(v1, authHandler)
-	RegisterUserRoutes(v1, userHandler, authMiddleware)
-}
-
-// RegisterAuthRoutes registers authentication-related routes (public)
-func RegisterAuthRoutes(v1 fiber.Router, authHandler *AuthHandler) {
-	authGroup := v1.Group("/auth")
-	authGroup.Post("/register", authHandler.Register)
-	authGroup.Post("/login", authHandler.Login)
-	authGroup.Post("/refresh", authHandler.Refresh)
-}
-
-// RegisterUserRoutes registers user-related routes (protected)
-func RegisterUserRoutes(v1 fiber.Router, userHandler *UserHandler, authMiddleware fiber.Handler) {
-	userGroup := v1.Group("/users", authMiddleware)
-	userGroup.Get("/me", userHandler.GetMe)
-	userGroup.Get("", userHandler.GetAllUsers)
-	userGroup.Put("/:id", userHandler.UpdateUser)
-	userGroup.Delete("/:id", userHandler.DeleteUser)
-}
 `
 }
 
@@ -1299,5 +1270,47 @@ var Module = fx.Module("auth",
 	}),
 	fx.Provide(NewJWTMiddleware),
 )
+`
+}
+
+// RoutesTemplate returns the internal/adapters/http/routes.go file content
+func (t *ProjectTemplates) RoutesTemplate() string {
+	return `package http
+
+import (
+	"github.com/gofiber/fiber/v2"
+	swagger "github.com/swaggo/fiber-swagger"
+
+	"` + t.projectName + `/internal/adapters/handlers"
+)
+
+// RegisterRoutes configures all application routes
+func RegisterRoutes(
+	app *fiber.App,
+	authHandler *handlers.AuthHandler,
+	userHandler *handlers.UserHandler,
+	authMiddleware fiber.Handler,
+) {
+	// Health & Swagger
+	RegisterHealthRoutes(app)
+	app.Get("/swagger/*", swagger.WrapHandler)
+
+	// API v1
+	api := app.Group("/api")
+	v1 := api.Group("/v1")
+
+	// Auth routes (public)
+	auth := v1.Group("/auth")
+	auth.Post("/register", authHandler.Register)
+	auth.Post("/login", authHandler.Login)
+	auth.Post("/refresh", authHandler.Refresh)
+
+	// User routes (protected)
+	users := v1.Group("/users", authMiddleware)
+	users.Get("/me", userHandler.GetMe)
+	users.Get("", userHandler.GetAllUsers)
+	users.Put("/:id", userHandler.UpdateUser)
+	users.Delete("/:id", userHandler.DeleteUser)
+}
 `
 }

@@ -143,11 +143,11 @@ func generateProjectFiles(projectPath, projectName string) error {
 6. **Interfaces** (1 fichier):
    - internal/interfaces/user_repository.go
 
-7. **Adapters** (9 fichiers):
+7. **Adapters** (10 fichiers):
    - Handlers: auth_handler.go, user_handler.go, module.go
    - Middleware: error_handler.go
    - Repository: user_repository.go, module.go
-   - HTTP: health.go
+   - HTTP: health.go, routes.go
 
 8. **Infrastructure** (2 fichiers):
    - internal/infrastructure/database/database.go
@@ -238,10 +238,11 @@ func (t *ProjectTemplates) ServerTemplate() string          // server.go avec Fi
 func (t *ProjectTemplates) ErrorHandlerMiddlewareTemplate() string
 ```
 
-#### Health Check
+#### Health Check & Routes
 
 ```go
-func (t *ProjectTemplates) HealthHandlerTemplate() string
+func (t *ProjectTemplates) HealthHandlerTemplate() string    // health.go
+func (t *ProjectTemplates) RoutesTemplate() string           // routes.go - Centralized routes
 ```
 
 #### Documentation

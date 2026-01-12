@@ -133,7 +133,8 @@ Files to update:
 - `docs/usage.md` - Usage guide
 - `docs/generated-project-guide.md` - Generated project guide
 - `docs/cli-architecture.md` - CLI architecture
-- `CLAUDE.md` / `GEMINI.md` - AI context files
+- `CLAUDE.md` / `GEMINI.md` / `AGENT.md` - AI context files
+
 
 ## Quick Reference
 
