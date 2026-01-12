@@ -749,6 +749,18 @@ func NewServer(logger zerolog.Logger, db *gorm.DB) *fiber.App {
 	app := fiber.New(fiber.Config{
 		AppName:      "` + t.projectName + `",
 		ErrorHandler: middleware.ErrorHandler,
+		// Increase buffer sizes to prevent "Request Header Fields Too Large" errors
+		ReadBufferSize:  16384, // 16KB (default is 4KB)
+		WriteBufferSize: 16384,
+	})
+
+	// Ignore common browser requests (favicon, apple-touch-icon)
+	// These would otherwise pollute error logs
+	app.Get("/favicon.ico", func(c *fiber.Ctx) error {
+		return c.SendStatus(fiber.StatusNoContent)
+	})
+	app.Get("/apple-touch-icon*.png", func(c *fiber.Ctx) error {
+		return c.SendStatus(fiber.StatusNoContent)
 	})
 
 	logger.Info().Msg("Fiber server initialized with centralized error handler")
