@@ -1190,19 +1190,23 @@ func (t *ProjectTemplates) JWTMiddlewareTemplate() string {
 	return `package auth
 
 import (
-	"github.com/gofiber/contrib/jwt"
+	"strings"
+
+	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	"` + t.projectName + `/pkg/config"
 )
 
 // NewJWTMiddleware creates a new JWT authentication middleware
+// It supports both "Bearer <token>" and raw "<token>" formats for Swagger UI compatibility
 func NewJWTMiddleware() fiber.Handler {
 	secret := config.GetEnv("JWT_SECRET", "")
 	if secret == "" {
 		panic("JWT_SECRET environment variable is required for middleware")
 	}
 
-	return jwtware.New(jwtware.Config{
+	// Create the JWT middleware
+	jwtMiddleware := jwtware.New(jwtware.Config{
 		SigningKey: jwtware.SigningKey{
 			JWTAlg: jwtware.HS256,
 			Key:    []byte(secret),
@@ -1215,6 +1219,19 @@ func NewJWTMiddleware() fiber.Handler {
 			})
 		},
 	})
+
+	// Return a wrapper that normalizes the Authorization header
+	return func(c *fiber.Ctx) error {
+		auth := c.Get("Authorization")
+		
+		// If token is provided without "Bearer " prefix, add it
+		// This makes Swagger UI work without typing "Bearer "
+		if auth != "" && !strings.HasPrefix(auth, "Bearer ") {
+			c.Request().Header.Set("Authorization", "Bearer "+auth)
+		}
+		
+		return jwtMiddleware(c)
+	}
 }
 `
 }
