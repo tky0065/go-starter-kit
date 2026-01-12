@@ -23,6 +23,7 @@ require (
 	github.com/gofiber/contrib/jwt v1.1.2
 	github.com/gofiber/fiber/v2 v2.52.10
 	github.com/golang-jwt/jwt/v5 v5.3.0
+	github.com/joho/godotenv v1.5.1
 	github.com/rs/zerolog v1.33.0
 	github.com/swaggo/fiber-swagger v1.3.0
 	github.com/swaggo/swag v1.16.4
@@ -835,6 +836,9 @@ func (t *ProjectTemplates) UpdatedMainGoTemplate() string {
 	return `package main
 
 import (
+	"log"
+
+	"github.com/joho/godotenv"
 	"go.uber.org/fx"
 
 	"` + t.projectName + `/internal/adapters/handlers"
@@ -866,6 +870,12 @@ import (
 // @description Type "Bearer" followed by a space and JWT token.
 
 func main() {
+	// Load environment variables from .env file
+	// This is primarily for local development; in production, use system environment variables
+	if err := godotenv.Load(); err != nil {
+		log.Println("Warning: .env file not found or couldn't be loaded")
+	}
+
 	fx.New(
 		// Core infrastructure
 		logger.Module,
@@ -1359,7 +1369,7 @@ if [ $SKIP_JWT -eq 0 ]; then
         sed -i "s|^JWT_SECRET=.*|JWT_SECRET=$JWT_SECRET|" .env
     fi
 
-    print_success "JWT_SECRET généré et ajouté à .env"
+    print_success "JWT_SECRET généré et ajouté à .env (chargé automatiquement au démarrage)"
 fi
 
 # ============================================================================
