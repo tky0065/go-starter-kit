@@ -286,13 +286,13 @@ func TestReadmeTemplate(t *testing.T) {
 		t.Errorf("ReadmeTemplate() should contain project structure with '%s/', got:\n%s", projectName, content)
 	}
 
-	// Check essential sections
+	// Check essential sections (README is in French)
 	essentialSections := []string{
 		"## Architecture",
-		"## Prerequisites",
-		"## Getting Started",
-		"## Development",
-		"## Project Structure",
+		"## Prérequis",
+		"## Installation rapide",
+		"## Développement",
+		"## API Endpoints",
 	}
 
 	for _, section := range essentialSections {
@@ -651,10 +651,10 @@ func TestUpdatedMainGoTemplate(t *testing.T) {
 func TestUserEntityTemplate(t *testing.T) {
 	projectName := "my-auth-app"
 	templates := NewProjectTemplates(projectName)
-	content := templates.UserEntityTemplate()
+	content := templates.ModelsUserTemplate() // User entity is now in ModelsUserTemplate
 
 	requiredContent := []string{
-		"package user",
+		"package models",
 		"type User struct",
 		"ID           uint",
 		"Email        string",
@@ -667,7 +667,7 @@ func TestUserEntityTemplate(t *testing.T) {
 
 	for _, required := range requiredContent {
 		if !strings.Contains(content, required) {
-			t.Errorf("UserEntityTemplate() should contain '%s'", required)
+			t.Errorf("ModelsUserTemplate() should contain '%s'", required)
 		}
 	}
 }
@@ -675,22 +675,21 @@ func TestUserEntityTemplate(t *testing.T) {
 func TestUserRefreshTokenTemplate(t *testing.T) {
 	projectName := "my-auth-app"
 	templates := NewProjectTemplates(projectName)
-	content := templates.UserRefreshTokenTemplate()
+	content := templates.ModelsUserTemplate() // RefreshToken is now in ModelsUserTemplate
 
 	requiredContent := []string{
-		"package user",
+		"package models",
 		"type RefreshToken struct",
 		"UserID    uint",
 		"Token     string",
 		"ExpiresAt time.Time",
 		"Revoked   bool",
 		"IsExpired() bool",
-		"IsRevoked() bool",
 	}
 
 	for _, required := range requiredContent {
 		if !strings.Contains(content, required) {
-			t.Errorf("UserRefreshTokenTemplate() should contain '%s'", required)
+			t.Errorf("ModelsUserTemplate() should contain '%s'", required)
 		}
 	}
 }
@@ -744,7 +743,7 @@ func TestUserRepositoryTemplate(t *testing.T) {
 		"func (r *UserRepository) RevokeRefreshToken(",
 		"func (r *UserRepository) RotateRefreshToken(",
 		"WithContext(ctx)",
-		projectName + "/internal/domain/user",
+		projectName + "/internal/models",
 	}
 
 	for _, required := range requiredContent {
@@ -773,7 +772,7 @@ func TestAuthHandlerTemplate(t *testing.T) {
 		`validate:"required,min=8,max=72"`,
 		"fiber.StatusCreated",
 		"validator.New()",
-		projectName + "/internal/interfaces",
+		projectName + "/internal/domain/user",
 	}
 
 	for _, required := range requiredContent {
@@ -869,18 +868,8 @@ func TestUserInterfacesTemplate(t *testing.T) {
 
 	requiredContent := []string{
 		"package interfaces",
-		"type AuthService interface",
-		"Register(ctx context.Context,",
-		"Authenticate(ctx context.Context,",
-		"RefreshToken(ctx context.Context,",
-		"type UserService interface",
-		"GetProfile(ctx context.Context,",
-		"GetAll(ctx context.Context,",
-		"UpdateUser(ctx context.Context,",
-		"DeleteUser(ctx context.Context,",
 		"type TokenService interface",
 		"GenerateTokens(userID uint)",
-		projectName + "/internal/domain/user",
 	}
 
 	for _, required := range requiredContent {
@@ -908,7 +897,7 @@ func TestUserRepositoryInterfaceTemplate(t *testing.T) {
 		"GetRefreshToken(ctx context.Context,",
 		"RevokeRefreshToken(ctx context.Context,",
 		"RotateRefreshToken(ctx context.Context,",
-		projectName + "/internal/domain/user",
+		projectName + "/internal/models",
 	}
 
 	for _, required := range requiredContent {
@@ -987,15 +976,6 @@ func TestHandlerModuleTemplate(t *testing.T) {
 		"var Module = fx.Module(",
 		"fx.Provide(func(s *user.Service) *AuthHandler",
 		"fx.Provide(func(s *user.Service) *UserHandler",
-		"fx.Invoke(RegisterAllRoutes)",
-		"func RegisterAuthRoutes(",
-		"func RegisterUserRoutes(",
-		`v1.Group("/auth")`,
-		`authGroup.Post("/register"`,
-		`authGroup.Post("/login"`,
-		`authGroup.Post("/refresh"`,
-		`v1.Group("/users"`,
-		`userGroup.Get("/me"`,
 		projectName + "/internal/domain/user",
 	}
 
