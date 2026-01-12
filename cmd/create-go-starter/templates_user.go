@@ -714,7 +714,7 @@ type ProfileResponse struct {
 // @Success 200 {object} map[string]interface{} "Standard JSON Envelope with data"
 // @Failure 401 {object} map[string]string
 // @Failure 404 {object} map[string]string
-// @Router /api/v1/users/me [get]
+// @Router /users/me [get]
 // @Security BearerAuth
 func (h *UserHandler) GetMe(c *fiber.Ctx) error {
 	userID, err := auth.GetUserID(c)
@@ -747,7 +747,7 @@ func (h *UserHandler) GetMe(c *fiber.Ctx) error {
 // @Param limit query int false "Users per page (default: 10, max: 100)"
 // @Success 200 {object} map[string]interface{} "Standard JSON Envelope with data"
 // @Failure 500 {object} map[string]string
-// @Router /api/v1/users [get]
+// @Router /users [get]
 // @Security BearerAuth
 func (h *UserHandler) GetAllUsers(c *fiber.Ctx) error {
 	page := c.QueryInt("page", 1)
@@ -795,7 +795,7 @@ type UpdateUserRequest struct {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/v1/users/{id} [put]
+// @Router /users/{id} [put]
 // @Security BearerAuth
 func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	userID, err := c.ParamsInt("id")
@@ -838,7 +838,7 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/v1/users/{id} [delete]
+// @Router /users/{id} [delete]
 // @Security BearerAuth
 func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	userID, err := c.ParamsInt("id")
@@ -933,7 +933,7 @@ type RegisterResponse struct {
 // @Failure 400 {object} map[string]string "Validation error"
 // @Failure 409 {object} map[string]string "Email already registered"
 // @Failure 500 {object} map[string]string "Internal server error"
-// @Router /api/v1/auth/register [post]
+// @Router /auth/register [post]
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	var req RegisterRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -991,7 +991,7 @@ type LoginRequest struct {
 // @Success 200 {object} map[string]interface{} "Standard JSON Envelope with tokens"
 // @Failure 400 {object} map[string]string "Validation error"
 // @Failure 401 {object} map[string]string "Invalid credentials"
-// @Router /api/v1/auth/login [post]
+// @Router /auth/login [post]
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	var req LoginRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -1029,7 +1029,7 @@ type RefreshRequest struct {
 // @Success 200 {object} map[string]interface{} "Standard JSON Envelope with new tokens"
 // @Failure 400 {object} map[string]string "Validation error"
 // @Failure 401 {object} map[string]string "Invalid or expired refresh token"
-// @Router /api/v1/auth/refresh [post]
+// @Router /auth/refresh [post]
 func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 	var req RefreshRequest
 	if err := c.BodyParser(&req); err != nil {
