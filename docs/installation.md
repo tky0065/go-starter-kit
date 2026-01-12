@@ -325,8 +325,30 @@ go clean -cache
 **Causes possibles**:
 1. `$GOPATH/bin` n'est pas dans votre `PATH`
 2. Le binaire n'a pas été installé correctement
+3. **Le cache du shell n'a pas été rechargé** (cause la plus fréquente)
 
 **Solutions**:
+
+**Solution 1: Recharger le cache du shell (⚡ Rapide - Essayez ça d'abord!)**
+
+Après `go install`, votre shell (zsh/bash) peut avoir une version en cache de la liste des commandes disponibles. Rechargez-la :
+
+```bash
+# Pour zsh et bash
+hash -r
+
+# Puis vérifier
+which create-go-starter
+create-go-starter --help
+```
+
+**Solution 2: Redémarrer le terminal**
+
+Fermez et rouvrez votre terminal. C'est souvent la solution la plus simple !
+
+**Solution 3: Vérifier et configurer le PATH**
+
+Si les solutions précédentes ne fonctionnent pas :
 
 ```bash
 # Vérifier GOPATH
@@ -335,11 +357,22 @@ go env GOPATH
 # Vérifier si le binaire existe
 ls -l $(go env GOPATH)/bin/create-go-starter
 
-# Ajouter GOPATH/bin au PATH (dans ~/.zshrc ou ~/.bashrc)
+# Vérifier si GOPATH/bin est dans PATH
+echo $PATH | grep "$(go env GOPATH)/bin"
+
+# Si absent, ajouter GOPATH/bin au PATH (dans ~/.zshrc ou ~/.bashrc)
 export PATH=$PATH:$(go env GOPATH)/bin
 
 # Recharger le shell
 source ~/.zshrc  # ou ~/.bashrc
+```
+
+**Solution 4: Utiliser le chemin complet temporairement**
+
+En attendant de résoudre le PATH :
+
+```bash
+$(go env GOPATH)/bin/create-go-starter mon-projet
 ```
 
 ### Problème: "permission denied" sur macOS
