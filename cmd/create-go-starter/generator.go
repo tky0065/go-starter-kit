@@ -179,6 +179,10 @@ func generateProjectFiles(projectPath, projectName string) error {
 			Content: templates.DocsReadmeTemplate(),
 		},
 		{
+			Path:    filepath.Join(projectPath, "docs", "docs.go"),
+			Content: templates.SwaggerDocsTemplate(),
+		},
+		{
 			Path:    filepath.Join(projectPath, "docs", "quick-start.md"),
 			Content: templates.QuickStartTemplate(),
 		},

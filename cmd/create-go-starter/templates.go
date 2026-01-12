@@ -998,6 +998,53 @@ Documentation complète pour le projet ` + t.projectName + `.
 `
 }
 
+// SwaggerDocsTemplate returns a placeholder docs/docs.go file
+// This file will be overwritten when running 'make swagger' (swag init)
+// but is needed for the project to compile before swagger generation
+func (t *ProjectTemplates) SwaggerDocsTemplate() string {
+	return `// Package docs provides Swagger documentation for the API.
+// This is a placeholder file that allows the project to compile
+// before running 'make swagger' to generate the actual documentation.
+//
+// Run 'make swagger' to generate the complete Swagger documentation.
+// This will overwrite this file with the generated content.
+package docs
+
+import "github.com/swaggo/swag"
+
+const docTemplate = ` + "`" + `{
+    "swagger": "2.0",
+    "info": {
+        "description": "` + t.projectName + ` API - Run 'make swagger' to generate complete documentation",
+        "title": "` + t.projectName + ` API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {}
+}` + "`" + `
+
+// SwaggerInfo holds exported Swagger Info so clients can modify it
+var SwaggerInfo = &swag.Spec{
+	Version:          "1.0",
+	Host:             "localhost:8080",
+	BasePath:         "/api/v1",
+	Schemes:          []string{},
+	Title:            "` + t.projectName + ` API",
+	Description:      "` + t.projectName + ` API - Run 'make swagger' to generate complete documentation",
+	InfoInstanceName: "swagger",
+	SwaggerTemplate:  docTemplate,
+	LeftDelim:        "{{",
+	RightDelim:       "}}",
+}
+
+func init() {
+	swag.Register(SwaggerInfo.InstanceName(), SwaggerInfo)
+}
+`
+}
+
 // QuickStartTemplate returns the docs/quick-start.md file content
 func (t *ProjectTemplates) QuickStartTemplate() string {
 	return `# Démarrage rapide
