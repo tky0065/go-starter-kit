@@ -62,6 +62,212 @@ Les projets générés suivent l'architecture hexagonale, également appelée "P
 └─────────────────────────────────────────────────────────┘
 ```
 
+### Diagramme d'architecture complète (Mermaid)
+
+Le diagramme suivant montre l'architecture hexagonale complète avec tous les composants et leurs interactions :
+
+```mermaid
+flowchart TB
+    subgraph External["Monde Externe"]
+        Client["Client HTTP<br/>(Web, Mobile, API)"]
+        DB[("PostgreSQL<br/>Database")]
+    end
+
+    subgraph Adapters["Adapters Layer"]
+        direction TB
+        subgraph Inbound["Inbound Adapters (Entree)"]
+            Handlers["Handlers<br/>AuthHandler<br/>UserHandler"]
+            Middleware["Middleware<br/>AuthMiddleware<br/>ErrorHandler"]
+        end
+        subgraph Outbound["Outbound Adapters (Sortie)"]
+            RepoImpl["Repository GORM<br/>UserRepository"]
+        end
+    end
+
+    subgraph Core["Core Business (Hexagone)"]
+        direction TB
+        Models["Models (Entites)<br/>User<br/>RefreshToken"]
+        Domain["Domain Services<br/>UserService<br/>Business Logic"]
+        Interfaces["Interfaces/Ports<br/>UserRepository<br/>UserService"]
+        Errors["Domain Errors<br/>NotFound<br/>Validation<br/>Conflict"]
+    end
+
+    subgraph Infrastructure["Infrastructure Layer"]
+        Server["Fiber Server<br/>Routes et Config"]
+        DBConn["Database Connection<br/>GORM Setup"]
+        Config["Configuration<br/>Environment vars"]
+    end
+
+    subgraph Packages["Packages Reutilisables (pkg/)"]
+        Auth["Auth Package<br/>JWT Generation<br/>Token Parsing"]
+        Logger["Logger Package<br/>Zerolog Config"]
+        ConfigPkg["Config Package<br/>Env Loading"]
+    end
+
+    Client -->|"HTTP Request"| Server
+    Server -->|"Route"| Handlers
+    Handlers --> Middleware
+    Handlers -->|"Appelle"| Domain
+    Domain -->|"Utilise"| Interfaces
+    Domain -->|"Utilise"| Models
+    Domain -->|"Retourne"| Errors
+    RepoImpl -.->|"Implemente"| Interfaces
+    RepoImpl -->|"Utilise"| Models
+    RepoImpl -->|"Query"| DBConn
+    DBConn -->|"SQL"| DB
+    Handlers -->|"Utilise"| Auth
+    Server -->|"Utilise"| Config
+    Domain -->|"Utilise"| Logger
+```
+
+### Flux d'une requete HTTP (Sequence Diagram)
+
+Ce diagramme montre le parcours complet d'une requete HTTP a travers l'architecture :
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Client
+    participant S as Server (Fiber)
+    participant M as Middleware
+    participant H as Handler
+    participant SVC as Service
+    participant P as Port (Interface)
+    participant R as Repository
+    participant DB as Database
+
+    C->>S: POST /api/v1/auth/register
+    S->>M: Route vers Handler
+    M->>M: Validation (si protege)
+    M->>H: Requete validee
+    
+    rect rgb(240, 248, 255)
+        Note over H: Handler Layer
+        H->>H: Parse JSON Body
+        H->>H: Validate Input (validator)
+    end
+    
+    H->>SVC: service.Register(email, password)
+    
+    rect rgb(255, 250, 240)
+        Note over SVC: Domain Layer
+        SVC->>SVC: Hash Password (bcrypt)
+        SVC->>SVC: Business Validation
+    end
+    
+    SVC->>P: repo.Create(user)
+    P->>R: Appel implementation
+    
+    rect rgb(240, 255, 240)
+        Note over R: Repository Layer
+        R->>DB: INSERT INTO users...
+        DB-->>R: User cree (ID)
+    end
+    
+    R-->>SVC: User entity
+    SVC-->>H: User + nil error
+    H->>H: Generate JWT tokens
+    H-->>C: HTTP 201 + JSON Response
+```
+
+### Principe de l'Inversion de Dependances
+
+Le coeur de l'architecture hexagonale repose sur l'**Inversion de Dependances** :
+
+```mermaid
+flowchart LR
+    subgraph Traditional["Approche Traditionnelle"]
+        direction TB
+        T_Handler["Handler"] --> T_Service["Service"]
+        T_Service --> T_Repo["Repository"]
+        T_Repo --> T_DB["Database"]
+    end
+
+    subgraph Hexagonal["Architecture Hexagonale"]
+        direction TB
+        H_Handler["Handler"]
+        H_Service["Service"]
+        H_Interface["Interface<br/>(Port)"]
+        H_Repo["Repository<br/>(Adapter)"]
+        H_DB["Database"]
+        
+        H_Handler --> H_Service
+        H_Service --> H_Interface
+        H_Repo -.->|"implemente"| H_Interface
+        H_Repo --> H_DB
+    end
+```
+
+**Avantages de cette approche** :
+
+| Aspect | Sans Hexagonal | Avec Hexagonal |
+|--------|----------------|----------------|
+| **Testabilite** | Difficile (depend de la DB) | Facile (mock des interfaces) |
+| **Changement de DB** | Modifications partout | Seulement le repository |
+| **Changement de framework** | Refactoring complet | Seulement les handlers |
+| **Logique metier** | Dispersee | Centralisee dans le domain |
+
+### Structure des fichiers et responsabilites
+
+```mermaid
+flowchart TD
+    subgraph CMD["cmd/"]
+        Main["main.go<br/>Bootstrap fx.New()"]
+    end
+
+    subgraph Internal["internal/"]
+        subgraph Models["models/"]
+            User["user.go<br/>Entites GORM"]
+        end
+        
+        subgraph Domain["domain/"]
+            DErrors["errors.go<br/>Erreurs metier"]
+            subgraph UserDomain["user/"]
+                Service["service.go<br/>Logique metier"]
+                Module["module.go<br/>fx.Module"]
+            end
+        end
+        
+        subgraph InterfacesPkg["interfaces/"]
+            Repos["*_repository.go<br/>Ports (abstractions)"]
+        end
+        
+        subgraph AdaptersPkg["adapters/"]
+            subgraph HandlersPkg["handlers/"]
+                AuthH["auth_handler.go"]
+                UserH["user_handler.go"]
+            end
+            subgraph MiddlewarePkg["middleware/"]
+                AuthM["auth_middleware.go"]
+                ErrorM["error_handler.go"]
+            end
+            subgraph RepoPkg["repository/"]
+                UserRepo["user_repository.go<br/>Implementation GORM"]
+            end
+        end
+        
+        subgraph Infra["infrastructure/"]
+            DBPkg["database/<br/>Connexion GORM"]
+            ServerPkg["server/<br/>Config Fiber"]
+        end
+    end
+
+    subgraph Pkg["pkg/"]
+        AuthPkg["auth/<br/>JWT utilities"]
+        ConfigPkg2["config/<br/>Env loading"]
+        LoggerPkg["logger/<br/>Zerolog setup"]
+    end
+
+    Main --> Domain
+    Main --> Infra
+    Main --> Pkg
+    HandlersPkg --> Domain
+    Domain --> InterfacesPkg
+    RepoPkg -.-> InterfacesPkg
+    RepoPkg --> Models
+    Domain --> Models
+```
+
 **Flux de données**:
 
 1. **Requête HTTP** → Handler (adapters/handlers)
@@ -894,126 +1100,226 @@ make lint
 | `make docker-build` | Build image Docker |
 | `make docker-run` | Run conteneur Docker |
 
-### Ajouter une nouvelle fonctionnalité
+### Ajouter une nouvelle fonctionnalite
 
-**Exemple**: Ajouter une entité "Product"
+Cette section vous guide pas a pas pour ajouter une nouvelle entite/fonctionnalite en respectant l'architecture hexagonale.
 
-#### Étape 1: Ajouter l'entité dans models
+#### Vue d'ensemble des 9 etapes
 
-**`internal/models/product.go`**:
+```mermaid
+flowchart LR
+    A["1. Model"] --> B["2. Interface"]
+    B --> C["3. Repository"]
+    B --> D["4. Service"]
+    C --> E["5. Module fx"]
+    D --> E
+    D --> F["6. Handler"]
+    F --> G["7. Routes"]
+    A --> H["8. Migration"]
+    E --> I["9. Bootstrap"]
+    G --> I
+```
+
+#### Checklist rapide
+
+Utilisez cette checklist pour ne rien oublier :
+
+| Etape | Fichier a creer/modifier | Depend de | Status |
+|-------|-------------------------|-----------|--------|
+| 1. Model | `internal/models/<entity>.go` | - | [ ] |
+| 2. Interface | `internal/interfaces/<entity>_repository.go` | Etape 1 | [ ] |
+| 3. Repository | `internal/adapters/repository/<entity>_repository.go` | Etapes 1, 2 | [ ] |
+| 4. Service | `internal/domain/<entity>/service.go` | Etapes 1, 2 | [ ] |
+| 5. Module fx | `internal/domain/<entity>/module.go` | Etapes 3, 4 | [ ] |
+| 6. Handler | `internal/adapters/handlers/<entity>_handler.go` | Etapes 1, 4 | [ ] |
+| 7. Routes | `internal/infrastructure/server/server.go` (modifier) | Etape 6 | [ ] |
+| 8. Migration | `internal/infrastructure/database/database.go` (modifier) | Etape 1 | [ ] |
+| 9. Bootstrap | `cmd/main.go` (modifier) | Etape 5 | [ ] |
+
+#### Diagramme des dependances entre fichiers
+
+Ce diagramme montre l'ordre de creation des fichiers et leurs dependances :
+
+```mermaid
+flowchart TD
+    subgraph Step1["Etape 1 - Foundation"]
+        Model["models/product.go<br/>Entite GORM"]
+    end
+
+    subgraph Step2["Etape 2 - Abstraction"]
+        Interface["interfaces/product_repository.go<br/>Port (contrat)"]
+    end
+
+    subgraph Step34["Etapes 3 et 4 - Implementation"]
+        Repo["repository/product_repository.go<br/>Adapter GORM"]
+        Service["domain/product/service.go<br/>Business Logic"]
+    end
+
+    subgraph Step5["Etape 5 - DI"]
+        Module["domain/product/module.go<br/>fx.Module"]
+    end
+
+    subgraph Step6["Etape 6 - HTTP"]
+        Handler["handlers/product_handler.go<br/>REST endpoints"]
+    end
+
+    subgraph Step789["Etapes 7, 8, 9 - Integration"]
+        Routes["server/server.go<br/>Ajouter routes"]
+        Migration["database/database.go<br/>AutoMigrate"]
+        Main["cmd/main.go<br/>Ajouter module"]
+    end
+
+    Model --> Interface
+    Model --> Repo
+    Model --> Service
+    Interface --> Repo
+    Interface --> Service
+    Repo --> Module
+    Service --> Module
+    Service --> Handler
+    Model --> Handler
+    Handler --> Routes
+    Module --> Main
+    Routes --> Main
+    Model --> Migration
+```
+
+---
+
+### Exemple complet : Entite Product
+
+Nous allons creer une entite `Product` complete avec CRUD. Suivez chaque etape dans l'ordre.
+
+> **Conseil** : Remplacez `mon-projet` par le nom de votre projet dans tous les imports.
+
+---
+
+#### Etape 1 : Creer le Model (Entite)
+
+**Fichier a creer : `internal/models/product.go`**
 
 ```go
 package models
 
 import (
     "time"
+
     "gorm.io/gorm"
 )
 
 // Product represents a product in the catalog
 type Product struct {
-    ID          uint           `gorm:"primarykey" json:"id"`
-    CreatedAt   time.Time      `json:"created_at"`
-    UpdatedAt   time.Time      `json:"updated_at"`
-    DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
+    ID          uint           `gorm:"primaryKey" json:"id"`
+    Name        string         `gorm:"not null;size:255" json:"name"`
+    Description string         `gorm:"type:text" json:"description"`
+    Price       float64        `gorm:"not null" json:"price"`
+    Stock       int            `gorm:"default:0" json:"stock"`
+    SKU         string         `gorm:"uniqueIndex;size:100" json:"sku"`
+    Active      bool           `gorm:"default:true" json:"active"`
+    CreatedAt   time.Time      `gorm:"autoCreateTime" json:"created_at"`
+    UpdatedAt   time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+    DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+}
 
-    Name        string  `gorm:"not null" json:"name"`
+// ProductResponse is the DTO for API responses (controls what is exposed)
+type ProductResponse struct {
+    ID          uint    `json:"id"`
+    Name        string  `json:"name"`
     Description string  `json:"description"`
-    Price       float64 `gorm:"not null" json:"price"`
-    Stock       int     `gorm:"default:0" json:"stock"`
-}
-```
-
-#### Étape 2: Créer le service (business logic)
-
-```bash
-mkdir -p internal/domain/product
-```
-
-**`internal/domain/product/service.go`**:
-
-```go
-package product
-
-import (
-    "context"
-    "mon-projet/internal/models"
-    "mon-projet/internal/interfaces"
-    "github.com/rs/zerolog"
-)
-
-type Service struct {
-    repo   interfaces.ProductRepository
-    logger zerolog.Logger
+    Price       float64 `json:"price"`
+    Stock       int     `json:"stock"`
+    SKU         string  `json:"sku"`
+    Active      bool    `json:"active"`
 }
 
-func NewService(repo interfaces.ProductRepository, logger zerolog.Logger) *Service {
-    return &Service{repo: repo, logger: logger}
-}
-
-func (s *Service) Create(ctx context.Context, name, description string, price float64, stock int) (*models.Product, error) {
-    product := &models.Product{
-        Name:        name,
-        Description: description,
-        Price:       price,
-        Stock:       stock,
+// ToResponse converts Product entity to ProductResponse DTO
+func (p *Product) ToResponse() ProductResponse {
+    return ProductResponse{
+        ID:          p.ID,
+        Name:        p.Name,
+        Description: p.Description,
+        Price:       p.Price,
+        Stock:       p.Stock,
+        SKU:         p.SKU,
+        Active:      p.Active,
     }
-
-    if err := s.repo.Create(ctx, product); err != nil {
-        return nil, err
-    }
-
-    s.logger.Info().Uint("product_id", product.ID).Msg("Product created")
-    return product, nil
-}
-
-func (s *Service) GetByID(ctx context.Context, id uint) (*models.Product, error) {
-    return s.repo.FindByID(ctx, id)
 }
 ```
 
-#### Étape 3: Créer l'interface (port)
+**Pourquoi ?**
+- Les entites sont centralisees dans `models/` pour eviter les dependances circulaires
+- Tags GORM pour la configuration de la base de donnees
+- Tags JSON pour controler la serialisation API
+- DTO separe (`ProductResponse`) pour controler ce qui est expose a l'API
 
-**`internal/interfaces/product_repository.go`**:
+---
+
+#### Etape 2 : Definir l'Interface (Port)
+
+**Fichier a creer : `internal/interfaces/product_repository.go`**
 
 ```go
 package interfaces
 
 import (
     "context"
+
     "mon-projet/internal/models"
 )
 
+// ProductRepository defines the contract for product data access
+// This is the "Port" in hexagonal architecture
 type ProductRepository interface {
     Create(ctx context.Context, product *models.Product) error
     FindByID(ctx context.Context, id uint) (*models.Product, error)
-    FindAll(ctx context.Context) ([]*models.Product, error)
+    FindBySKU(ctx context.Context, sku string) (*models.Product, error)
+    FindAll(ctx context.Context, limit, offset int) ([]*models.Product, error)
+    FindActive(ctx context.Context) ([]*models.Product, error)
     Update(ctx context.Context, product *models.Product) error
     Delete(ctx context.Context, id uint) error
+    Count(ctx context.Context) (int64, error)
+}
+
+// ProductService defines the contract for product business logic
+type ProductService interface {
+    Create(ctx context.Context, name, description, sku string, price float64, stock int) (*models.Product, error)
+    GetByID(ctx context.Context, id uint) (*models.Product, error)
+    GetAll(ctx context.Context, page, pageSize int) ([]*models.Product, int64, error)
+    Update(ctx context.Context, id uint, name, description string, price float64, stock int, active bool) (*models.Product, error)
+    Delete(ctx context.Context, id uint) error
+    UpdateStock(ctx context.Context, id uint, quantity int) error
 }
 ```
 
-**Note**: Les interfaces référencent maintenant `models.Product` (entités partagées) au lieu de `product.Product` pour éviter les dépendances circulaires.
+**Pourquoi ?**
+- **Abstraction complete** : le domain ne connait pas GORM
+- **Contrat clair** : toutes les operations disponibles sont definies
+- **Testable** : facile a mocker pour les tests unitaires
 
-#### Étape 4: Implémenter le repository
+---
 
-**`internal/adapters/repository/product_repository.go`**:
+#### Etape 3 : Implementer le Repository (Adapter)
+
+**Fichier a creer : `internal/adapters/repository/product_repository.go`**
 
 ```go
 package repository
 
 import (
     "context"
+
     "gorm.io/gorm"
+
     "mon-projet/internal/domain"
-    "mon-projet/internal/models"
     "mon-projet/internal/interfaces"
+    "mon-projet/internal/models"
 )
 
 type productRepositoryGORM struct {
     db *gorm.DB
 }
 
+// NewProductRepository creates a new product repository
 func NewProductRepository(db *gorm.DB) interfaces.ProductRepository {
     return &productRepositoryGORM{db: db}
 }
@@ -1023,34 +1329,314 @@ func (r *productRepositoryGORM) Create(ctx context.Context, product *models.Prod
 }
 
 func (r *productRepositoryGORM) FindByID(ctx context.Context, id uint) (*models.Product, error) {
-    var p models.Product
-    err := r.db.WithContext(ctx).First(&p, id).Error
+    var product models.Product
+    err := r.db.WithContext(ctx).First(&product, id).Error
     if err == gorm.ErrRecordNotFound {
         return nil, domain.NewNotFoundError("Product not found", "PRODUCT_NOT_FOUND", err)
     }
-    return &p, err
+    return &product, err
+}
+
+func (r *productRepositoryGORM) FindBySKU(ctx context.Context, sku string) (*models.Product, error) {
+    var product models.Product
+    err := r.db.WithContext(ctx).Where("sku = ?", sku).First(&product).Error
+    if err == gorm.ErrRecordNotFound {
+        return nil, domain.NewNotFoundError("Product not found", "PRODUCT_NOT_FOUND", err)
+    }
+    return &product, err
+}
+
+func (r *productRepositoryGORM) FindAll(ctx context.Context, limit, offset int) ([]*models.Product, error) {
+    var products []*models.Product
+    err := r.db.WithContext(ctx).
+        Limit(limit).
+        Offset(offset).
+        Order("created_at DESC").
+        Find(&products).Error
+    return products, err
+}
+
+func (r *productRepositoryGORM) FindActive(ctx context.Context) ([]*models.Product, error) {
+    var products []*models.Product
+    err := r.db.WithContext(ctx).Where("active = ?", true).Find(&products).Error
+    return products, err
+}
+
+func (r *productRepositoryGORM) Update(ctx context.Context, product *models.Product) error {
+    return r.db.WithContext(ctx).Save(product).Error
+}
+
+func (r *productRepositoryGORM) Delete(ctx context.Context, id uint) error {
+    return r.db.WithContext(ctx).Delete(&models.Product{}, id).Error
+}
+
+func (r *productRepositoryGORM) Count(ctx context.Context) (int64, error) {
+    var count int64
+    err := r.db.WithContext(ctx).Model(&models.Product{}).Count(&count).Error
+    return count, err
 }
 ```
 
-#### Étape 5: Créer le handler
+**Points cles :**
+- Implemente l'interface `ProductRepository`
+- Utilise `WithContext(ctx)` pour la propagation du contexte
+- Convertit `gorm.ErrRecordNotFound` en `DomainError`
 
-**`internal/adapters/handlers/product_handler.go`**:
+---
+
+#### Etape 4 : Creer le Service (Domain/Business Logic)
+
+**Creer le dossier :**
+```bash
+mkdir -p internal/domain/product
+```
+
+**Fichier a creer : `internal/domain/product/service.go`**
+
+```go
+package product
+
+import (
+    "context"
+    "fmt"
+
+    "github.com/rs/zerolog"
+
+    "mon-projet/internal/domain"
+    "mon-projet/internal/interfaces"
+    "mon-projet/internal/models"
+)
+
+// Service handles product business logic
+type Service struct {
+    repo   interfaces.ProductRepository
+    logger zerolog.Logger
+}
+
+// NewService creates a new product service
+func NewService(repo interfaces.ProductRepository, logger zerolog.Logger) *Service {
+    return &Service{
+        repo:   repo,
+        logger: logger.With().Str("service", "product").Logger(),
+    }
+}
+
+// Create creates a new product with business validation
+func (s *Service) Create(ctx context.Context, name, description, sku string, price float64, stock int) (*models.Product, error) {
+    // Business validation
+    if price <= 0 {
+        return nil, domain.NewValidationError("Price must be greater than 0", "INVALID_PRICE", nil)
+    }
+    if stock < 0 {
+        return nil, domain.NewValidationError("Stock cannot be negative", "INVALID_STOCK", nil)
+    }
+
+    // Check SKU uniqueness (business rule)
+    existing, err := s.repo.FindBySKU(ctx, sku)
+    if err == nil && existing != nil {
+        return nil, domain.NewConflictError("Product with this SKU already exists", "SKU_EXISTS", nil)
+    }
+
+    product := &models.Product{
+        Name:        name,
+        Description: description,
+        SKU:         sku,
+        Price:       price,
+        Stock:       stock,
+        Active:      true,
+    }
+
+    if err := s.repo.Create(ctx, product); err != nil {
+        s.logger.Error().Err(err).Str("sku", sku).Msg("Failed to create product")
+        return nil, fmt.Errorf("failed to create product: %w", err)
+    }
+
+    s.logger.Info().
+        Uint("product_id", product.ID).
+        Str("sku", sku).
+        Msg("Product created successfully")
+
+    return product, nil
+}
+
+// GetByID retrieves a product by its ID
+func (s *Service) GetByID(ctx context.Context, id uint) (*models.Product, error) {
+    return s.repo.FindByID(ctx, id)
+}
+
+// GetAll retrieves all products with pagination
+func (s *Service) GetAll(ctx context.Context, page, pageSize int) ([]*models.Product, int64, error) {
+    // Validate and set defaults for pagination
+    if page < 1 {
+        page = 1
+    }
+    if pageSize < 1 || pageSize > 100 {
+        pageSize = 20 // Default page size
+    }
+
+    offset := (page - 1) * pageSize
+
+    products, err := s.repo.FindAll(ctx, pageSize, offset)
+    if err != nil {
+        return nil, 0, fmt.Errorf("failed to fetch products: %w", err)
+    }
+
+    total, err := s.repo.Count(ctx)
+    if err != nil {
+        return nil, 0, fmt.Errorf("failed to count products: %w", err)
+    }
+
+    return products, total, nil
+}
+
+// Update updates an existing product
+func (s *Service) Update(ctx context.Context, id uint, name, description string, price float64, stock int, active bool) (*models.Product, error) {
+    // Fetch existing product
+    product, err := s.repo.FindByID(ctx, id)
+    if err != nil {
+        return nil, err
+    }
+
+    // Business validation
+    if price <= 0 {
+        return nil, domain.NewValidationError("Price must be greater than 0", "INVALID_PRICE", nil)
+    }
+    if stock < 0 {
+        return nil, domain.NewValidationError("Stock cannot be negative", "INVALID_STOCK", nil)
+    }
+
+    // Update fields
+    product.Name = name
+    product.Description = description
+    product.Price = price
+    product.Stock = stock
+    product.Active = active
+
+    if err := s.repo.Update(ctx, product); err != nil {
+        s.logger.Error().Err(err).Uint("product_id", id).Msg("Failed to update product")
+        return nil, fmt.Errorf("failed to update product: %w", err)
+    }
+
+    s.logger.Info().Uint("product_id", id).Msg("Product updated successfully")
+    return product, nil
+}
+
+// Delete soft-deletes a product
+func (s *Service) Delete(ctx context.Context, id uint) error {
+    // Verify product exists
+    _, err := s.repo.FindByID(ctx, id)
+    if err != nil {
+        return err
+    }
+
+    if err := s.repo.Delete(ctx, id); err != nil {
+        s.logger.Error().Err(err).Uint("product_id", id).Msg("Failed to delete product")
+        return fmt.Errorf("failed to delete product: %w", err)
+    }
+
+    s.logger.Info().Uint("product_id", id).Msg("Product deleted successfully")
+    return nil
+}
+
+// UpdateStock adjusts the stock quantity (positive or negative)
+func (s *Service) UpdateStock(ctx context.Context, id uint, quantity int) error {
+    product, err := s.repo.FindByID(ctx, id)
+    if err != nil {
+        return err
+    }
+
+    newStock := product.Stock + quantity
+    if newStock < 0 {
+        return domain.NewValidationError("Insufficient stock", "INSUFFICIENT_STOCK", nil)
+    }
+
+    product.Stock = newStock
+    if err := s.repo.Update(ctx, product); err != nil {
+        return fmt.Errorf("failed to update stock: %w", err)
+    }
+
+    s.logger.Info().
+        Uint("product_id", id).
+        Int("quantity_change", quantity).
+        Int("new_stock", newStock).
+        Msg("Stock updated")
+
+    return nil
+}
+```
+
+**Points cles :**
+- Toute la **logique metier** est ici (validation, regles business)
+- Utilise les `DomainError` pour les erreurs metier
+- Logging structure avec contexte
+- Le service ne connait que les **interfaces**, pas les implementations
+
+---
+
+#### Etape 5 : Creer le Module fx (Dependency Injection)
+
+**Fichier a creer : `internal/domain/product/module.go`**
+
+```go
+package product
+
+import (
+    "go.uber.org/fx"
+
+    "mon-projet/internal/adapters/handlers"
+    "mon-projet/internal/adapters/repository"
+    "mon-projet/internal/interfaces"
+)
+
+// Module provides all product-related dependencies
+var Module = fx.Module("product",
+    fx.Provide(
+        // Repository: concrete -> interface
+        fx.Annotate(
+            repository.NewProductRepository,
+            fx.As(new(interfaces.ProductRepository)),
+        ),
+        // Service: concrete -> interface
+        fx.Annotate(
+            NewService,
+            fx.As(new(interfaces.ProductService)),
+        ),
+        // Handler
+        handlers.NewProductHandler,
+    ),
+)
+```
+
+**Pourquoi fx.Annotate ?**
+- Permet de fournir une implementation concrete tout en exposant l'interface
+- Facilite le remplacement des implementations (tests, mock, autre DB)
+
+---
+
+#### Etape 6 : Creer le Handler (HTTP Adapter)
+
+**Fichier a creer : `internal/adapters/handlers/product_handler.go`**
 
 ```go
 package handlers
 
 import (
-    "github.com/gofiber/fiber/v2"
-    "github.com/go-playground/validator/v10"
-    "mon-projet/internal/domain/product"
     "strconv"
+
+    "github.com/go-playground/validator/v10"
+    "github.com/gofiber/fiber/v2"
+
+    "mon-projet/internal/domain"
+    "mon-projet/internal/interfaces"
 )
 
+// ProductHandler handles HTTP requests for products
 type ProductHandler struct {
-    service  *product.Service
+    service  interfaces.ProductService
     validate *validator.Validate
 }
 
+// NewProductHandler creates a new product handler
 func NewProductHandler(service interfaces.ProductService) *ProductHandler {
     return &ProductHandler{
         service:  service,
@@ -1058,36 +1644,58 @@ func NewProductHandler(service interfaces.ProductService) *ProductHandler {
     }
 }
 
+// Request DTOs with validation tags
 type CreateProductRequest struct {
     Name        string  `json:"name" validate:"required,max=255"`
-    Description string  `json:"description"`
+    Description string  `json:"description" validate:"max=1000"`
+    SKU         string  `json:"sku" validate:"required,max=100"`
     Price       float64 `json:"price" validate:"required,gt=0"`
     Stock       int     `json:"stock" validate:"gte=0"`
 }
 
+type UpdateProductRequest struct {
+    Name        string  `json:"name" validate:"required,max=255"`
+    Description string  `json:"description" validate:"max=1000"`
+    Price       float64 `json:"price" validate:"required,gt=0"`
+    Stock       int     `json:"stock" validate:"gte=0"`
+    Active      bool    `json:"active"`
+}
+
+// Create handles POST /api/v1/products
 func (h *ProductHandler) Create(c *fiber.Ctx) error {
     var req CreateProductRequest
     if err := c.BodyParser(&req); err != nil {
-        return err
+        return domain.NewValidationError("Invalid request body", "INVALID_BODY", err)
     }
 
     if err := h.validate.Struct(req); err != nil {
-        return domain.NewValidationError("Invalid input", "VALIDATION_ERROR", err)
+        return domain.NewValidationError("Validation failed", "VALIDATION_ERROR", err)
     }
 
-    product, err := h.service.Create(c.Context(), req.Name, req.Description, req.Price, req.Stock)
+    product, err := h.service.Create(
+        c.Context(),
+        req.Name,
+        req.Description,
+        req.SKU,
+        req.Price,
+        req.Stock,
+    )
     if err != nil {
         return err
     }
 
     return c.Status(fiber.StatusCreated).JSON(fiber.Map{
         "status": "success",
-        "data":   product,
+        "data":   product.ToResponse(),
     })
 }
 
+// GetByID handles GET /api/v1/products/:id
 func (h *ProductHandler) GetByID(c *fiber.Ctx) error {
-    id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+    id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+    if err != nil {
+        return domain.NewValidationError("Invalid product ID", "INVALID_ID", err)
+    }
 
     product, err := h.service.GetByID(c.Context(), uint(id))
     if err != nil {
@@ -1096,73 +1704,177 @@ func (h *ProductHandler) GetByID(c *fiber.Ctx) error {
 
     return c.JSON(fiber.Map{
         "status": "success",
-        "data":   product,
+        "data":   product.ToResponse(),
+    })
+}
+
+// List handles GET /api/v1/products
+func (h *ProductHandler) List(c *fiber.Ctx) error {
+    page, _ := strconv.Atoi(c.Query("page", "1"))
+    pageSize, _ := strconv.Atoi(c.Query("page_size", "20"))
+
+    products, total, err := h.service.GetAll(c.Context(), page, pageSize)
+    if err != nil {
+        return err
+    }
+
+    // Convert to response DTOs
+    responses := make([]interface{}, len(products))
+    for i, p := range products {
+        responses[i] = p.ToResponse()
+    }
+
+    totalPages := (total + int64(pageSize) - 1) / int64(pageSize)
+
+    return c.JSON(fiber.Map{
+        "status": "success",
+        "data":   responses,
+        "meta": fiber.Map{
+            "page":        page,
+            "page_size":   pageSize,
+            "total":       total,
+            "total_pages": totalPages,
+        },
+    })
+}
+
+// Update handles PUT /api/v1/products/:id
+func (h *ProductHandler) Update(c *fiber.Ctx) error {
+    id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+    if err != nil {
+        return domain.NewValidationError("Invalid product ID", "INVALID_ID", err)
+    }
+
+    var req UpdateProductRequest
+    if err := c.BodyParser(&req); err != nil {
+        return domain.NewValidationError("Invalid request body", "INVALID_BODY", err)
+    }
+
+    if err := h.validate.Struct(req); err != nil {
+        return domain.NewValidationError("Validation failed", "VALIDATION_ERROR", err)
+    }
+
+    product, err := h.service.Update(
+        c.Context(),
+        uint(id),
+        req.Name,
+        req.Description,
+        req.Price,
+        req.Stock,
+        req.Active,
+    )
+    if err != nil {
+        return err
+    }
+
+    return c.JSON(fiber.Map{
+        "status": "success",
+        "data":   product.ToResponse(),
+    })
+}
+
+// Delete handles DELETE /api/v1/products/:id
+func (h *ProductHandler) Delete(c *fiber.Ctx) error {
+    id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+    if err != nil {
+        return domain.NewValidationError("Invalid product ID", "INVALID_ID", err)
+    }
+
+    if err := h.service.Delete(c.Context(), uint(id)); err != nil {
+        return err
+    }
+
+    return c.JSON(fiber.Map{
+        "status":  "success",
+        "message": "Product deleted successfully",
     })
 }
 ```
 
-#### Étape 5: Enregistrer les routes
+**Points cles :**
+- Utilise l'interface `ProductService`, pas l'implementation concrete
+- Validation avec `go-playground/validator`
+- Retourne des DTOs (`ToResponse()`) au lieu des entites directement
+- Gestion propre des erreurs avec `DomainError`
 
-**`internal/infrastructure/server/server.go`**:
+---
+
+#### Etape 7 : Ajouter les Routes
+
+**Modifier : `internal/infrastructure/server/server.go`**
+
+Ajoutez le parametre `productHandler` et les routes :
 
 ```go
 func NewServer(
-    // ... paramètres existants
-    productHandler *handlers.ProductHandler,
+    config *config.Config,
+    logger zerolog.Logger,
+    authHandler *handlers.AuthHandler,
+    userHandler *handlers.UserHandler,
+    productHandler *handlers.ProductHandler,  // <- AJOUTER
     authMiddleware *middleware.AuthMiddleware,
+    errorHandler *middleware.ErrorHandler,
+    lc fx.Lifecycle,
 ) *fiber.App {
-    // ... configuration existante
+    // ... configuration existante ...
 
-    // Products routes (protected)
+    // ============================================
+    // AJOUTER : Products routes (protected)
+    // ============================================
     products := api.Group("/products")
     products.Use(authMiddleware.Authenticate())
     products.Post("/", productHandler.Create)
-    products.Get("/:id", productHandler.GetByID)
     products.Get("/", productHandler.List)
+    products.Get("/:id", productHandler.GetByID)
     products.Put("/:id", productHandler.Update)
     products.Delete("/:id", productHandler.Delete)
 
-    // ... reste du code
+    // ... reste du code ...
 }
 ```
 
-#### Étape 6: Créer le module fx
+---
 
-**`internal/domain/product/module.go`**:
+#### Etape 8 : Ajouter la Migration
+
+**Modifier : `internal/infrastructure/database/database.go`**
 
 ```go
-package product
+func NewDatabase(config *config.Config, logger zerolog.Logger) (*gorm.DB, error) {
+    // ... code existant ...
+
+    // AutoMigrate - AJOUTER models.Product
+    if err := db.AutoMigrate(
+        &models.User{},
+        &models.RefreshToken{},
+        &models.Product{},  // <- AJOUTER
+    ); err != nil {
+        return nil, fmt.Errorf("failed to auto-migrate: %w", err)
+    }
+
+    // ... reste du code ...
+}
+```
+
+---
+
+#### Etape 9 : Enregistrer le Module dans le Bootstrap
+
+**Modifier : `cmd/main.go`**
+
+```go
+package main
 
 import (
     "go.uber.org/fx"
-    "mon-projet/internal/adapters/handlers"
-    "mon-projet/internal/adapters/repository"
-    "mon-projet/internal/interfaces"
-)
 
-var Module = fx.Module("product",
-    fx.Provide(
-        fx.Annotate(
-            NewService,
-            fx.As(new(interfaces.ProductService)),
-        ),
-        fx.Annotate(
-            repository.NewProductRepository,
-            fx.As(new(interfaces.ProductRepository)),
-        ),
-        handlers.NewProductHandler,
-    ),
-)
-```
-
-#### Étape 7: Ajouter au bootstrap
-
-**`cmd/main.go`**:
-
-```go
-import (
-    // ... imports existants
-    "mon-projet/internal/domain/product"
+    "mon-projet/internal/domain/product"  // <- AJOUTER
+    "mon-projet/internal/domain/user"
+    "mon-projet/internal/infrastructure/database"
+    "mon-projet/internal/infrastructure/server"
+    "mon-projet/pkg/auth"
+    "mon-projet/pkg/config"
+    "mon-projet/pkg/logger"
 )
 
 func main() {
@@ -1172,44 +1884,81 @@ func main() {
         database.Module,
         auth.Module,
         user.Module,
-        product.Module,  // Nouveau module
+        product.Module,  // <- AJOUTER
         server.Module,
     ).Run()
 }
 ```
 
-#### Étape 8: Mettre à jour les migrations
+---
 
-**`internal/infrastructure/database/database.go`**:
-
-```go
-import (
-    "mon-projet/internal/domain/product"
-)
-
-func NewDatabase(...) {
-    // ...
-    db.AutoMigrate(
-        &models.User{},
-        &models.RefreshToken{},
-        &product.Product{},  // Nouvelle entité
-    )
-    // ...
-}
-```
-
-#### Étape 9: Tester
+#### Verification finale
 
 ```bash
-# Rebuild et run
+# 1. Verifier la compilation
+go build ./...
+
+# 2. Lancer l'application
 make run
 
-# Tester l'endpoint
-curl -X POST http://localhost:8080/api/v1/products \
-  -H "Authorization: Bearer <token>" \
+# 3. S'authentifier pour obtenir un token
+TOKEN=$(curl -s -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"name":"Product 1","description":"Test product","price":99.99,"stock":10}'
+  -d '{"email":"test@example.com","password":"password123"}' \
+  | jq -r '.data.access_token')
+
+# 4. Creer un produit
+curl -X POST http://localhost:8080/api/v1/products \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "MacBook Pro 14",
+    "description": "Apple laptop with M3 chip",
+    "sku": "APPLE-MBP14-M3",
+    "price": 1999.99,
+    "stock": 50
+  }'
+
+# 5. Lister les produits
+curl -X GET "http://localhost:8080/api/v1/products?page=1&page_size=10" \
+  -H "Authorization: Bearer $TOKEN"
+
+# 6. Obtenir un produit par ID
+curl -X GET http://localhost:8080/api/v1/products/1 \
+  -H "Authorization: Bearer $TOKEN"
+
+# 7. Mettre a jour un produit
+curl -X PUT http://localhost:8080/api/v1/products/1 \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "MacBook Pro 14 - Updated",
+    "description": "Apple laptop with M3 Pro chip",
+    "price": 2499.99,
+    "stock": 30,
+    "active": true
+  }'
+
+# 8. Supprimer un produit
+curl -X DELETE http://localhost:8080/api/v1/products/1 \
+  -H "Authorization: Bearer $TOKEN"
 ```
+
+---
+
+### Resume : Fichiers crees/modifies
+
+| Action | Fichier | Description |
+|--------|---------|-------------|
+| Creer | `internal/models/product.go` | Entite GORM + DTO |
+| Creer | `internal/interfaces/product_repository.go` | Interfaces (Ports) |
+| Creer | `internal/adapters/repository/product_repository.go` | Implementation GORM |
+| Creer | `internal/domain/product/service.go` | Business Logic |
+| Creer | `internal/domain/product/module.go` | fx.Module |
+| Creer | `internal/adapters/handlers/product_handler.go` | HTTP Handler |
+| Modifier | `internal/infrastructure/server/server.go` | Ajouter routes |
+| Modifier | `internal/infrastructure/database/database.go` | Ajouter AutoMigrate |
+| Modifier | `cmd/main.go` | Ajouter product.Module |
 
 ### Patterns à suivre
 
