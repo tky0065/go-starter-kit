@@ -4,7 +4,7 @@ A powerful CLI tool to generate production-ready Go projects in seconds.
 
 ---
 
-## :rocket: Quick Start
+## :material-rocket-launch: Quick Start
 
 <div class="grid" markdown>
 
@@ -148,4 +148,4 @@ graph TB
 
 ---
 
-**Made with :heart: for the Go community**
+**Made with :material-heart: for the Go community**

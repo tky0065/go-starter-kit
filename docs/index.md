@@ -4,7 +4,7 @@ Un outil CLI puissant pour generer des projets Go prets pour la production en qu
 
 ---
 
-## :rocket: Demarrage rapide
+## :material-rocket-launch: Demarrage rapide
 
 <div class="grid" markdown>
 
@@ -148,4 +148,4 @@ graph TB
 
 ---
 
-**Fait avec :heart: pour la communaute Go**
+**Fait avec :material-heart: pour la communaute Go**
