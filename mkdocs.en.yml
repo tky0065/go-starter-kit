@@ -1,0 +1,41 @@
+# Configuration MkDocs - English Documentation
+# Inherits from mkdocs.yml and overrides for English
+
+INHERIT: mkdocs.yml
+
+site_name: Go Starter Kit
+site_description: A powerful CLI tool to generate production-ready Go projects
+docs_dir: docs_en
+
+theme:
+  language: en
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search:
+      lang: en
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: installation.md
+    - Usage: usage.md
+  - Architecture:
+    - CLI: cli-architecture.md
+    - Generated Project: generated-project-guide.md
+  - Tutorial: tutorial-exemple-complet.md
+  - Contributing: contributing.md

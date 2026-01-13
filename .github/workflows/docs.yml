@@ -1,0 +1,72 @@
+# GitHub Actions workflow for deploying MkDocs to GitHub Pages
+name: Deploy Documentation
+
+on:
+  # Deploy on push to main branch when docs change
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'docs_en/**'
+      - 'mkdocs.yml'
+      - 'mkdocs.en.yml'
+      - 'requirements-docs.txt'
+      - '.github/workflows/docs.yml'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+
+# Sets permissions for GITHUB_TOKEN for GitHub Pages deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for git info
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements-docs.txt
+
+      - name: Build French documentation (default)
+        run: mkdocs build -f mkdocs.yml -d site
+
+      - name: Build English documentation
+        run: mkdocs build -f mkdocs.en.yml -d site/en
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

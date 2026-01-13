@@ -1,0 +1,5 @@
+# MkDocs dependencies for documentation site
+# Install with: pip install -r requirements-docs.txt
+
+mkdocs-material>=9.5
+pymdown-extensions>=10.0
