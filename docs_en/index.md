@@ -2,41 +2,23 @@
 
 A powerful CLI tool to generate production-ready Go projects in seconds.
 
-<div class="grid cards" markdown>
+---
 
--   :material-rocket-launch:{ .lg .middle } **Quick Start**
+## :rocket: Quick Start
 
-    ---
+<div class="grid" markdown>
 
-    Install and create your first project in 30 seconds
+:material-rocket-launch: **[Installation](installation.md)** - Install and create your first project in 30 seconds
 
-    [:octicons-arrow-right-24: Installation](installation.md)
+:material-puzzle: **[Usage Guide](usage.md)** - Project structure with clear separation of concerns
 
--   :material-puzzle:{ .lg .middle } **Hexagonal Architecture**
+:material-cog: **[Generated Project](generated-project-guide.md)** - JWT, Docker, CI/CD, tests and more included by default
 
-    ---
-
-    Project structure with clear separation of concerns
-
-    [:octicons-arrow-right-24: Usage Guide](usage.md)
-
--   :material-cog:{ .lg .middle } **Production-ready**
-
-    ---
-
-    JWT, Docker, CI/CD, tests and more included by default
-
-    [:octicons-arrow-right-24: Generated Project](generated-project-guide.md)
-
--   :material-heart:{ .lg .middle } **Open Source**
-
-    ---
-
-    Contribute to the project and improve the Go ecosystem
-
-    [:octicons-arrow-right-24: Contributing](contributing.md)
+:material-heart: **[Contributing](contributing.md)** - Contribute to the project and improve the Go ecosystem
 
 </div>
+
+---
 
 ## Overview
 
@@ -135,17 +117,17 @@ Generated projects use the best libraries from the Go ecosystem:
 
 ```mermaid
 graph TB
-    subgraph "Adapters"
+    subgraph Adapters
         HTTP[HTTP Handlers]
         REPO[Repository GORM]
     end
     
-    subgraph "Domain"
+    subgraph Domain
         SVC[Services]
         ENT[Entities]
     end
     
-    subgraph "Infrastructure"
+    subgraph Infrastructure
         DB[(PostgreSQL)]
         CFG[Config]
     end
@@ -159,10 +141,10 @@ graph TB
 
 ## Next Steps
 
-- [:material-download: **Installation**](installation.md) - Detailed installation guide
-- [:material-book-open: **Usage**](usage.md) - Learn to use the CLI
-- [:material-architecture: **Architecture**](cli-architecture.md) - Understand internals
-- [:material-school: **Tutorial**](tutorial-exemple-complet.md) - Complete step-by-step example
+- :material-download: **[Installation](installation.md)** - Detailed installation guide
+- :material-book-open: **[Usage](usage.md)** - Learn to use the CLI
+- :material-wrench: **[Architecture](cli-architecture.md)** - Understand internals
+- :material-school: **[Tutorial](tutorial-exemple-complet.md)** - Complete step-by-step example
 
 ---
 
