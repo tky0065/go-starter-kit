@@ -88,7 +88,6 @@ Transformation en plateforme écosystémique.
 *   Architecture de Plugins et Marketplace communautaire.
 *   Support Multi-Framework (Gin, Echo).
 *   Interface Web/Dashboard pour la gestion de projets.
-
 ## User Journeys
 
 ### Journey 1: Alex - De la Confusion à la Clarté (Apprenant/Junior)

@@ -104,18 +104,27 @@ This document provides the complete epic and story breakdown for go-starter-kit,
 ### Epic 1: Project Initialization & Core Infrastructure
 Permettre à l'utilisateur de générer un projet API Go fonctionnel, structuré et connecté à sa base de données en une seule commande.
 **FRs covered:** FR1, FR2, FR3, FR4, FR5, FR6, FR18, FR19, FR21, FR22, FR23, FR25.
+**Status:** ✅ Completed (Sprint 1)
 
 ### Epic 2: Authentication & Security Foundation
 Fournir un système d'authentification complet et sécurisé dès le départ.
 **FRs covered:** FR7, FR8, FR9, FR10, FR11, FR12, FR16.
+**Status:** ✅ Completed (Sprint 1)
 
 ### Epic 3: User Management Logic
 Gérer les données et les opérations métier liées aux utilisateurs.
 **FRs covered:** FR20.
+**Status:** ✅ Completed (Sprint 1)
 
 ### Epic 4: Production Readiness & Developer Experience
 Rendre le projet prêt pour la production et agréable à développer.
 **FRs covered:** FR13, FR14, FR15, FR17, FR24, FR26.
+**Status:** ✅ Completed (Sprint 1)
+
+### Epic 5: MVP Finalization & Quality Assurance
+Finaliser le MVP avec les automatisations CLI manquantes et la validation qualité.
+**NFRs covered:** NFR3, NFR8, NFR9, NFR10.
+**Status:** 🔄 In Progress (Sprint 2)
 
 ## Epic 1: Project Initialization & Core Infrastructure
 
@@ -352,4 +361,135 @@ So that je puisse éviter les régressions lors du travail en équipe.
 **Then** Un workflow GitHub Actions se déclenche automatiquement
 **And** Il installe Go, exécute le linting et lance les tests
 **And** Le statut du commit devient rouge en cas d'échec
+
+## Epic 5: MVP Finalization & Quality Assurance
+
+Cette Epic finalise le MVP en ajoutant les automatisations manquantes du CLI, en améliorant la couverture de tests, et en vérifiant la conformité aux NFR (Non-Functional Requirements) définis dans le PRD.
+
+**Objectif:** Atteindre un MVP "production-ready" avec une expérience utilisateur fluide et une qualité de code irréprochable.
+
+**NFRs couverts:** NFR3 (Image Docker < 50 Mo), NFR8 (golangci-lint compliant), NFR9 (Documentation), NFR10 (Testabilité)
+
+### Story 5.1: Initialisation Git automatique
+
+As a développeur,
+I want que le CLI initialise automatiquement un dépôt Git dans le projet généré,
+So that je puisse commencer à versionner mon code immédiatement sans étape manuelle.
+
+**Acceptance Criteria:**
+
+**Given** J'exécute `create-go-starter mon-projet`
+**When** La génération est terminée avec succès
+**Then** Un dépôt Git est initialisé dans le dossier `mon-projet` (`git init`)
+**And** Un fichier `.gitignore` approprié est présent (déjà fait)
+**And** Un premier commit initial est créé avec le message "Initial commit from go-starter-kit"
+**And** Si Git n'est pas installé, un avertissement s'affiche mais la génération continue
+
+**Technical Notes:**
+- Utiliser `os/exec` pour exécuter les commandes git
+- Gérer gracieusement l'absence de Git sur le système
+- Le commit initial doit inclure tous les fichiers générés
+
+### Story 5.2: Installation automatique des dépendances Go
+
+As a développeur,
+I want que le CLI exécute automatiquement `go mod tidy` après la génération,
+So that toutes les dépendances soient téléchargées et le projet soit immédiatement fonctionnel.
+
+**Acceptance Criteria:**
+
+**Given** Le projet a été généré avec succès
+**When** Le CLI termine la génération des fichiers
+**Then** La commande `go mod tidy` est exécutée automatiquement
+**And** Les dépendances sont téléchargées dans le cache Go
+**And** Un message de progression s'affiche ("📦 Installation des dépendances...")
+**And** En cas d'échec réseau, un message d'erreur clair s'affiche avec les instructions pour réessayer manuellement
+
+**Technical Notes:**
+- Utiliser `os/exec` pour exécuter `go mod tidy`
+- Capturer stdout/stderr pour afficher les erreurs éventuelles
+- Timeout de 2 minutes maximum pour l'opération
+
+### Story 5.3: Amélioration de la couverture de tests du CLI
+
+As a mainteneur du projet,
+I want que la couverture de tests du CLI atteigne au moins 70%,
+So that le code soit fiable et les régressions détectées automatiquement.
+
+**Acceptance Criteria:**
+
+**Given** Le code actuel du CLI a une couverture de ~44%
+**When** J'exécute `go test -cover ./cmd/create-go-starter`
+**Then** La couverture affichée est >= 70%
+**And** Les fonctions critiques sont testées : `validateProjectName`, `createProjectStructure`, `generateProjectFiles`, `copyEnvFile`
+**And** Les cas d'erreur sont couverts (nom invalide, répertoire existant, erreurs d'écriture)
+
+**Technical Notes:**
+- Ajouter des tests pour les nouvelles fonctionnalités (git init, go mod tidy)
+- Utiliser `t.TempDir()` pour les tests de système de fichiers
+- Mocker les commandes externes si nécessaire
+
+### Story 5.4: Optimisation de l'image Docker générée
+
+As a DevOps/SRE,
+I want que l'image Docker générée par le starter kit pèse moins de 50 Mo,
+So that les déploiements soient rapides et les coûts de stockage minimisés.
+
+**Acceptance Criteria:**
+
+**Given** Un projet généré avec `create-go-starter`
+**When** J'exécute `docker build -t mon-projet .`
+**Then** L'image finale pèse moins de 50 Mo
+**And** L'image utilise un utilisateur non-root pour la sécurité
+**And** Seuls les fichiers nécessaires sont inclus (pas de sources, pas de cache)
+**And** Les health checks Docker sont configurés
+
+**Technical Notes:**
+- Vérifier le Dockerfile template actuel
+- Utiliser `scratch` ou `alpine` comme base
+- Ajouter `USER nonroot` dans le Dockerfile
+- Ajouter HEALTHCHECK instruction
+
+### Story 5.5: Documentation des fonctions publiques du code généré
+
+As a développeur utilisant le starter kit,
+I want que toutes les fonctions publiques du code généré soient documentées,
+So that je puisse comprendre rapidement le fonctionnement de chaque composant.
+
+**Acceptance Criteria:**
+
+**Given** Le code généré par le CLI
+**When** J'examine les fichiers Go générés
+**Then** Chaque fonction publique (commençant par une majuscule) a un commentaire de documentation
+**And** Les commentaires suivent le format standard Go (`// FunctionName does...`)
+**And** Les structures et interfaces publiques sont également documentées
+**And** `go doc` affiche une documentation lisible pour chaque package
+
+**Technical Notes:**
+- Mettre à jour tous les templates dans `templates.go` et `templates_user.go`
+- Vérifier avec `golint` ou `go doc`
+- Priorité aux fichiers : handlers, services, repositories, middleware
+
+### Story 5.6: Validation finale et smoke tests
+
+As a mainteneur du projet,
+I want exécuter une suite de tests de validation complète sur un projet généré,
+So that je puisse confirmer que le MVP fonctionne de bout en bout.
+
+**Acceptance Criteria:**
+
+**Given** Le CLI avec toutes les améliorations du Sprint 2
+**When** Je génère un nouveau projet de test
+**Then** La génération se termine sans erreur
+**And** `go build ./...` compile sans erreur
+**And** `go test ./...` passe (si des tests sont inclus)
+**And** `golangci-lint run` ne retourne aucune erreur
+**And** Le serveur démarre et répond sur `/health`
+**And** L'endpoint `/swagger` est accessible
+**And** L'authentification JWT fonctionne (register/login)
+
+**Technical Notes:**
+- Créer un script de validation E2E
+- Peut être un test Go avec le tag `// +build e2e`
+- Documenter la procédure de validation manuelle
 
