@@ -177,6 +177,16 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Initialize Git repository (AC: 1, 2, 3, 4, 5)
+	fmt.Println("🔧 Initialisation du dépôt Git...")
+	if err := initGitRepo(projectPath); err != nil {
+		// Non-fatal: warn user but continue
+		fmt.Println(Red(fmt.Sprintf("⚠️  Avertissement Git: %v", err)))
+		fmt.Println("   Vous pouvez initialiser le dépôt manuellement plus tard.")
+	} else if isGitAvailable() {
+		fmt.Println(Green("✅ Dépôt Git initialisé avec un commit initial"))
+	}
+
 	// Display success message with detailed setup instructions
 	fmt.Printf("\n%s\n", Green("════════════════════════════════════════════════════════════════"))
 	fmt.Printf("%s\n", Green("🎉 Projet '"+projectName+"' créé avec succès!"))
