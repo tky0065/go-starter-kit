@@ -38,3 +38,11 @@ site/
 # Manual test projects
 manual-test-project/
 test-*/
+
+# Python virtual environment
+venv/
+__pycache__/
+*.pyc
+
+# Go binaries
+bin/

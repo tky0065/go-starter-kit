@@ -16,18 +16,217 @@ create-go-starter <nom-du-projet>
 create-go-starter mon-api-backend
 ```
 
-Cette commande va créer un nouveau répertoire `mon-api-backend/` avec toute la structure du projet.
+Cette commande va créer un nouveau répertoire `mon-api-backend/` avec toute la structure du projet en utilisant le template **full** par défaut.
+
+## Templates disponibles
+
+`create-go-starter` propose **trois templates** pour répondre à différents besoins de projets. Choisissez le template avec le flag `--template`:
+
+```bash
+create-go-starter mon-projet --template minimal    # API REST basique
+create-go-starter mon-projet --template full       # API complète avec auth (défaut)
+create-go-starter mon-projet --template graphql    # API GraphQL
+```
+
+### Vue d'ensemble des templates
+
+| Template | Description | Cas d'usage |
+|----------|-------------|-------------|
+| `minimal` | API REST basique avec Swagger (sans authentification) | Prototypes rapides, APIs publiques simples, microservices sans auth |
+| `full` | API complète avec JWT auth, gestion utilisateurs et Swagger (**défaut**) | Applications backend complètes, APIs nécessitant authentification |
+| `graphql` | API GraphQL avec gqlgen et GraphQL Playground | Applications nécessitant GraphQL, clients frontend modernes |
+
+### Comparaison détaillée des fonctionnalités
+
+| Fonctionnalité | minimal | full | graphql |
+|----------------|---------|------|---------|
+| **API REST** | ✅ | ✅ | ❌ |
+| **API GraphQL** | ❌ | ❌ | ✅ |
+| **Authentification JWT** | ❌ | ✅ | ❌ |
+| **Gestion utilisateurs** | ❌ | ✅ | ✅ |
+| **Documentation Swagger** | ✅ | ✅ | ❌ |
+| **GraphQL Playground** | ❌ | ❌ | ✅ |
+| **Base de données (GORM)** | ✅ | ✅ | ✅ |
+| **PostgreSQL** | ✅ | ✅ | ✅ |
+| **Dependency Injection (fx)** | ✅ | ✅ | ✅ |
+| **Logging structuré (zerolog)** | ✅ | ✅ | ✅ |
+| **Architecture hexagonale** | ✅ | ✅ | ✅ |
+| **Tests unitaires** | ✅ | ✅ | ✅ |
+| **Docker** | ✅ | ✅ | ✅ |
+| **CI/CD (GitHub Actions)** | ✅ | ✅ | ✅ |
+
+### Différences structurelles majeures
+
+#### Template `minimal`
+
+**Caractéristiques**:
+- API REST simple avec endpoints CRUD de base
+- Pas d'authentification ni d'autorisation
+- Swagger pour documentation API
+- Parfait pour commencer rapidement sans complexité
+
+**Structure spécifique**:
+- `internal/adapters/handlers/user_handler.go` - Handlers CRUD simples sans auth
+- `internal/domain/user/service.go` - Logique métier basique
+- Documentation Swagger automatique via annotations
+
+**Endpoints générés**:
+```
+GET    /health                  # Health check
+GET    /api/v1/users            # Liste tous les utilisateurs
+GET    /api/v1/users/:id        # Récupère un utilisateur
+POST   /api/v1/users            # Crée un utilisateur
+PUT    /api/v1/users/:id        # Met à jour un utilisateur
+DELETE /api/v1/users/:id        # Supprime un utilisateur
+GET    /swagger/*               # Documentation Swagger UI
+```
+
+**Cas d'usage recommandés**:
+- Prototypes et POCs rapides
+- APIs publiques sans données sensibles
+- Microservices internes sans besoins d'authentification
+- Apprentissage de l'architecture hexagonale
+
+---
+
+#### Template `full` (défaut)
+
+**Caractéristiques**:
+- API REST complète avec authentification JWT
+- Système d'auth avec access tokens + refresh tokens
+- Gestion complète des utilisateurs (CRUD + auth)
+- Swagger avec authentification Bearer token
+- Production-ready avec sécurité intégrée
+
+**Structure spécifique**:
+- `internal/adapters/handlers/auth_handler.go` - Endpoints register, login, refresh
+- `internal/adapters/handlers/user_handler.go` - CRUD protégé par JWT
+- `internal/adapters/middleware/auth_middleware.go` - Vérification JWT
+- `pkg/auth/` - Génération et validation des tokens JWT
+- `internal/models/user.go` - User + RefreshToken avec bcrypt
+
+**Endpoints générés**:
+```
+GET    /health                      # Health check
+POST   /api/v1/auth/register        # Inscription utilisateur
+POST   /api/v1/auth/login           # Connexion (retourne access + refresh tokens)
+POST   /api/v1/auth/refresh         # Rafraîchir l'access token
+GET    /api/v1/users                # Liste utilisateurs (🔒 JWT requis)
+GET    /api/v1/users/:id            # Récupère utilisateur (🔒 JWT requis)
+PUT    /api/v1/users/:id            # Met à jour utilisateur (🔒 JWT requis)
+DELETE /api/v1/users/:id            # Supprime utilisateur (🔒 JWT requis)
+GET    /swagger/*                   # Documentation Swagger UI
+```
+
+**Cas d'usage recommandés**:
+- Applications backend complètes
+- APIs nécessitant authentification et autorisation
+- SaaS et applications multi-utilisateurs
+- APIs exposées publiquement avec données sensibles
+
+---
+
+#### Template `graphql`
+
+**Caractéristiques**:
+- API GraphQL complète avec gqlgen
+- GraphQL Playground pour explorer l'API interactivement
+- Schéma GraphQL typé avec resolvers
+- Gestion des utilisateurs avec mutations et queries
+- Architecture hexagonale adaptée à GraphQL
+
+**Structure spécifique**:
+- `graph/schema.graphqls` - Schéma GraphQL (types, queries, mutations)
+- `graph/resolver.go` - Resolver principal
+- `graph/schema.resolvers.go` - Implémentation des resolvers
+- `gqlgen.yml` - Configuration gqlgen
+- `internal/infrastructure/server/server.go` - Serveur GraphQL avec Playground
+
+**Schéma GraphQL généré**:
+```graphql
+type User {
+  id: ID!
+  email: String!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Query {
+  users(limit: Int, offset: Int): [User!]!
+  user(id: ID!): User
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): User!
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  deleteUser(id: ID!): Boolean!
+}
+```
+
+**Endpoints générés**:
+```
+GET    /health                  # Health check
+POST   /graphql                 # Endpoint GraphQL
+GET    /                        # GraphQL Playground UI
+```
+
+**Cas d'usage recommandés**:
+- Applications frontend modernes (React, Vue, Angular)
+- APIs nécessitant des queries flexibles
+- Applications mobile avec besoins de données spécifiques
+- Projets privilégiant GraphQL à REST
+
+---
+
+### Comment choisir le bon template?
+
+**Choisissez `minimal` si**:
+- Vous voulez un prototype rapide
+- Votre API est publique sans données sensibles
+- Vous n'avez pas besoin d'authentification
+- Vous voulez apprendre l'architecture hexagonale simplement
+
+**Choisissez `full` si**:
+- Vous construisez une application backend complète
+- Vous avez besoin d'authentification JWT
+- Vous voulez des utilisateurs avec login/register
+- Vous préférez REST à GraphQL
+- Vous voulez un projet production-ready immédiatement
+
+**Choisissez `graphql` si**:
+- Vous construisez une API GraphQL
+- Votre frontend utilise Apollo Client, Relay ou urql
+- Vous préférez un schéma typé fort
+- Vous voulez GraphQL Playground pour l'exploration
+- Vos clients ont des besoins de données variables
+
+
 
 ## Options disponibles
 
 ### Flags actuels
 
 ```bash
-create-go-starter --help    # Afficher l'aide
-create-go-starter -h        # Alias pour --help
+create-go-starter --help                  # Afficher l'aide
+create-go-starter -h                      # Alias pour --help
+create-go-starter --template <type>       # Choisir le template (minimal, full, graphql)
 ```
 
-> **Note**: D'autres options seront ajoutées dans les futures versions (choix de templates, bases de données, frameworks, etc.)
+**Exemples**:
+
+```bash
+# Utiliser le template minimal
+create-go-starter mon-projet --template minimal
+
+# Utiliser le template full (défaut - équivalent à ne pas spécifier --template)
+create-go-starter mon-projet --template full
+create-go-starter mon-projet  # Même résultat
+
+# Utiliser le template graphql
+create-go-starter mon-projet --template graphql
+```
+
+> **Note**: Le flag `--template` est optionnel. Si non spécifié, le template **full** est utilisé par défaut.
 
 ## Conventions de nommage
 

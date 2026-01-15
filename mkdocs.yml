@@ -1,120 +1,75 @@
-# Configuration MkDocs - Documentation Francaise
 site_name: Go Starter Kit
-site_url: https://tky0065.github.io/go-starter-kit/
 site_description: Un outil CLI puissant pour generer des projets Go prets pour la production
 site_author: tky0065
-repo_url: https://github.com/tky0065/go-starter-kit
-repo_name: tky0065/go-starter-kit
-edit_uri: edit/main/docs/
+site_url: https://tky0065.github.io/go-starter-kit/
 
-# Theme Material
+repo_name: tky0065/go-starter-kit
+repo_url: https://github.com/tky0065/go-starter-kit
+
 theme:
   name: material
   language: fr
-  
-  # Palette avec toggle mode sombre/clair
   palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
+    - scheme: default
       primary: indigo
       accent: indigo
       toggle:
         icon: material/brightness-7
-        name: Passer en mode sombre
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
+        name: Passer au mode sombre
+    - scheme: slate
       primary: indigo
       accent: indigo
       toggle:
         icon: material/brightness-4
-        name: Passer en mode clair
-  
-  # Features
+        name: Passer au mode clair
   features:
-    - content.code.copy          # Bouton copier code
-    - content.code.annotate      # Annotations dans le code
-    - navigation.tabs            # Onglets de navigation
-    - navigation.sections        # Sections dans la sidebar
-    - navigation.top             # Bouton retour en haut
-    - navigation.footer          # Footer avec navigation
-    - search.highlight           # Surlignage recherche
-    - search.suggest             # Suggestions recherche
-    - toc.follow                 # TOC suit le scroll
-  
-  # Icons
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
   icon:
     repo: fontawesome/brands/github
 
-# Extensions Markdown
-markdown_extensions:
-  # Tables
-  - tables
-  
-  # Admonitions (notes, warnings, etc.)
-  - admonition
-  - pymdownx.details
-  
-  # Code blocks avec syntaxe highlighting
-  - pymdownx.highlight:
-      anchor_linenums: true
-      line_spans: __span
-      pygments_lang_class: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
-  
-  # Superfences pour diagrammes Mermaid
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
-  
-  # Icones Material (SVG)
-  - attr_list
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
-  
-  # Autres extensions utiles
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.tasklist:
-      custom_checkbox: true
-  - pymdownx.mark
-  - pymdownx.keys
-  - md_in_html
-  - def_list
-  - toc:
-      permalink: true
-
-# Plugins
 plugins:
   - search:
       lang: fr
 
-# Extra - Selecteur de langue et liens sociaux
+nav:
+  - Accueil: index.md
+  - Installation: installation.md
+  - Utilisation: usage.md
+  - Projet généré: generated-project-guide.md
+  - Tutoriel complet: tutorial-exemple-complet.md
+  - Architecture CLI: cli-architecture.md
+  - Contribuer: contributing.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - tables
+  - toc:
+      permalink: true
+
 extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/tky0065/go-starter-kit
   alternate:
-    - name: Francais
+    - name: Français
       link: /go-starter-kit/
       lang: fr
     - name: English
       link: /go-starter-kit/en/
       lang: en
-  
-  social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/tky0065/go-starter-kit
-      name: GitHub
 
-# Navigation
-nav:
-  - Accueil: index.md
-  - Guide de demarrage:
-    - Installation: installation.md
-    - Utilisation: usage.md
-  - Architecture:
-    - CLI: cli-architecture.md
-    - Projet genere: generated-project-guide.md
-  - Tutoriel: tutorial-exemple-complet.md
-  - Contribuer: contributing.md
+copyright: Copyright &copy; 2026 tky0065

@@ -86,6 +86,26 @@ Cette commande va:
 4. Copier le fichier `.env.example` vers `.env`
 5. Initialiser un dépôt Git avec un commit initial (si Git est disponible)
 
+### Choisir un template
+
+Par défaut, `create-go-starter` génère un projet **full** avec authentification JWT et gestion des utilisateurs. Vous pouvez choisir un template différent avec le flag `--template`:
+
+```bash
+create-go-starter mon-projet --template minimal    # API REST basique avec Swagger
+create-go-starter mon-projet --template full       # API complète avec JWT auth (défaut)
+create-go-starter mon-projet --template graphql    # API GraphQL avec gqlgen
+```
+
+**Templates disponibles**:
+
+| Template | Description | Cas d'usage |
+|----------|-------------|-------------|
+| `minimal` | API REST basique avec Swagger (sans authentification) | Prototypes rapides, APIs publiques simples |
+| `full` | API complète avec JWT auth, gestion utilisateurs et Swagger | Applications backend complètes (défaut) |
+| `graphql` | API GraphQL avec gqlgen et GraphQL Playground | Applications nécessitant GraphQL |
+
+Pour plus de détails sur les différences entre templates, consultez le [guide d'utilisation](./docs/usage.md#templates-disponibles).
+
 ### Lancer le projet généré
 
 #### Option 1: Configuration automatique (Recommandé) 🚀
@@ -334,14 +354,16 @@ Les contributions sont les bienvenues! Consultez le [guide de contribution](./do
 
 ## Roadmap
 
-Fonctionnalités prévues:
+**Fonctionnalités complétées**:
 
-- [ ] Templates multiples (minimal, full, api-only, graphql)
+- [x] **Templates multiples** - Trois templates disponibles (minimal, full, graphql) pour différents cas d'usage
+
+**Fonctionnalités prévues**:
+
 - [ ] Support pour d'autres bases de données (MySQL, SQLite, MongoDB)
 - [ ] Choix du framework web (Gin, Echo, Chi)
 - [ ] CLI interactif avec prompts
 - [ ] Génération de microservices
-- [ ] Support GraphQL avec gqlgen
 - [ ] Templates de tests E2E
 - [ ] Configuration Kubernetes
 
