@@ -2,15 +2,15 @@
 
 Un outil CLI puissant pour générer des projets Go prêts pour la production en quelques secondes.
 
-## :material-party-popper: Statut du projet
+## :material-information: À propos
 
-**MVP COMPLET** - Toutes les fonctionnalités prévues ont été implémentées et validées (janvier 2026)
+**create-go-starter** est un générateur CLI stable et production-ready pour créer des applications Go modernes.
 
-- **6 Epics complétées** avec 26 user stories implémentées
-- **26 exigences fonctionnelles** satisfaites à 100%
-- **13 exigences non-fonctionnelles** validées (performance, sécurité, maintenabilité)
-- **Tests de fumée automatisés** passent avec succès
-- **Prêt pour la production** avec validation complète end-to-end
+- :material-check: **Version stable** - v1.0.0 disponible
+- :material-check: **3 templates** - minimal, full, GraphQL
+- :material-check: **Testé et validé** - Utilisé en production
+- :material-check: **Open source** - MIT License
+- :material-check: **Activement maintenu** - Mises à jour régulières
 
 ## Aperçu
 

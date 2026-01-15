@@ -2,47 +2,42 @@
 
 Ce document présente la vision et les prochaines étapes pour l'évolution de `create-go-starter`.
 
-## :material-party-popper: Version Actuelle: v1.0.0 (MVP Complete)
+## :material-rocket-launch: Version Actuelle: v1.0.0
 
 **Date de release**: 15 janvier 2026  
-**Statut**: :material-check-circle: Production Ready
+**Statut**: :material-check: Production Ready
 
 ### Fonctionnalités Disponibles
 
-- :material-check-circle: 3 templates de projet (minimal, full, graphql)
-- :material-check-circle: Architecture hexagonale
-- :material-check-circle: JWT Authentication (access + refresh tokens)
-- :material-check-circle: User CRUD complet
-- :material-check-circle: API REST avec Fiber v2
-- :material-check-circle: API GraphQL avec gqlgen
-- :material-check-circle: PostgreSQL + GORM
-- :material-check-circle: Swagger/OpenAPI docs
-- :material-check-circle: Docker multi-stage optimisé
-- :material-check-circle: GitHub Actions CI/CD
-- :material-check-circle: Tests complets (unitaires + intégration)
-- :material-check-circle: Initialisation Git automatique
-- :material-check-circle: Installation dépendances automatique
-
-**Métriques**:
-- 6/6 Epics complétées
-- 26/26 Exigences fonctionnelles satisfaites
-- 13/13 Exigences non-fonctionnelles validées
+- :material-check: 3 templates de projet (minimal, full, graphql)
+- :material-check: Architecture hexagonale
+- :material-check: JWT Authentication (access + refresh tokens)
+- :material-check: User CRUD complet
+- :material-check: API REST avec Fiber v2
+- :material-check: API GraphQL avec gqlgen
+- :material-check: PostgreSQL + GORM
+- :material-check: Swagger/OpenAPI docs
+- :material-check: Docker multi-stage optimisé
+- :material-check: GitHub Actions CI/CD
+- :material-check: Tests complets (unitaires + intégration)
+- :material-check: Initialisation Git automatique
+- :material-check: Installation dépendances automatique
 
 ---
 
-## :material-rocket-launch: Growth Features (Post-MVP)
+## :material-trending-up: Prochaines Fonctionnalités
 
-Fonctionnalités planifiées pour élargir la base d'utilisateurs après validation du MVP.
+Fonctionnalités planifiées pour les prochaines versions.
 
-### Epic 7: Support Multi-Base de Données :material-database:
+### v1.1.0 - Support Multi-Base de Données :material-database:
 
-**Objectif**: Permettre aux utilisateurs de choisir leur base de données préférée.
+**Description**: Permettre aux utilisateurs de choisir leur base de données préférée.
 
-**Priority**: High  
-**Estimated Effort**: 3-4 semaines  
-**Target Release**: v1.1.0
+**Priorité**: Haute  
+**Temps estimé**: 3-4 semaines  
+**Version cible**: v1.1.0
 
-#### Stories Potentielles
+#### Ce qui sera ajouté
 
 1. **Support MySQL/MariaDB**
    - Ajouter flag `--database=mysql`
@@ -62,7 +57,7 @@ Fonctionnalités planifiées pour élargir la base d'utilisateurs après validat
    - Driver mongo-go-driver
    - Documentation patterns NoSQL
 
-**Acceptance Criteria**:
+**Objectifs**:
 - [ ] Utilisateur peut spécifier `--database=postgres|mysql|sqlite`
 - [ ] Tous les templates fonctionnent avec chaque DB
 - [ ] Documentation complète pour chaque DB
@@ -70,15 +65,15 @@ Fonctionnalités planifiées pour élargir la base d'utilisateurs après validat
 
 ---
 
-### Epic 8: CRUD Scaffolding Generator :material-office-building:
+###  CRUD Scaffolding Generator :material-office-building:
 
-**Objectif**: Générer automatiquement du code CRUD pour de nouveaux modèles.
+**Description**: Générer automatiquement du code CRUD pour de nouveaux modèles.
 
-**Priority**: High  
-**Estimated Effort**: 4-5 semaines  
-**Target Release**: v1.2.0
+**Priorité**: Haute  
+**Temps estimé**: 4-5 semaines  
+**Version cible**: v1.2.0
 
-#### Stories Potentielles
+#### Ce qui sera ajouté
 
 1. **Commande `add-model`**
    - Sous-commande CLI `create-go-starter add-model <name>`
@@ -103,7 +98,7 @@ create-go-starter add-model Todo --fields "title:string,completed:bool,dueDate:t
 # Génère: model, repository, service, handler, tests, swagger docs
 ```
 
-**Acceptance Criteria**:
+**Objectifs**:
 - [ ] Commande `add-model` fonctionne dans projet existant
 - [ ] Code généré compile et tests passent
 - [ ] Swagger mis à jour automatiquement
@@ -111,15 +106,15 @@ create-go-starter add-model Todo --fields "title:string,completed:bool,dueDate:t
 
 ---
 
-### Epic 9: Observabilité Avancée :material-chart-bar:
+###  Observabilité Avancée :material-chart-bar:
 
-**Objectif**: Ajouter monitoring et observabilité pour projets production.
+**Description**: Ajouter monitoring et observabilité pour projets production.
 
-**Priority**: Medium  
-**Estimated Effort**: 3-4 semaines  
-**Target Release**: v1.3.0
+**Priorité**: Moyenne  
+**Temps estimé**: 3-4 semaines  
+**Version cible**: v1.3.0
 
-#### Stories Potentielles
+#### Ce qui sera ajouté
 
 1. **Prometheus Metrics**
    - Endpoint `/metrics` avec prometheus
@@ -144,7 +139,7 @@ create-go-starter add-model Todo --fields "title:string,completed:bool,dueDate:t
    - Visualisations clés (traffic, errors, latency)
    - Alerting rules
 
-**Acceptance Criteria**:
+**Objectifs**:
 - [ ] Flag `--observability=basic|advanced`
 - [ ] Metrics Prometheus exposés
 - [ ] Distributed tracing fonctionnel
@@ -153,15 +148,15 @@ create-go-starter add-model Todo --fields "title:string,completed:bool,dueDate:t
 
 ---
 
-### Epic 10: Support Multi-Framework 🎭
+###  Support Multi-Framework 🎭
 
-**Objectif**: Supporter d'autres frameworks Go populaires (Gin, Echo).
+**Description**: Supporter d'autres frameworks Go populaires (Gin, Echo).
 
-**Priority**: Low  
-**Estimated Effort**: 5-6 semaines  
-**Target Release**: v2.0.0
+**Priorité**: Basse  
+**Temps estimé**: 5-6 semaines  
+**Version cible**: v2.0.0
 
-#### Stories Potentielles
+#### Ce qui sera ajouté
 
 1. **Support Gin Framework**
    - Flag `--framework=gin`
@@ -188,9 +183,9 @@ create-go-starter add-model Todo --fields "title:string,completed:bool,dueDate:t
 
 Transformation en plateforme écosystémique communautaire.
 
-### Epic 11: Plugin System & Marketplace
+###  Plugin System & Marketplace
 
-**Objectif**: Permettre à la communauté de créer et partager des plugins.
+**Description**: Permettre à la communauté de créer et partager des plugins.
 
 **Features**:
 - Architecture de plugins modulaire
@@ -206,9 +201,9 @@ Transformation en plateforme écosystémique communautaire.
 
 ---
 
-### Epic 12: Interface Web/Dashboard
+###  Interface Web/Dashboard
 
-**Objectif**: Interface graphique pour créer et gérer projets.
+**Description**: Interface graphique pour créer et gérer projets.
 
 **Features**:
 - Web UI pour configuration projet (alternative au CLI)
@@ -221,9 +216,9 @@ Transformation en plateforme écosystémique communautaire.
 
 ---
 
-### Epic 13: Cloud Deployment Automation
+###  Cloud Deployment Automation
 
-**Objectif**: Déploiement one-click vers cloud providers.
+**Description**: Déploiement one-click vers cloud providers.
 
 **Features**:
 - Commande `create-go-starter deploy --provider=aws|gcp|azure`

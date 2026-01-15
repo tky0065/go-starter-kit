@@ -6,15 +6,15 @@
 
 Un outil CLI puissant pour générer des projets Go prêts pour la production en quelques secondes.
 
-## :material-party-popper: Statut du projet
+## :material-rocket-launch: Version actuelle
 
-**:material-check-circle: MVP COMPLET** - Toutes les fonctionnalités prévues ont été implémentées et validées (janvier 2026)
+**v1.0.0** - Stable et prêt pour la production
 
-- **6 Epics complétées** avec 26 user stories implémentées
-- **26 exigences fonctionnelles** satisfaites à 100%
-- **13 exigences non-fonctionnelles** validées (performance, sécurité, maintenabilité)
-- **Tests de fumée automatisés** passent avec succès
-- **Prêt pour la production** avec validation complète end-to-end
+- :material-check: **Production ready** - Utilisé dans des projets réels
+- :material-check: **3 templates** - Minimal, Full (JWT), GraphQL
+- :material-check: **Bien testé** - Tests unitaires et E2E
+- :material-check: **Documentation complète** - Guides et exemples
+- :material-check: **Open source** - MIT License
 
 ## Aperçu
 
