@@ -22,9 +22,13 @@
 ## Directory Structure
 
 ### Main Tool (`/cmd/create-go-starter`)
-- `main.go`: CLI entry point, handles project name validation and directory creation.
+- `main.go`: CLI entry point, handles project name validation and directory creation (refactored with `run()` function for testability).
 - `generator.go`: Orchestrates the file generation process using templates.
 - `templates.go`: Contains all boilerplate code templates for the generated project.
+- `templates_user.go`: User domain specific templates.
+- `git.go`: Handles Git repository initialization and initial commit creation.
+- `smoke_test.go`: End-to-end smoke tests for project generation validation.
+- `scripts/smoke_test.sh`: Bash script for comprehensive E2E validation.
 
 ### Generated Project Structure (Boilerplate)
 - `cmd/main.go`: Application entry point using `fx` for dependency injection.

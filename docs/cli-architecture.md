@@ -10,8 +10,12 @@ Documentation technique pour contributeurs et développeurs avancés.
 create-go-starter (CLI)
 ├── main.go              # Entry point, validation, orchestration
 ├── generator.go         # File generation orchestrator
-├── templates.go         # Core templates (config, server, domain)
-└── templates_user.go    # User domain specific templates
+├── templates.go         # Core templates (config, server, domain, setup.sh)
+├── templates_user.go    # User domain specific templates
+├── git.go               # Git repository initialization
+├── smoke_test.go        # E2E smoke tests
+└── scripts/
+    └── smoke_test.sh    # Bash E2E validation script
 ```
 
 **Statistiques**:
@@ -394,6 +398,29 @@ type AuthResponse struct {
 - **Centralisation**: Les entités sont définies en un seul endroit
 - **Réutilisabilité**: Tous les layers (domain, interfaces, adapters) peuvent importer models sans conflit
 
+### 5. git.go - Initialisation Git
+
+**Responsabilités**:
+- Vérification de la disponibilité de Git sur le système
+- Initialisation automatique d'un dépôt Git dans le projet généré
+- Création d'un commit initial avec tous les fichiers générés
+
+**Fonctions clés**:
+
+```go
+func isGitAvailable() bool           // Vérifie si git est installé
+func initGitRepo(projectPath string) error  // Initialise le repo et crée le commit initial
+```
+
+**Comportement**:
+- Si Git est disponible: initialise le repo et crée un commit "Initial commit from go-starter-kit"
+- Si Git n'est pas disponible: affiche un avertissement mais continue (dégradation gracieuse)
+- Le `.gitignore` est ajouté automatiquement avant le commit initial
+
+**Intégration**:
+- Appelé dans `main.go` après `copyEnvFile()` et avant `printSuccessMessage()`
+- Messages: "🔧 Setting up Git repository..." et "✅ Git repository initialized"
+
 ## Patterns et conventions
 
 ### 1. Pattern de templates
@@ -464,13 +491,30 @@ os.Exit(1)
 ```
 cmd/create-go-starter/
 ├── main.go
-├── main_test.go           # Tests CLI
+├── main_test.go           # Tests CLI et fonction run()
 ├── generator.go
 ├── generator_test.go      # Tests génération
 ├── templates.go
 ├── templates_test.go      # Tests templates
+├── templates_user.go
+├── git.go
+├── git_test.go            # Tests initialisation Git
 ├── colors_test.go         # Tests utilitaires couleurs
-└── env_test.go            # Tests .env copy
+├── env_test.go            # Tests .env copy
+├── scaffold_test.go       # Tests création structure
+└── smoke_test.go          # Tests E2E smoke tests
+scripts/
+└── smoke_test.sh          # Script bash E2E validation
+```
+
+**Couverture de tests**: 83%+
+
+**Commandes Makefile**:
+```bash
+make test              # Tous les tests
+make test-short        # Tests rapides (skip tests longs)
+make smoke-test        # Validation E2E complète avec runtime
+make smoke-test-quick  # Validation E2E sans runtime (pas de Docker)
 ```
 
 **Patterns de tests**:

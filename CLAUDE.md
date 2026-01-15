@@ -33,6 +33,15 @@ go test -v ./...
 
 # Run a specific test function
 go test -run TestColors ./cmd/create-go-starter
+
+# Run tests with coverage report
+go test -cover ./...
+
+# Using Makefile targets
+make test              # Run all tests
+make test-short        # Quick unit tests (skip long-running tests)
+make smoke-test        # Full E2E validation with runtime tests
+make smoke-test-quick  # E2E validation without runtime (no Docker needed)
 ```
 
 ### Development
@@ -93,12 +102,16 @@ make run
 
 ### CLI Tool Structure (this repository)
 - `cmd/create-go-starter/` - Main CLI application entry point
-  - `main.go` - CLI implementation with flag parsing and color utilities
+  - `main.go` - CLI orchestration, validation, and entry point (refactored with `run()` function for testability)
   - `generator.go` - File generation orchestrator
-  - `templates.go` - Core templates (config, server, domain)
+  - `templates.go` - Core templates (config, server, domain, setup.sh)
   - `templates_user.go` - User domain specific templates
-  - `colors_test.go` - Tests for ANSI color formatting functions
-- `go.mod` - Go module definition (requires Go 1.25.5)
+  - `git.go` - Git repository initialization and initial commit
+  - `git_test.go` - Tests for Git functionality
+  - `smoke_test.go` - End-to-end smoke tests for project generation validation
+  - `*_test.go` - Unit tests for each module (colors, env, generator, main, scaffold, templates)
+- `scripts/smoke_test.sh` - Bash script for comprehensive E2E validation
+- `go.mod` - Go module definition (requires Go 1.25)
 - `_bmad/` - BMAD workflow automation system (not part of core application)
 
 ### Generated Project Structure (projects created by the CLI)
@@ -119,9 +132,14 @@ The tool uses a simple command-line interface with:
 - Basic scaffolding placeholder ready for expansion
 
 ### Code Organization
-- All CLI logic currently lives in a single `main.go` file
+- CLI logic is organized across multiple files for maintainability:
+  - `main.go` - Entry point and orchestration
+  - `generator.go` - File generation logic
+  - `templates.go` / `templates_user.go` - Template definitions
+  - `git.go` - Git integration (automatic repository initialization)
 - Color utilities are embedded in the main package and tested separately
 - The tool is designed to be distributed as a single binary via `go install`
+- Test coverage: 83%+ with comprehensive unit and smoke tests
 
 ### Testing Approach
 - Unit tests are co-located with source code (e.g., `colors_test.go` alongside `main.go`)
@@ -162,6 +180,7 @@ After ANY code change, review and update these files as needed:
 - `docs/cli-architecture.md` - CLI tool architecture documentation
 - `CLAUDE.md` - This file (AI context)
 - `GEMINI.md` - Gemini AI context
+- `AGENTS.md` - Agents AI context
 
 ### Documentation Update Process
 

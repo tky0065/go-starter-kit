@@ -136,10 +136,21 @@ func main() {
 
 	projectName := args[0]
 
-	// Validate project name
-	if err := validateProjectName(projectName); err != nil {
+	// Run the project creation logic
+	if err := run(projectName); err != nil {
 		fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("Error: %v", err)))
 		os.Exit(1)
+	}
+}
+
+// run executes the main project creation logic.
+// It validates the project name, creates the directory structure,
+// generates files, and initializes git.
+// Returns an error if any step fails (except git initialization which is non-fatal).
+func run(projectName string) error {
+	// Validate project name
+	if err := validateProjectName(projectName); err != nil {
+		return err
 	}
 
 	// Display start message
@@ -153,8 +164,7 @@ func main() {
 
 	// Create the project structure
 	if err := createProjectStructure(projectPath); err != nil {
-		fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("Error: %v", err)))
-		os.Exit(1)
+		return err
 	}
 
 	fmt.Println(Green("✅ Structure terminée"))
@@ -163,8 +173,7 @@ func main() {
 	fmt.Println("📝 Génération des fichiers de base...")
 
 	if err := generateProjectFiles(projectPath, projectName); err != nil {
-		fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("Error: %v", err)))
-		os.Exit(1)
+		return err
 	}
 
 	// Display success message
@@ -173,11 +182,27 @@ func main() {
 	// Copy .env.example to .env
 	fmt.Println("🔑 Configuration de l'environnement...")
 	if err := copyEnvFile(projectPath); err != nil {
-		fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("Error: %v", err)))
-		os.Exit(1)
+		return err
+	}
+
+	// Initialize Git repository (AC: 1, 2, 3, 4, 5)
+	fmt.Println("🔧 Initialisation du dépôt Git...")
+	if err := initGitRepo(projectPath); err != nil {
+		// Non-fatal: warn user but continue
+		fmt.Println(Red(fmt.Sprintf("⚠️  Avertissement Git: %v", err)))
+		fmt.Println("   Vous pouvez initialiser le dépôt manuellement plus tard.")
+	} else if isGitAvailable() {
+		fmt.Println(Green("✅ Dépôt Git initialisé avec un commit initial"))
 	}
 
 	// Display success message with detailed setup instructions
+	printSuccessMessage(projectName)
+
+	return nil
+}
+
+// printSuccessMessage displays the final success message and setup instructions
+func printSuccessMessage(projectName string) {
 	fmt.Printf("\n%s\n", Green("════════════════════════════════════════════════════════════════"))
 	fmt.Printf("%s\n", Green("🎉 Projet '"+projectName+"' créé avec succès!"))
 	fmt.Printf("%s\n\n", Green("════════════════════════════════════════════════════════════════"))
@@ -196,11 +221,7 @@ func main() {
 	fmt.Println("    cd " + projectName)
 	fmt.Println()
 
-	fmt.Println("2️⃣  Installer les dépendances Go:")
-	fmt.Println("    go mod tidy")
-	fmt.Println()
-
-	fmt.Println("3️⃣  Configurer PostgreSQL (choisir une option):")
+	fmt.Println("2️⃣  Configurer PostgreSQL (choisir une option):")
 	fmt.Println()
 	fmt.Println("    Option A - Docker (Recommandé):")
 	fmt.Println("    docker run -d --name postgres \\")
@@ -215,18 +236,18 @@ func main() {
 	fmt.Println("    createdb " + projectName)
 	fmt.Println()
 
-	fmt.Println("4️⃣  Générer le JWT secret (OBLIGATOIRE):")
+	fmt.Println("3️⃣  Générer le JWT secret (OBLIGATOIRE):")
 	fmt.Println("    openssl rand -base64 32")
 	fmt.Println()
 	fmt.Println("    Puis éditer .env et ajouter:")
 	fmt.Println("    JWT_SECRET=<le_secret_généré>")
 	fmt.Println()
 
-	fmt.Println("5️⃣  Lancer l'application:")
+	fmt.Println("4️⃣  Lancer l'application:")
 	fmt.Println("    make run")
 	fmt.Println()
 
-	fmt.Println("6️⃣  Vérifier l'installation:")
+	fmt.Println("5️⃣  Vérifier l'installation:")
 	fmt.Println("    curl http://localhost:8080/health")
 	fmt.Println("    # Devrait retourner: {\"status\":\"ok\"}")
 	fmt.Println()

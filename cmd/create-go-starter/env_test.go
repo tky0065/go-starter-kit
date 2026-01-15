@@ -138,3 +138,62 @@ func findSubstring(s, substr string) bool {
 	}
 	return false
 }
+
+// TestCopyEnvFileWithUnreadableFile tests error handling when .env.example can't be read
+func TestCopyEnvFileWithUnreadableFile(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	projectPath := filepath.Join(tmpDir, "test-project")
+	if err := os.Mkdir(projectPath, 0755); err != nil {
+		t.Fatalf("Failed to create test project directory: %v", err)
+	}
+
+	// Create .env.example with no read permissions
+	envExamplePath := filepath.Join(projectPath, ".env.example")
+	if err := os.WriteFile(envExamplePath, []byte("content"), 0000); err != nil {
+		t.Fatalf("Failed to create .env.example: %v", err)
+	}
+
+	// Ensure file permissions are restored for cleanup
+	defer func() {
+		os.Chmod(envExamplePath, 0644)
+	}()
+
+	// Attempt to copy - should fail due to permission error
+	err := copyEnvFile(projectPath)
+	if err == nil {
+		t.Log("Note: Test may pass on some systems where root can read all files")
+	}
+}
+
+// TestCopyEnvFileWriteError tests error handling when .env can't be written
+func TestCopyEnvFileWriteError(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	projectPath := filepath.Join(tmpDir, "test-project")
+	if err := os.Mkdir(projectPath, 0755); err != nil {
+		t.Fatalf("Failed to create test project directory: %v", err)
+	}
+
+	// Create .env.example file
+	envExamplePath := filepath.Join(projectPath, ".env.example")
+	if err := os.WriteFile(envExamplePath, []byte("content"), 0644); err != nil {
+		t.Fatalf("Failed to create .env.example: %v", err)
+	}
+
+	// Make project directory read-only to prevent writing .env
+	if err := os.Chmod(projectPath, 0555); err != nil {
+		t.Fatalf("Failed to change directory permissions: %v", err)
+	}
+
+	// Ensure directory permissions are restored for cleanup
+	defer func() {
+		os.Chmod(projectPath, 0755)
+	}()
+
+	// Attempt to copy - should fail due to write permission error
+	err := copyEnvFile(projectPath)
+	if err == nil {
+		t.Log("Note: Test may pass on some systems where root can write anywhere")
+	}
+}

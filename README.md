@@ -2,6 +2,16 @@
 
 Un outil CLI puissant pour générer des projets Go prêts pour la production en quelques secondes.
 
+## 🎉 Statut du projet
+
+**✅ MVP COMPLET** - Toutes les fonctionnalités prévues ont été implémentées et validées (janvier 2026)
+
+- **5 Epics complétées** avec 26 user stories implémentées
+- **26 exigences fonctionnelles** satisfaites à 100%
+- **13 exigences non-fonctionnelles** validées (performance, sécurité, maintenabilité)
+- **Tests de fumée automatisés** passent avec succès
+- **Prêt pour la production** avec validation complète end-to-end
+
 ## Aperçu
 
 `create-go-starter` est un générateur de projets Go qui crée une architecture hexagonale complète avec toutes les fonctionnalités essentielles d'une application backend moderne. En une seule commande, obtenez un projet structuré avec authentification JWT, API REST, base de données, tests, et configuration Docker prête pour le déploiement.
@@ -74,6 +84,7 @@ Cette commande va:
 2. Générer ~30+ fichiers (handlers, services, repositories, tests, etc.)
 3. Configurer tous les fichiers nécessaires (.env, Dockerfile, Makefile, etc.)
 4. Copier le fichier `.env.example` vers `.env`
+5. Initialiser un dépôt Git avec un commit initial (si Git est disponible)
 
 ### Lancer le projet généré
 

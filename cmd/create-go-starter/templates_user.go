@@ -2,7 +2,11 @@ package main
 
 // ModelsUserTemplate returns the internal/models/user.go file content with domain entities
 func (t *ProjectTemplates) ModelsUserTemplate() string {
-	return `package models
+	return `// Package models defines the domain entities used throughout the application.
+// These structs represent the core business objects and are used by services,
+// repositories, and handlers. They include GORM annotations for database mapping
+// and JSON tags for API serialization.
+package models
 
 import (
 	"time"
@@ -10,7 +14,9 @@ import (
 	"gorm.io/gorm"
 )
 
-// User represents the domain entity for a user.
+// User represents the domain entity for a user account.
+// It contains authentication credentials and metadata managed by GORM.
+// The PasswordHash field is excluded from JSON serialization for security.
 type User struct {
 	ID           uint           ` + "`gorm:\"primaryKey\" json:\"id\"`" + `
 	Email        string         ` + "`gorm:\"uniqueIndex;not null\" json:\"email\"`" + `
@@ -20,7 +26,9 @@ type User struct {
 	DeletedAt    gorm.DeletedAt ` + "`gorm:\"index\" json:\"deleted_at,omitempty\"`" + `
 }
 
-// RefreshToken represents a refresh token for session management
+// RefreshToken represents a refresh token for secure session management.
+// Tokens support revocation for security and expiration for automatic cleanup.
+// The Revoked field enables token rotation and replay attack detection.
 type RefreshToken struct {
 	ID        uint      ` + "`gorm:\"primaryKey\" json:\"id\"`" + `
 	UserID    uint      ` + "`gorm:\"not null;index\" json:\"user_id\"`" + `
@@ -31,17 +39,21 @@ type RefreshToken struct {
 	UpdatedAt time.Time ` + "`gorm:\"autoUpdateTime\" json:\"updated_at\"`" + `
 }
 
-// IsExpired returns true if the token has expired
+// IsExpired returns true if the refresh token has passed its expiration time.
+// Expired tokens should not be used for obtaining new access tokens.
 func (rt *RefreshToken) IsExpired() bool {
 	return time.Now().After(rt.ExpiresAt)
 }
 
-// IsRevoked returns true if the token has been revoked
+// IsRevoked returns true if the refresh token has been explicitly revoked.
+// Revoked tokens indicate potential security issues and should trigger alerts.
 func (rt *RefreshToken) IsRevoked() bool {
 	return rt.Revoked
 }
 
-// AuthResponse represents the authentication response with tokens
+// AuthResponse represents the authentication response containing JWT tokens.
+// It is returned after successful login or token refresh operations.
+// ExpiresIn indicates the access token lifetime in seconds.
 type AuthResponse struct {
 	AccessToken  string ` + "`json:\"access_token\"`" + `
 	RefreshToken string ` + "`json:\"refresh_token\"`" + `
@@ -62,11 +74,19 @@ func (t *ProjectTemplates) UserRefreshTokenTemplate() string {
 
 // UserInterfacesTemplate returns the internal/interfaces/services.go file content
 func (t *ProjectTemplates) UserInterfacesTemplate() string {
-	return `package interfaces
+	return `// Package interfaces defines the ports (abstractions) for the hexagonal architecture.
+// These interfaces decouple the domain layer from external concerns like databases,
+// HTTP frameworks, and authentication providers. Adapters implement these interfaces
+// to provide concrete functionality while keeping the domain logic pure and testable.
+package interfaces
 
-// TokenService defines the interface for token generation.
+// TokenService defines the interface for JWT token generation and management.
+// This abstraction allows the domain layer to generate tokens without depending
+// on specific JWT implementation details, following hexagonal architecture principles.
 // Implemented by pkg/auth/JWTService.
 type TokenService interface {
+	// GenerateTokens creates a new access token and refresh token pair for authentication.
+	// Returns the access token, refresh token, expiration time in seconds, and any error.
 	GenerateTokens(userID uint) (accessToken string, refreshToken string, expiresIn int64, err error)
 }
 `
@@ -74,7 +94,8 @@ type TokenService interface {
 
 // UserRepositoryInterfaceTemplate returns the internal/interfaces/user_repository.go file content
 func (t *ProjectTemplates) UserRepositoryInterfaceTemplate() string {
-	return `package interfaces
+	return `// Package interfaces defines the ports (abstractions) for the hexagonal architecture.
+package interfaces
 
 import (
 	"context"
@@ -83,17 +104,30 @@ import (
 	"` + t.projectName + `/internal/models"
 )
 
-// UserRepository defines the interface for user data persistence.
+// UserRepository defines the interface for user data persistence operations.
+// This abstraction allows the domain layer to interact with storage without
+// depending on specific database implementation details (GORM, PostgreSQL, etc.).
+// Following hexagonal architecture, this is a "port" that adapters implement.
 type UserRepository interface {
+	// CreateUser inserts a new user record into the database.
 	CreateUser(ctx context.Context, user *models.User) error
+	// GetUserByEmail retrieves a user by their email address. Returns nil if not found.
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
+	// FindByID retrieves a user by their unique identifier. Returns nil if not found.
 	FindByID(ctx context.Context, id uint) (*models.User, error)
+	// FindAll retrieves users with pagination. Returns users, total count, and any error.
 	FindAll(ctx context.Context, page, limit int) ([]*models.User, int64, error)
+	// Update persists changes to an existing user record.
 	Update(ctx context.Context, user *models.User) error
+	// Delete performs a soft delete on a user by setting deleted_at.
 	Delete(ctx context.Context, id uint) error
+	// SaveRefreshToken stores a new refresh token for the given user.
 	SaveRefreshToken(ctx context.Context, UserID uint, token string, expiresAt time.Time) error
+	// GetRefreshToken retrieves a refresh token by its string value. Returns nil if not found.
 	GetRefreshToken(ctx context.Context, token string) (*models.RefreshToken, error)
+	// RevokeRefreshToken marks a refresh token as revoked by its ID.
 	RevokeRefreshToken(ctx context.Context, tokenID uint) error
+	// RotateRefreshToken atomically revokes the old token and creates a new one.
 	RotateRefreshToken(ctx context.Context, oldTokenID uint, newToken *models.RefreshToken) error
 }
 `
@@ -101,7 +135,11 @@ type UserRepository interface {
 
 // UserRepositoryTemplate returns the internal/adapters/repository/user_repository.go file content
 func (t *ProjectTemplates) UserRepositoryTemplate() string {
-	return `package repository
+	return `// Package repository provides database adapter implementations for the application.
+// It implements the interfaces defined in internal/interfaces using GORM for PostgreSQL.
+// This package is part of the adapters layer in the hexagonal architecture,
+// translating domain operations into database queries.
+package repository
 
 import (
 	"context"
@@ -113,22 +151,28 @@ import (
 	"` + t.projectName + `/internal/models"
 )
 
-// UserRepository implements user data persistence using GORM
+// UserRepository implements user data persistence using GORM.
+// It provides database operations for users and refresh tokens,
+// implementing the interfaces.UserRepository interface.
 type UserRepository struct {
 	db *gorm.DB
 }
 
-// NewUserRepository creates a new UserRepository instance
+// NewUserRepository creates a new UserRepository instance with the provided database connection.
+// The repository handles all database operations related to users and authentication tokens.
 func NewUserRepository(db *gorm.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-// CreateUser creates a new user in the database
+// CreateUser inserts a new user record into the database.
+// Returns an error if the insert fails (e.g., duplicate email constraint).
 func (r *UserRepository) CreateUser(ctx context.Context, u *models.User) error {
 	return r.db.WithContext(ctx).Create(u).Error
 }
 
-// GetUserByEmail retrieves a user by email, returns nil if not found
+// GetUserByEmail retrieves a user by their email address.
+// Returns nil, nil if no user is found (not an error condition).
+// Returns nil, error if a database error occurs.
 func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	var u models.User
 	err := r.db.WithContext(ctx).Where("email = ?", email).First(&u).Error
@@ -141,7 +185,9 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*mod
 	return &u, nil
 }
 
-// FindByID retrieves a user by ID, returns nil if not found
+// FindByID retrieves a user by their unique identifier.
+// Returns nil, nil if no user is found (not an error condition).
+// Soft-deleted users are excluded from the result.
 func (r *UserRepository) FindByID(ctx context.Context, id uint) (*models.User, error) {
 	var u models.User
 	err := r.db.WithContext(ctx).Where("id = ?", id).First(&u).Error
@@ -154,7 +200,9 @@ func (r *UserRepository) FindByID(ctx context.Context, id uint) (*models.User, e
 	return &u, nil
 }
 
-// FindAll retrieves all users from the database (excluding soft-deleted)
+// FindAll retrieves all users with pagination support.
+// Returns users for the specified page, total count, and any error.
+// Soft-deleted users are automatically excluded by GORM.
 func (r *UserRepository) FindAll(ctx context.Context, page, limit int) ([]*models.User, int64, error) {
 	var users []*models.User
 	var total int64
@@ -174,17 +222,20 @@ func (r *UserRepository) FindAll(ctx context.Context, page, limit int) ([]*model
 	return users, total, nil
 }
 
-// Update updates an existing user in the database
+// Update persists changes to an existing user record.
+// Only non-zero fields are updated (GORM Updates behavior).
 func (r *UserRepository) Update(ctx context.Context, u *models.User) error {
 	return r.db.WithContext(ctx).Updates(u).Error
 }
 
-// Delete performs a soft delete on the user (sets deleted_at)
+// Delete performs a soft delete on the user by setting the deleted_at timestamp.
+// The record is retained but excluded from normal queries.
 func (r *UserRepository) Delete(ctx context.Context, id uint) error {
 	return r.db.WithContext(ctx).Delete(&models.User{}, id).Error
 }
 
-// SaveRefreshToken saves a refresh token for the given user
+// SaveRefreshToken creates a new refresh token record for the given user.
+// The token is stored with its expiration time for validation during refresh.
 func (r *UserRepository) SaveRefreshToken(ctx context.Context, userID uint, token string, expiresAt time.Time) error {
 	refreshToken := &models.RefreshToken{
 		UserID:    userID,
@@ -195,7 +246,8 @@ func (r *UserRepository) SaveRefreshToken(ctx context.Context, userID uint, toke
 	return r.db.WithContext(ctx).Create(refreshToken).Error
 }
 
-// GetRefreshToken retrieves a refresh token by token string
+// GetRefreshToken retrieves a refresh token by its token string value.
+// Returns nil, nil if the token is not found (not an error condition).
 func (r *UserRepository) GetRefreshToken(ctx context.Context, token string) (*models.RefreshToken, error) {
 	var rt models.RefreshToken
 	err := r.db.WithContext(ctx).Where("token = ?", token).First(&rt).Error
@@ -208,14 +260,17 @@ func (r *UserRepository) GetRefreshToken(ctx context.Context, token string) (*mo
 	return &rt, nil
 }
 
-// RevokeRefreshToken marks a refresh token as revoked
+// RevokeRefreshToken marks a refresh token as revoked by its ID.
+// Revoked tokens cannot be used for obtaining new access tokens.
 func (r *UserRepository) RevokeRefreshToken(ctx context.Context, tokenID uint) error {
 	return r.db.WithContext(ctx).Model(&models.RefreshToken{}).
 		Where("id = ?", tokenID).
 		Update("revoked", true).Error
 }
 
-// RotateRefreshToken performs atomic token rotation: revocation of old and creation of new
+// RotateRefreshToken performs atomic token rotation within a database transaction.
+// It revokes the old token and creates the new one atomically, preventing race conditions.
+// Returns ErrRefreshTokenRevoked if the old token was already revoked (replay attack detection).
 func (r *UserRepository) RotateRefreshToken(ctx context.Context, oldTokenID uint, newToken *models.RefreshToken) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// 1. Revoke old token with optimistic locking check
@@ -244,7 +299,11 @@ func (r *UserRepository) RotateRefreshToken(ctx context.Context, oldTokenID uint
 
 // DomainErrorsTemplate returns the internal/domain/errors.go file content
 func (t *ProjectTemplates) DomainErrorsTemplate() string {
-	return `package domain
+	return `// Package domain contains the core business logic and domain-specific types.
+// This is the innermost layer of the hexagonal architecture and has no external
+// dependencies. It defines domain errors, business rules, and core abstractions
+// that other layers depend upon.
+package domain
 
 import (
 	"errors"
@@ -253,6 +312,8 @@ import (
 )
 
 // AppError represents a structured application error with HTTP status and details.
+// It provides a consistent error format across the API with machine-readable codes
+// and human-readable messages. The Details field can contain validation errors.
 type AppError struct {
 	Code    string ` + "`json:\"code\"`" + `
 	Message string ` + "`json:\"message\"`" + `
@@ -260,12 +321,14 @@ type AppError struct {
 	Details any    ` + "`json:\"details,omitempty\"`" + `
 }
 
-// Error implements the error interface.
+// Error implements the error interface, returning the human-readable message.
+// This allows AppError to be used with standard Go error handling patterns.
 func (e *AppError) Error() string {
 	return e.Message
 }
 
-// NewNotFoundError creates a 404 error.
+// NewNotFoundError creates a 404 Not Found error with the specified message and code.
+// Use this when a requested resource does not exist.
 func NewNotFoundError(msg string, code string) *AppError {
 	return &AppError{
 		Code:    code,
@@ -275,7 +338,8 @@ func NewNotFoundError(msg string, code string) *AppError {
 	}
 }
 
-// NewBadRequestError creates a 400 error with optional validation details.
+// NewBadRequestError creates a 400 Bad Request error with optional validation details.
+// Use this for client errors such as invalid input or validation failures.
 func NewBadRequestError(msg string, code string, details any) *AppError {
 	return &AppError{
 		Code:    code,
@@ -285,7 +349,8 @@ func NewBadRequestError(msg string, code string, details any) *AppError {
 	}
 }
 
-// NewInternalError creates a 500 error.
+// NewInternalError creates a 500 Internal Server Error.
+// Use this for unexpected server-side errors. Messages are masked in production.
 func NewInternalError(msg string, code string) *AppError {
 	return &AppError{
 		Code:    code,
@@ -295,7 +360,8 @@ func NewInternalError(msg string, code string) *AppError {
 	}
 }
 
-// NewUnauthorizedError creates a 401 error.
+// NewUnauthorizedError creates a 401 Unauthorized error.
+// Use this when authentication is required but not provided or invalid.
 func NewUnauthorizedError(msg string, code string) *AppError {
 	return &AppError{
 		Code:    code,
@@ -305,7 +371,8 @@ func NewUnauthorizedError(msg string, code string) *AppError {
 	}
 }
 
-// NewForbiddenError creates a 403 error.
+// NewForbiddenError creates a 403 Forbidden error.
+// Use this when the user is authenticated but lacks permission for the action.
 func NewForbiddenError(msg string, code string) *AppError {
 	return &AppError{
 		Code:    code,
@@ -315,7 +382,8 @@ func NewForbiddenError(msg string, code string) *AppError {
 	}
 }
 
-// NewConflictError creates a 409 error.
+// NewConflictError creates a 409 Conflict error.
+// Use this when the request conflicts with existing state (e.g., duplicate email).
 func NewConflictError(msg string, code string) *AppError {
 	return &AppError{
 		Code:    code,
@@ -325,13 +393,20 @@ func NewConflictError(msg string, code string) *AppError {
 	}
 }
 
-// Domain-wide errors
+// Domain-wide sentinel errors for consistent error checking across the application.
+// These can be checked using errors.Is() for proper error handling.
 var (
+	// ErrEmailAlreadyRegistered indicates an attempt to register with an existing email.
 	ErrEmailAlreadyRegistered = errors.New("email already registered")
+	// ErrInvalidCredentials indicates incorrect email or password during login.
 	ErrInvalidCredentials     = errors.New("invalid credentials")
+	// ErrUserNotFound indicates the requested user does not exist.
 	ErrUserNotFound           = errors.New("user not found")
+	// ErrInvalidRefreshToken indicates the provided refresh token is malformed or unknown.
 	ErrInvalidRefreshToken    = errors.New("invalid refresh token")
+	// ErrRefreshTokenExpired indicates the refresh token has passed its expiration time.
 	ErrRefreshTokenExpired    = errors.New("refresh token expired")
+	// ErrRefreshTokenRevoked indicates the refresh token was explicitly revoked.
 	ErrRefreshTokenRevoked    = errors.New("refresh token has been revoked")
 )
 `
@@ -339,7 +414,11 @@ var (
 
 // ErrorHandlerMiddlewareTemplate returns the internal/adapters/middleware/error_handler.go file content
 func (t *ProjectTemplates) ErrorHandlerMiddlewareTemplate() string {
-	return `package middleware
+	return `// Package middleware provides HTTP middleware components for the Fiber web framework.
+// It includes centralized error handling, request logging, and other cross-cutting concerns
+// that apply to all HTTP requests. These middleware components ensure consistent
+// API behavior and proper error responses across all endpoints.
+package middleware
 
 import (
 	"errors"
@@ -353,6 +432,8 @@ import (
 
 // ErrorHandler is a centralized error handler for Fiber that formats all errors
 // into a consistent JSON structure following the API standardization requirements.
+// It handles domain errors, Fiber errors, and generic errors with appropriate
+// HTTP status codes and masks internal error details in production.
 func ErrorHandler(c *fiber.Ctx, err error) error {
 	// Default to 500 Internal Server Error
 	code := fiber.StatusInternalServerError
@@ -410,7 +491,8 @@ func ErrorHandler(c *fiber.Ctx, err error) error {
 	return c.Status(code).JSON(resp)
 }
 
-// mapHTTPStatusToCode maps HTTP status codes to readable error codes.
+// mapHTTPStatusToCode converts HTTP status codes to readable error code strings.
+// These codes are used in API responses for client-side error handling.
 func mapHTTPStatusToCode(status int) string {
 	switch status {
 	case fiber.StatusBadRequest:
@@ -438,7 +520,11 @@ func mapHTTPStatusToCode(status int) string {
 
 // UserServiceTemplate returns the internal/domain/user/service.go file content
 func (t *ProjectTemplates) UserServiceTemplate() string {
-	return `package user
+	return `// Package user implements the user domain including authentication, registration,
+// profile management, and CRUD operations. It contains the business logic for
+// user-related features and depends only on interfaces, not concrete implementations.
+// This is part of the domain layer in the hexagonal architecture.
+package user
 
 import (
 	"context"
@@ -451,18 +537,23 @@ import (
 	"` + t.projectName + `/internal/models"
 )
 
-// Service handles user business logic
+// Service handles user business logic including registration, authentication,
+// profile management, and CRUD operations. It implements the hexagonal architecture
+// pattern by depending on repository and token service interfaces.
 type Service struct {
 	repo         interfaces.UserRepository
 	tokenService interfaces.TokenService
 }
 
-// NewService creates a new user service
+// NewService creates a new user service with the provided repository.
+// Use NewServiceWithJWT for full authentication support including token generation.
 func NewService(repo interfaces.UserRepository) *Service {
 	return &Service{repo: repo}
 }
 
-// NewServiceWithJWT creates a new user service with JWT support
+// NewServiceWithJWT creates a new user service with JWT token generation support.
+// This is the recommended constructor for production use as it enables
+// authentication and token refresh functionality.
 func NewServiceWithJWT(repo interfaces.UserRepository, tokenService interfaces.TokenService) *Service {
 	return &Service{
 		repo:         repo,
@@ -470,7 +561,9 @@ func NewServiceWithJWT(repo interfaces.UserRepository, tokenService interfaces.T
 	}
 }
 
-// Register creates a new user account with the given email and password
+// Register creates a new user account with the given email and password.
+// It validates that the email is not already registered and hashes the password
+// using bcrypt before storing. Returns the created user or an error.
 func (s *Service) Register(ctx context.Context, email, password string) (*models.User, error) {
 	existing, err := s.repo.GetUserByEmail(ctx, email)
 	if err != nil {
@@ -502,7 +595,10 @@ func (s *Service) Register(ctx context.Context, email, password string) (*models
 	return newUser, nil
 }
 
-// Authenticate validates user credentials and returns JWT tokens
+// Authenticate validates user credentials and returns JWT tokens on success.
+// It verifies the email exists, compares the password hash, and generates
+// both access and refresh tokens. The refresh token is stored in the database
+// for rotation support. Returns an AuthResponse or an error.
 func (s *Service) Authenticate(ctx context.Context, email, password string) (*models.AuthResponse, error) {
 	u, err := s.repo.GetUserByEmail(ctx, email)
 	if err != nil {
@@ -537,7 +633,10 @@ func (s *Service) Authenticate(ctx context.Context, email, password string) (*mo
 	}, nil
 }
 
-// RefreshToken validates an existing refresh token and generates new tokens
+// RefreshToken validates an existing refresh token and generates new token pair.
+// It implements secure token rotation by revoking the old token atomically
+// when creating the new one. This prevents token reuse attacks.
+// Returns new tokens or an error if the token is invalid, expired, or revoked.
 func (s *Service) RefreshToken(ctx context.Context, oldToken string) (*models.AuthResponse, error) {
 	rt, err := s.repo.GetRefreshToken(ctx, oldToken)
 	if err != nil {
@@ -586,7 +685,8 @@ func (s *Service) RefreshToken(ctx context.Context, oldToken string) (*models.Au
 	}, nil
 }
 
-// GetProfile retrieves a user's profile by their ID
+// GetProfile retrieves a user's profile by their ID.
+// Returns the user data or ErrUserNotFound if no user exists with the given ID.
 func (s *Service) GetProfile(ctx context.Context, userID uint) (*models.User, error) {
 	u, err := s.repo.FindByID(ctx, userID)
 	if err != nil {
@@ -600,7 +700,9 @@ func (s *Service) GetProfile(ctx context.Context, userID uint) (*models.User, er
 	return u, nil
 }
 
-// GetAll retrieves all users from the database
+// GetAll retrieves all users with pagination support.
+// Page must be >= 1 (defaults to 1), limit must be between 1-100 (defaults to 10).
+// Returns the users slice, total count for pagination, and any error.
 func (s *Service) GetAll(ctx context.Context, page, limit int) ([]*models.User, int64, error) {
 	if page < 1 {
 		page = 1
@@ -619,7 +721,9 @@ func (s *Service) GetAll(ctx context.Context, page, limit int) ([]*models.User, 
 	return users, total, nil
 }
 
-// UpdateUser updates a user's email address
+// UpdateUser updates a user's email address.
+// It validates that the new email is not already in use by another user.
+// Returns the updated user or ErrUserNotFound/ErrEmailAlreadyRegistered on conflict.
 func (s *Service) UpdateUser(ctx context.Context, userID uint, email string) (*models.User, error) {
 	u, err := s.repo.FindByID(ctx, userID)
 	if err != nil {
@@ -650,7 +754,9 @@ func (s *Service) UpdateUser(ctx context.Context, userID uint, email string) (*m
 	return u, nil
 }
 
-// DeleteUser performs a soft delete on a user
+// DeleteUser performs a soft delete on a user by setting the deleted_at timestamp.
+// The user record is retained for audit purposes but excluded from normal queries.
+// Returns ErrUserNotFound if no user exists with the given ID.
 func (s *Service) DeleteUser(ctx context.Context, userID uint) error {
 	u, err := s.repo.FindByID(ctx, userID)
 	if err != nil {
@@ -673,7 +779,11 @@ func (s *Service) DeleteUser(ctx context.Context, userID uint) error {
 
 // UserHandlerTemplate returns the internal/adapters/handlers/user_handler.go file content
 func (t *ProjectTemplates) UserHandlerTemplate() string {
-	return `package handlers
+	return `// Package handlers provides HTTP request handlers for the Fiber web framework.
+// Each handler is responsible for processing HTTP requests, validating input,
+// delegating to domain services, and formatting responses. Handlers are part
+// of the adapters layer and translate HTTP concerns into domain operations.
+package handlers
 
 import (
 	"time"
@@ -685,13 +795,17 @@ import (
 	"` + t.projectName + `/pkg/auth"
 )
 
-// UserHandler handles user-related HTTP requests
+// UserHandler handles user-related HTTP requests including profile retrieval,
+// listing users, updating user information, and soft-deleting users.
+// All endpoints require JWT authentication.
 type UserHandler struct {
 	service  *user.Service
 	validate *validator.Validate
 }
 
-// NewUserHandler creates a new UserHandler instance
+// NewUserHandler creates a new UserHandler instance with the provided user service.
+// The handler is responsible for processing user management requests following
+// the API standardization guidelines with proper validation.
 func NewUserHandler(service *user.Service) *UserHandler {
 	return &UserHandler{
 		service:  service,
@@ -699,7 +813,8 @@ func NewUserHandler(service *user.Service) *UserHandler {
 	}
 }
 
-// ProfileResponse represents the user profile response
+// ProfileResponse represents the user profile data returned by user endpoints.
+// It excludes sensitive fields like password hash for security.
 type ProfileResponse struct {
 	ID        uint   ` + "`json:\"id\"`" + `
 	Email     string ` + "`json:\"email\"`" + `
@@ -778,7 +893,8 @@ func (h *UserHandler) GetAllUsers(c *fiber.Ctx) error {
 	})
 }
 
-// UpdateUserRequest represents the request body for updating a user
+// UpdateUserRequest represents the request body for updating a user's information.
+// Currently supports email updates only. Email must be a valid email address.
 type UpdateUserRequest struct {
 	Email string ` + "`json:\"email\" validate:\"required,email\"`" + `
 }
@@ -870,6 +986,8 @@ import (
 	"` + t.projectName + `/internal/domain/user"
 )
 
+// Module provides HTTP handler dependencies via fx dependency injection.
+// It creates handler instances with their required service dependencies.
 var Module = fx.Module("handlers",
 	fx.Provide(func(s *user.Service) *AuthHandler {
 		return NewAuthHandler(s)
@@ -895,13 +1013,17 @@ import (
 	"` + t.projectName + `/internal/domain/user"
 )
 
-// AuthHandler handles authentication-related HTTP requests
+// AuthHandler handles authentication-related HTTP requests including user registration,
+// login, and token refresh operations. It delegates business logic to the user service
+// and uses the validator package for request validation.
 type AuthHandler struct {
 	service  *user.Service
 	validate *validator.Validate
 }
 
-// NewAuthHandler creates a new AuthHandler instance
+// NewAuthHandler creates a new AuthHandler instance with the provided user service.
+// The handler is responsible for processing authentication requests and returning
+// appropriate HTTP responses following the API standardization guidelines.
 func NewAuthHandler(service *user.Service) *AuthHandler {
 	return &AuthHandler{
 		service:  service,
@@ -909,13 +1031,16 @@ func NewAuthHandler(service *user.Service) *AuthHandler {
 	}
 }
 
-// RegisterRequest represents the user registration request
+// RegisterRequest represents the user registration request payload.
+// Email must be a valid email address with a maximum of 255 characters.
+// Password must be between 8 and 72 characters (bcrypt limitation).
 type RegisterRequest struct {
 	Email    string ` + "`json:\"email\" validate:\"required,email,max=255\"`" + `
 	Password string ` + "`json:\"password\" validate:\"required,min=8,max=72\"`" + `
 }
 
-// RegisterResponse represents the user registration response
+// RegisterResponse represents the successful user registration response.
+// It contains the newly created user's ID, email, and creation timestamp.
 type RegisterResponse struct {
 	ID        uint   ` + "`json:\"id\"`" + `
 	Email     string ` + "`json:\"email\"`" + `
@@ -975,7 +1100,8 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	})
 }
 
-// LoginRequest represents the authentication request
+// LoginRequest represents the authentication request payload.
+// Both email and password are required fields.
 type LoginRequest struct {
 	Email    string ` + "`json:\"email\" validate:\"required,email\"`" + `
 	Password string ` + "`json:\"password\" validate:\"required\"`" + `
@@ -1014,7 +1140,8 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	})
 }
 
-// RefreshRequest represents the token refresh request
+// RefreshRequest represents the token refresh request payload.
+// The refresh_token field must contain a valid, non-expired, non-revoked refresh token.
 type RefreshRequest struct {
 	RefreshToken string ` + "`json:\"refresh_token\" validate:\"required\"`" + `
 }
@@ -1056,7 +1183,11 @@ func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 
 // JWTAuthTemplate returns the pkg/auth/jwt.go file content
 func (t *ProjectTemplates) JWTAuthTemplate() string {
-	return `package auth
+	return `// Package auth provides JWT-based authentication and authorization utilities.
+// It includes token generation, validation, and middleware for protecting routes.
+// This package implements the interfaces.TokenService interface and provides
+// the security layer for the application following OAuth 2.0 best practices.
+package auth
 
 import (
 	"errors"
@@ -1069,19 +1200,23 @@ import (
 )
 
 var (
-	// ErrInvalidToken is returned when the JWT token is invalid
+	// ErrInvalidToken is returned when the JWT token is malformed, expired, or has an invalid signature.
 	ErrInvalidToken = errors.New("invalid token")
-	// ErrMissingUserID is returned when user ID is missing from token claims
+	// ErrMissingUserID is returned when the user_id claim is missing from the token payload.
 	ErrMissingUserID = errors.New("missing user ID in token")
 )
 
-// JWTService handles JWT token generation and validation
+// JWTService handles JWT token generation and validation for user authentication.
+// It supports both access tokens (short-lived) and refresh tokens (long-lived)
+// following OAuth 2.0 best practices.
 type JWTService struct {
 	secretKey string
 	expiresIn time.Duration
 }
 
-// NewJWTService creates a new JWT service instance
+// NewJWTService creates a new JWT service instance configured from environment variables.
+// It requires JWT_SECRET to be set and optionally reads JWT_EXPIRY (default: 24h).
+// Panics if JWT_SECRET is not configured as this is a critical security requirement.
 func NewJWTService() *JWTService {
 	secret := config.GetEnv("JWT_SECRET", "")
 	if secret == "" {
@@ -1100,7 +1235,10 @@ func NewJWTService() *JWTService {
 	}
 }
 
-// GenerateTokens creates a new JWT access token and refresh token for the given user ID
+// GenerateTokens creates a new JWT access token and refresh token pair for the given user ID.
+// The access token expires based on JWT_EXPIRY configuration (default: 24h).
+// The refresh token expires after 7 days and is used for obtaining new access tokens.
+// Returns the access token, refresh token, expiration time in seconds, and any error.
 func (s *JWTService) GenerateTokens(userID uint) (accessToken string, refreshToken string, expiresIn int64, err error) {
 	// Create access token claims
 	now := time.Now()
@@ -1137,7 +1275,9 @@ func (s *JWTService) GenerateTokens(userID uint) (accessToken string, refreshTok
 	return accessToken, refreshToken, int64(s.expiresIn.Seconds()), nil
 }
 
-// GetUserID extracts the user ID from the JWT token stored in the Fiber context
+// GetUserID extracts the user ID from the JWT token stored in the Fiber context.
+// The token must have been validated by the JWT middleware and stored in c.Locals("user").
+// Returns the user ID as uint or an error if the token is invalid or missing the user_id claim.
 func GetUserID(c *fiber.Ctx) (uint, error) {
 	// Get user from JWT middleware (stored by gofiber/contrib/jwt)
 	user := c.Locals("user")
@@ -1163,7 +1303,9 @@ func GetUserID(c *fiber.Ctx) (uint, error) {
 	return uint(userIDFloat), nil
 }
 
-// ValidateToken validates a JWT token and returns the claims
+// ValidateToken validates a JWT token string and returns the claims if valid.
+// It verifies the signature using HMAC-SHA256 and checks the expiration time.
+// Returns the token claims as jwt.MapClaims or an error if validation fails.
 func (s *JWTService) ValidateToken(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -1197,8 +1339,11 @@ import (
 	"` + t.projectName + `/pkg/config"
 )
 
-// NewJWTMiddleware creates a new JWT authentication middleware
-// It supports both "Bearer <token>" and raw "<token>" formats for Swagger UI compatibility
+// NewJWTMiddleware creates a new JWT authentication middleware for protecting routes.
+// It validates the Authorization header and extracts the JWT token.
+// Supports both "Bearer <token>" and raw "<token>" formats for Swagger UI compatibility.
+// The validated token is stored in c.Locals("user") for access in handlers.
+// Panics if JWT_SECRET is not configured as this is a critical security requirement.
 func NewJWTMiddleware() fiber.Handler {
 	secret := config.GetEnv("JWT_SECRET", "")
 	if secret == "" {
@@ -1238,13 +1383,15 @@ func NewJWTMiddleware() fiber.Handler {
 
 // UserModuleTemplate returns the internal/domain/user/module.go file content
 func (t *ProjectTemplates) UserModuleTemplate() string {
-	return `package user
+	return `// Package user implements the user domain including authentication and management.
+package user
 
 import (
 	"go.uber.org/fx"
 )
 
-// Module provides user domain services via fx
+// Module provides user domain services via fx dependency injection.
+// It registers the user service with JWT support for authentication operations.
 var Module = fx.Module("user",
 	// Provide service with JWT support - TokenService is injected by fx from auth.Module
 	fx.Provide(NewServiceWithJWT),
@@ -1254,7 +1401,8 @@ var Module = fx.Module("user",
 
 // RepositoryModuleTemplate returns the internal/adapters/repository/module.go file content
 func (t *ProjectTemplates) RepositoryModuleTemplate() string {
-	return `package repository
+	return `// Package repository provides database adapter implementations for the application.
+package repository
 
 import (
 	"go.uber.org/fx"
@@ -1262,7 +1410,9 @@ import (
 	"` + t.projectName + `/internal/interfaces"
 )
 
-// Module provides repository implementations via fx
+// Module provides repository implementations via fx dependency injection.
+// It binds concrete repository implementations to their interface contracts,
+// enabling dependency injection throughout the application.
 var Module = fx.Module("repository",
 	fx.Provide(func(db *gorm.DB) interfaces.UserRepository {
 		return NewUserRepository(db)
@@ -1280,7 +1430,9 @@ import (
 	"` + t.projectName + `/internal/interfaces"
 )
 
-// Module provides auth services via fx
+// Module provides authentication services via fx dependency injection.
+// It registers the JWT service as a TokenService interface implementation
+// and provides the JWT middleware for protecting routes.
 var Module = fx.Module("auth",
 	fx.Provide(func() interfaces.TokenService {
 		return NewJWTService()
@@ -1292,7 +1444,8 @@ var Module = fx.Module("auth",
 
 // RoutesTemplate returns the internal/adapters/http/routes.go file content
 func (t *ProjectTemplates) RoutesTemplate() string {
-	return `package http
+	return `// Package http provides HTTP route registration and health check endpoints.
+package http
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -1301,7 +1454,10 @@ import (
 	"` + t.projectName + `/internal/adapters/handlers"
 )
 
-// RegisterRoutes configures all application routes
+// RegisterRoutes configures all application routes including authentication,
+// user management, health checks, and Swagger documentation endpoints.
+// It organizes routes into logical groups with appropriate middleware application.
+// Public routes are accessible without authentication; protected routes require JWT.
 func RegisterRoutes(
 	app *fiber.App,
 	authHandler *handlers.AuthHandler,

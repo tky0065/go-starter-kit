@@ -16,6 +16,7 @@
 #   - skipped: Optional/conditional workflow that was skipped
 
 generated: "2026-01-07"
+updated: "2026-01-14"
 project: "go-starter-kit"
 project_type: "software"
 selected_track: "bmad-method"
@@ -24,19 +25,26 @@ workflow_path: "method-greenfield.yaml"
 
 workflow_status:
   # Phase 1 - Analysis (Optional)
-  brainstorm-project: optional
-  research: optional
+  brainstorm-project: skipped
+  research: skipped
   product-brief: "_bmad-output/planning-artifacts/product-brief-go-starter-kit-2026-01-07.md"
 
   # Phase 2 - Planning
-  prd: required
-  create-ux-design: conditional
+  prd: "_bmad-output/planning-artifacts/prd.md"
+  create-ux-design: skipped
 
   # Phase 3 - Solutioning
-  create-architecture: required
-  create-epics-and-stories: required
-  test-design: optional
-  implementation-readiness: required
+  create-architecture: "_bmad-output/planning-artifacts/architecture.md"
+  create-epics-and-stories: "_bmad-output/planning-artifacts/epics.md"
+  test-design: skipped
+  implementation-readiness: "_bmad-output/planning-artifacts/implementation-readiness-report-2026-01-07.md"
 
   # Phase 4 - Implementation
-  sprint-planning: required
+  sprint-planning: "_bmad-output/implementation-artifacts/sprint-status.yaml"
+
+# Current Status Summary
+current_status:
+  phase: "Implementation"
+  sprint: 2
+  next_action: "Execute Sprint 2 stories (Epic 5: MVP Finalization)"
+  agent: "dev"

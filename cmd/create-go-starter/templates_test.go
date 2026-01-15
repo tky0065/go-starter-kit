@@ -1,6 +1,10 @@
 package main
 
 import (
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -982,6 +986,112 @@ func TestHandlerModuleTemplate(t *testing.T) {
 	for _, required := range requiredContent {
 		if !strings.Contains(content, required) {
 			t.Errorf("HandlerModuleTemplate() should contain '%s'", required)
+		}
+	}
+}
+
+// TestE2EDockerImageSize tests that generated Docker image is under 50MB (AC #1)
+// This is an end-to-end test that requires Docker to be installed and running
+func TestE2EDockerImageSize(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping E2E Docker test in short mode")
+	}
+
+	// Check if Docker is available
+	if _, err := exec.LookPath("docker"); err != nil {
+		t.Skip("Docker not available, skipping Docker image size test")
+	}
+
+	// Create temporary project
+	tmpDir := t.TempDir()
+	projectName := "test-docker-size"
+	projectPath := filepath.Join(tmpDir, projectName)
+
+	// Use createProjectStructure function
+	if err := createProjectStructure(projectPath); err != nil {
+		t.Fatalf("Failed to create project structure: %v", err)
+	}
+
+	// Generate files using templates
+	templates := NewProjectTemplates(projectName)
+
+	// Create Dockerfile
+	dockerfilePath := filepath.Join(projectPath, "Dockerfile")
+	if err := os.WriteFile(dockerfilePath, []byte(templates.DockerfileTemplate()), 0644); err != nil {
+		t.Fatalf("Failed to create Dockerfile: %v", err)
+	}
+
+	// Create go.mod
+	gomodPath := filepath.Join(projectPath, "go.mod")
+	if err := os.WriteFile(gomodPath, []byte(templates.GoModTemplate()), 0644); err != nil {
+		t.Fatalf("Failed to create go.mod: %v", err)
+	}
+
+	// Create cmd directory and main.go
+	cmdDir := filepath.Join(projectPath, "cmd")
+	if err := os.MkdirAll(cmdDir, defaultDirPerm); err != nil {
+		t.Fatalf("Failed to create cmd directory: %v", err)
+	}
+
+	mainGoPath := filepath.Join(cmdDir, "main.go")
+	if err := os.WriteFile(mainGoPath, []byte(templates.MainGoTemplate()), 0644); err != nil {
+		t.Fatalf("Failed to create main.go: %v", err)
+	}
+
+	// Run go mod tidy
+	cmd := exec.Command("go", "mod", "tidy")
+	cmd.Dir = projectPath
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("Failed to tidy go module: %v", err)
+	}
+
+	// Build Docker image
+	imageName := "test-docker-optimization:latest"
+	cmd = exec.Command("docker", "build", "-t", imageName, ".")
+	cmd.Dir = projectPath
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("Failed to build Docker image: %v\nOutput: %s", err, string(output))
+	}
+
+	// Cleanup image after test
+	defer func() {
+		exec.Command("docker", "rmi", imageName).Run()
+	}()
+
+	// Check image size using docker images --format
+	cmd = exec.Command("docker", "images", "--format", "table {{.Repository}}:{{.Tag}}\t{{.Size}}", imageName)
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("Failed to get image size: %v", err)
+	}
+
+	// Parse size (format is like "54.9MB" or "14.9MB")
+	lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+	if len(lines) < 2 {
+		t.Fatalf("Unexpected docker images output: %s", string(output))
+	}
+
+	sizeStr := strings.Fields(lines[1])
+	if len(sizeStr) < 2 {
+		t.Fatalf("Could not parse image size from: %s", lines[1])
+	}
+
+	size := sizeStr[len(sizeStr)-1] // Last field should be size
+	t.Logf("Docker image size: %s", size)
+
+	// Verify it's under 50MB (accepting MB or GB units)
+	if strings.Contains(size, "GB") {
+		t.Errorf("Docker image size %s exceeds 50MB requirement (size in GB)", size)
+	} else if strings.Contains(size, "MB") {
+		// Extract numeric part
+		sizeNum := strings.TrimSuffix(size, "MB")
+		if sizeValue, err := strconv.ParseFloat(sizeNum, 64); err == nil {
+			if sizeValue > 50.0 {
+				t.Errorf("Docker image size %.1fMB exceeds 50MB requirement", sizeValue)
+			} else {
+				t.Logf("✅ Docker image size %.1fMB is under 50MB requirement", sizeValue)
+			}
 		}
 	}
 }
