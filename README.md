@@ -245,6 +245,7 @@ Les projets générés utilisent les meilleures bibliothèques de l'écosystème
 - **[Guide d'utilisation](./docs/usage.md)** - Utilisation du CLI et structure complète générée
 - **[Guide des projets générés](./docs/generated-project-guide.md)** - Guide complet pour développer avec les projets créés (architecture, API, tests, déploiement)
 - **[Changelog](./CHANGELOG.md)** - Historique des versions et nouveautés
+- **[Roadmap](./ROADMAP.md)** - Prochaines fonctionnalités et vision long-terme
 
 ### Documentation avancée
 
