@@ -1,12 +1,16 @@
 # create-go-starter
 
+[![Release](https://img.shields.io/github/v/release/tky0065/go-starter-kit)](https://github.com/tky0065/go-starter-kit/releases)
+[![Go Version](https://img.shields.io/badge/Go-1.25.5-blue)](https://golang.org/dl/)
+[![License](https://img.shields.io/github/license/tky0065/go-starter-kit)](LICENSE)
+
 Un outil CLI puissant pour générer des projets Go prêts pour la production en quelques secondes.
 
 ## 🎉 Statut du projet
 
 **✅ MVP COMPLET** - Toutes les fonctionnalités prévues ont été implémentées et validées (janvier 2026)
 
-- **5 Epics complétées** avec 26 user stories implémentées
+- **6 Epics complétées** avec 26 user stories implémentées
 - **26 exigences fonctionnelles** satisfaites à 100%
 - **13 exigences non-fonctionnelles** validées (performance, sécurité, maintenabilité)
 - **Tests de fumée automatisés** passent avec succès
@@ -38,7 +42,14 @@ Un outil CLI puissant pour générer des projets Go prêts pour la production en
 Installation globale en une seule commande, sans cloner le repository:
 
 ```bash
+# Version stable (recommandée)
+go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@v1.0.0
+
+# Ou dernière version
 go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@latest
+
+# Ou version de développement
+go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@develop
 ```
 
 Le binaire sera installé dans `$GOPATH/bin` (généralement `~/go/bin`). Assurez-vous que ce répertoire est dans votre PATH.
@@ -47,6 +58,13 @@ Le binaire sera installé dans `$GOPATH/bin` (généralement `~/go/bin`). Assure
 
 ```bash
 export PATH=$PATH:$(go env GOPATH)/bin
+```
+
+**Vérifier l'installation**:
+
+```bash
+create-go-starter --help
+# Devrait afficher l'aide du CLI
 ```
 
 ### Méthode 2: Build depuis les sources
@@ -226,6 +244,7 @@ Les projets générés utilisent les meilleures bibliothèques de l'écosystème
 - **[Guide d'installation](./docs/installation.md)** - Installation détaillée avec toutes les méthodes
 - **[Guide d'utilisation](./docs/usage.md)** - Utilisation du CLI et structure complète générée
 - **[Guide des projets générés](./docs/generated-project-guide.md)** - Guide complet pour développer avec les projets créés (architecture, API, tests, déploiement)
+- **[Changelog](./CHANGELOG.md)** - Historique des versions et nouveautés
 
 ### Documentation avancée
 
