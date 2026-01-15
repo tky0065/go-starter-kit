@@ -154,6 +154,105 @@ func TestValidateGoModuleName(t *testing.T) {
 	}
 }
 
+// TestGenerateProjectFilesWithInvalidModuleName tests that invalid module names are rejected
+func TestGenerateProjectFilesWithInvalidModuleName(t *testing.T) {
+	tempDir := t.TempDir()
+	projectPath := filepath.Join(tempDir, "test-project")
+
+	// Create the project directory first
+	if err := os.Mkdir(projectPath, 0755); err != nil {
+		t.Fatalf("Failed to create project directory: %v", err)
+	}
+
+	// Test with empty module name
+	err := generateProjectFiles(projectPath, "")
+	if err == nil {
+		t.Error("generateProjectFiles() should return error for empty module name")
+	}
+	if !strings.Contains(err.Error(), "empty") {
+		t.Errorf("Error message should mention 'empty', got: %v", err)
+	}
+
+	// Test with invalid module name
+	err = generateProjectFiles(projectPath, "-invalid")
+	if err == nil {
+		t.Error("generateProjectFiles() should return error for invalid module name")
+	}
+}
+
+// TestGenerateProjectFilesCreatesAllRequiredFiles tests that all expected files are created
+func TestGenerateProjectFilesCreatesAllRequiredFiles(t *testing.T) {
+	tempDir := t.TempDir()
+	projectName := "complete-test-project"
+	projectPath := filepath.Join(tempDir, projectName)
+
+	// Create the project structure first
+	if err := createProjectStructure(projectPath); err != nil {
+		t.Fatalf("Failed to create project structure: %v", err)
+	}
+
+	// Generate project files
+	if err := generateProjectFiles(projectPath, projectName); err != nil {
+		t.Fatalf("generateProjectFiles() error = %v", err)
+	}
+
+	// List of all expected files
+	expectedFiles := []string{
+		"go.mod",
+		"cmd/main.go",
+		"pkg/config/env.go",
+		"pkg/logger/logger.go",
+		"pkg/auth/jwt.go",
+		"pkg/auth/middleware.go",
+		"pkg/auth/module.go",
+		"internal/domain/errors.go",
+		"internal/models/user.go",
+		"internal/domain/user/service.go",
+		"internal/domain/user/module.go",
+		"internal/interfaces/services.go",
+		"internal/interfaces/user_repository.go",
+		"internal/adapters/middleware/error_handler.go",
+		"internal/adapters/repository/user_repository.go",
+		"internal/adapters/repository/module.go",
+		"internal/adapters/handlers/auth_handler.go",
+		"internal/adapters/handlers/user_handler.go",
+		"internal/adapters/handlers/module.go",
+		"internal/adapters/http/health.go",
+		"internal/adapters/http/routes.go",
+		"internal/infrastructure/database/database.go",
+		"internal/infrastructure/server/server.go",
+		"Dockerfile",
+		"docker-compose.yml",
+		"Makefile",
+		".env.example",
+		".gitignore",
+		".golangci.yml",
+		".github/workflows/ci.yml",
+		"README.md",
+		"docs/README.md",
+		"docs/docs.go",
+		"docs/quick-start.md",
+		"setup.sh",
+	}
+
+	for _, file := range expectedFiles {
+		filePath := filepath.Join(projectPath, file)
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			t.Errorf("Expected file %s does not exist", file)
+		}
+	}
+
+	// Verify setup.sh is executable
+	setupPath := filepath.Join(projectPath, "setup.sh")
+	info, err := os.Stat(setupPath)
+	if err != nil {
+		t.Fatalf("Failed to stat setup.sh: %v", err)
+	}
+	if info.Mode().Perm()&0111 == 0 {
+		t.Error("setup.sh should be executable")
+	}
+}
+
 // TestE2EGeneratedProjectBuilds is an end-to-end test that verifies
 // a generated project can actually be built successfully
 func TestE2EGeneratedProjectBuilds(t *testing.T) {
@@ -226,5 +325,66 @@ func TestE2EGeneratedProjectBuilds(t *testing.T) {
 		if !strings.Contains(string(output), projectName) {
 			t.Errorf("Module name should be '%s', got: %s", projectName, string(output))
 		}
+	})
+}
+
+// TestGoModTidyWorkflow specifically tests go mod tidy command execution (AC#4)
+func TestGoModTidyWorkflow(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping E2E test in short mode")
+	}
+
+	tmpDir := t.TempDir()
+	projectName := "test-mod-tidy-workflow"
+	projectPath := filepath.Join(tmpDir, projectName)
+
+	// Create project structure and files
+	if err := createProjectStructure(projectPath); err != nil {
+		t.Fatalf("Failed to create project structure: %v", err)
+	}
+
+	if err := generateProjectFiles(projectPath, projectName); err != nil {
+		t.Fatalf("Failed to generate project files: %v", err)
+	}
+
+	// Verify go.mod exists
+	goModPath := filepath.Join(projectPath, "go.mod")
+	if _, err := os.Stat(goModPath); os.IsNotExist(err) {
+		t.Fatal("go.mod was not created")
+	}
+
+	// Test go mod tidy execution
+	t.Run("GoModTidyExecution", func(t *testing.T) {
+		cmd := exec.Command("go", "mod", "tidy")
+		cmd.Dir = projectPath
+		output, err := cmd.CombinedOutput()
+
+		if err != nil {
+			t.Errorf("go mod tidy failed: %v\nOutput:\n%s", err, string(output))
+			return
+		}
+
+		// Verify go.sum is created after tidy
+		goSumPath := filepath.Join(projectPath, "go.sum")
+		if _, err := os.Stat(goSumPath); os.IsNotExist(err) {
+			t.Error("go.sum was not created after go mod tidy")
+		}
+
+		t.Logf("✅ go mod tidy executed successfully")
+	})
+
+	// Test that generated dependencies are valid
+	t.Run("DependenciesValid", func(t *testing.T) {
+		// Verify that we can download dependencies
+		cmd := exec.Command("go", "mod", "download")
+		cmd.Dir = projectPath
+		output, err := cmd.CombinedOutput()
+
+		if err != nil {
+			t.Errorf("go mod download failed: %v\nOutput:\n%s", err, string(output))
+			return
+		}
+
+		t.Logf("✅ Dependencies downloaded successfully")
 	})
 }

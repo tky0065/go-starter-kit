@@ -56,34 +56,70 @@ func main() {
 }
 
 // DockerfileTemplate returns the Dockerfile content
+// Optimized for minimal image size (<50MB) with security best practices
 func (t *ProjectTemplates) DockerfileTemplate() string {
-	return `# Build stage
+	return `# =============================================================================
+# Build stage - Compile the Go application
+# =============================================================================
 FROM golang:1.25-alpine AS builder
 
 WORKDIR /app
 
-# Copy go mod files
+# Install ca-certificates for HTTPS and git for private modules (if needed)
+RUN apk --no-cache add ca-certificates
+
+# Copy go mod files first for better layer caching
 COPY go.mod ./
-RUN go mod tidy
+
+# Download dependencies and generate go.sum
+RUN go mod download
 
 # Copy source code
 COPY . .
 
-# Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -o ` + t.projectName + ` ./cmd
+# Run go mod tidy to ensure all dependencies are resolved
+RUN go mod tidy
 
-# Runtime stage
-FROM alpine:latest
+# Build a statically linked binary with optimized flags
+# -s: Omit the symbol table and debug information
+# -w: Omit the DWARF symbol table
+# CGO_ENABLED=0: Disable cgo for a fully static binary (required for scratch/alpine)
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+    -ldflags="-s -w" \
+    -o ` + t.projectName + ` ./cmd
 
-RUN apk --no-cache add ca-certificates
+# =============================================================================
+# Runtime stage - Minimal production image
+# =============================================================================
+FROM alpine:3.21
 
-WORKDIR /root/
+# Add ca-certificates for HTTPS requests and wget for healthcheck
+RUN apk --no-cache add ca-certificates wget
 
-# Copy the binary from builder
-COPY --from=builder /app/` + t.projectName + ` .
+# Create non-root user for security (AC #2)
+# -D: No password, -g: GECOS, -s: Shell, -H: No home directory
+RUN addgroup -g 1000 -S appgroup && \
+    adduser -u 1000 -S appuser -G appgroup -s /sbin/nologin -H
 
-# Expose port
+# Set working directory
+WORKDIR /app
+
+# Copy the binary from builder with proper ownership
+COPY --from=builder --chown=appuser:appgroup /app/` + t.projectName + ` .
+
+# Copy ca-certificates from builder
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+# Switch to non-root user
+USER appuser
+
+# Expose application port
 EXPOSE 8080
+
+# Healthcheck to monitor application status (AC #4)
+# Check /health endpoint every 30s, timeout 3s, start after 5s, fail after 3 retries
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
 # Run the binary
 CMD ["./` + t.projectName + `"]
@@ -91,6 +127,7 @@ CMD ["./` + t.projectName + `"]
 }
 
 // GolangCILintTemplate returns the .golangci.yml file content
+// Compatible with golangci-lint v1.x (widely deployed)
 func (t *ProjectTemplates) GolangCILintTemplate() string {
 	return `run:
   timeout: 5m
@@ -607,7 +644,11 @@ MIT
 
 // LoggerTemplate returns the pkg/logger/logger.go file content
 func (t *ProjectTemplates) LoggerTemplate() string {
-	return `package logger
+	return `// Package logger provides structured logging utilities using zerolog.
+// It configures the logger based on the application environment, using JSON format
+// in production for log aggregation systems and console format in development
+// for human readability. The logger is provided via fx for dependency injection.
+package logger
 
 import (
 	"os"
@@ -616,12 +657,14 @@ import (
 	"go.uber.org/fx"
 )
 
-// Module provides the logger dependency via fx
+// Module provides the logger dependency via fx for application-wide logging.
 var Module = fx.Module("logger",
 	fx.Provide(NewLogger),
 )
 
-// NewLogger creates a new zerolog logger instance
+// NewLogger creates a new zerolog logger instance configured for the current environment.
+// In production (APP_ENV=production), it outputs JSON format for log aggregation.
+// In other environments, it uses a human-readable console format with colors.
 func NewLogger() zerolog.Logger {
 	// Use JSON format in production, console format in development
 	env := os.Getenv("APP_ENV")
@@ -640,7 +683,11 @@ func NewLogger() zerolog.Logger {
 
 // DatabaseTemplate returns the internal/infrastructure/database/database.go file content
 func (t *ProjectTemplates) DatabaseTemplate() string {
-	return `package database
+	return `// Package database provides PostgreSQL database connectivity and management.
+// It configures GORM for database operations, handles connection pooling,
+// runs automatic migrations, and manages graceful shutdown through fx lifecycle hooks.
+// This package is part of the infrastructure layer in the hexagonal architecture.
+package database
 
 import (
 	"context"
@@ -655,13 +702,15 @@ import (
 	"` + t.projectName + `/pkg/config"
 )
 
-// Module provides the database dependency via fx
+// Module provides the database dependency via fx with automatic lifecycle management.
 var Module = fx.Module("database",
 	fx.Provide(NewDatabase),
 	fx.Invoke(registerHooks),
 )
 
-// NewDatabase creates a new GORM database connection
+// NewDatabase creates a new GORM database connection configured from environment variables.
+// It establishes a PostgreSQL connection, configures connection pooling, and runs
+// automatic migrations for all domain models. Returns an error if connection fails.
 func NewDatabase(logger zerolog.Logger) (*gorm.DB, error) {
 	// Build DSN from environment variables
 	dsn := fmt.Sprintf(
@@ -703,7 +752,8 @@ func NewDatabase(logger zerolog.Logger) (*gorm.DB, error) {
 	return db, nil
 }
 
-// registerHooks registers lifecycle hooks for graceful shutdown
+// registerHooks registers fx lifecycle hooks for graceful database shutdown.
+// It ensures the database connection is properly closed when the application stops.
 func registerHooks(lifecycle fx.Lifecycle, db *gorm.DB, logger zerolog.Logger) {
 	lifecycle.Append(fx.Hook{
 		OnStop: func(ctx context.Context) error {
@@ -722,7 +772,11 @@ func registerHooks(lifecycle fx.Lifecycle, db *gorm.DB, logger zerolog.Logger) {
 
 // ServerTemplate returns the internal/infrastructure/server/server.go file content
 func (t *ProjectTemplates) ServerTemplate() string {
-	return `package server
+	return `// Package server provides HTTP server configuration and lifecycle management.
+// It creates and configures a Fiber application with middleware, error handling,
+// and graceful shutdown support through fx lifecycle hooks. This package is part
+// of the infrastructure layer and coordinates all HTTP-related concerns.
+package server
 
 import (
 	"context"
@@ -740,14 +794,16 @@ import (
 	_ "` + t.projectName + `/docs"
 )
 
-// Module provides the Fiber server dependency via fx
+// Module provides the Fiber server dependency via fx with automatic lifecycle management.
 var Module = fx.Module("server",
 	fx.Provide(NewServer),
 	fx.Invoke(registerHooks),
 	fx.Invoke(httpRoutes.RegisterRoutes),
 )
 
-// NewServer creates and configures a new Fiber application
+// NewServer creates and configures a new Fiber application with centralized error handling.
+// It sets up the application name, error handler, and common routes like favicon handling.
+// The server is ready to accept route registrations after creation.
 func NewServer(logger zerolog.Logger, db *gorm.DB) *fiber.App {
 	app := fiber.New(fiber.Config{
 		AppName:      "` + t.projectName + `",
@@ -771,7 +827,9 @@ func NewServer(logger zerolog.Logger, db *gorm.DB) *fiber.App {
 	return app
 }
 
-// registerHooks registers lifecycle hooks for server startup and shutdown
+// registerHooks registers fx lifecycle hooks for server startup and graceful shutdown.
+// It starts the server in a background goroutine on startup and properly shuts it down
+// when the application receives a termination signal.
 func registerHooks(lifecycle fx.Lifecycle, app *fiber.App, logger zerolog.Logger) {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -799,23 +857,30 @@ func registerHooks(lifecycle fx.Lifecycle, app *fiber.App, logger zerolog.Logger
 
 // HealthHandlerTemplate returns the internal/adapters/http/health.go file content
 func (t *ProjectTemplates) HealthHandlerTemplate() string {
-	return `package http
+	return `// Package http provides HTTP route registration and health check endpoints.
+// It coordinates route setup for the Fiber application and provides essential
+// endpoints like health checks for container orchestration and load balancers.
+package http
 
 import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// HealthResponse represents the health check response
+// HealthResponse represents the health check response structure.
+// It provides a simple status field for health monitoring systems.
 type HealthResponse struct {
 	Status string ` + "`json:\"status\"`" + `
 }
 
-// RegisterHealthRoutes registers health check routes
+// RegisterHealthRoutes registers health check routes on the Fiber application.
+// The health endpoint is used by container orchestrators and load balancers
+// to verify the application is running and ready to accept requests.
 func RegisterHealthRoutes(app *fiber.App) {
 	app.Get("/health", healthHandler)
 }
 
-// healthHandler handles health check requests
+// healthHandler handles health check requests and returns the application status.
+// It returns a simple JSON response indicating the service is operational.
 func healthHandler(c *fiber.Ctx) error {
 	return c.JSON(HealthResponse{
 		Status: "ok",
@@ -826,11 +891,16 @@ func healthHandler(c *fiber.Ctx) error {
 
 // ConfigTemplate returns the pkg/config/env.go file content
 func (t *ProjectTemplates) ConfigTemplate() string {
-	return `package config
+	return `// Package config provides configuration management utilities for the application.
+// It offers a simple interface for accessing environment variables with sensible
+// defaults, enabling twelve-factor app configuration patterns.
+package config
 
 import "os"
 
-// GetEnv retrieves an environment variable with a fallback default value
+// GetEnv retrieves an environment variable with a fallback default value.
+// If the environment variable is not set or is empty, the default value is returned.
+// This function is the primary way to access configuration throughout the application.
 func GetEnv(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
 		return value

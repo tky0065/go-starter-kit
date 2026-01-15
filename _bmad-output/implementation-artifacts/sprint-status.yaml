@@ -73,11 +73,11 @@ development_status:
   epic-4-retrospective: optional
 
   # Epic 5
-  epic-5: in-progress
+  epic-5: done
   5-1-initialisation-git-automatique: done
-  5-2-installation-automatique-des-dependances-go: backlog
-  5-3-amelioration-de-la-couverture-de-tests-du-cli: backlog
-  5-4-optimisation-de-l-image-docker-generee: backlog
-  5-5-documentation-des-fonctions-publiques-du-code-genere: backlog
-  5-6-validation-finale-et-smoke-tests: backlog
+  5-2-installation-automatique-des-dependances-go: done
+  5-3-amelioration-de-la-couverture-de-tests-du-cli: done
+  5-4-optimisation-de-l-image-docker-generee: done
+  5-5-documentation-des-fonctions-publiques-du-code-genere: done
+  5-6-validation-finale-et-smoke-tests: done
   epic-5-retrospective: optional

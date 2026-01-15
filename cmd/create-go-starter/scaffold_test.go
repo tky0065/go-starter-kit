@@ -113,3 +113,68 @@ func TestValidateProjectName(t *testing.T) {
 		})
 	}
 }
+
+// TestCreateProjectStructureVerifiesAllDirectories verifies all directories are created correctly
+func TestCreateProjectStructureVerifiesAllDirectories(t *testing.T) {
+	tempDir := t.TempDir()
+	projectName := "verify-all-dirs"
+	projectPath := filepath.Join(tempDir, projectName)
+
+	// Call the function to create directories
+	err := createProjectStructure(projectPath)
+	if err != nil {
+		t.Fatalf("createProjectStructure failed: %v", err)
+	}
+
+	// Complete list of all expected directories
+	allExpectedDirs := []string{
+		"cmd",
+		"internal/adapters/http",
+		"internal/adapters/middleware",
+		"internal/domain",
+		"internal/interfaces",
+		"internal/models",
+		"internal/infrastructure/database",
+		"internal/infrastructure/server",
+		"pkg/config",
+		"pkg/logger",
+		"deployments",
+	}
+
+	// Verify each directory exists
+	for _, dir := range allExpectedDirs {
+		fullPath := filepath.Join(projectPath, dir)
+		info, err := os.Stat(fullPath)
+		if err != nil {
+			t.Errorf("Directory %s does not exist: %v", dir, err)
+			continue
+		}
+		if !info.IsDir() {
+			t.Errorf("%s is not a directory", dir)
+		}
+	}
+}
+
+// TestCreateProjectStructureRootDirCreation tests root directory creation
+func TestCreateProjectStructureRootDirCreation(t *testing.T) {
+	tempDir := t.TempDir()
+	projectName := "root-test"
+	projectPath := filepath.Join(tempDir, projectName)
+
+	err := createProjectStructure(projectPath)
+	if err != nil {
+		t.Fatalf("createProjectStructure failed: %v", err)
+	}
+
+	// Verify root directory exists with correct permissions
+	info, err := os.Stat(projectPath)
+	if err != nil {
+		t.Fatalf("Root directory does not exist: %v", err)
+	}
+	if !info.IsDir() {
+		t.Error("Root path is not a directory")
+	}
+	if info.Mode().Perm() != defaultDirPerm {
+		t.Errorf("Root directory has permissions %v, expected %v", info.Mode().Perm(), defaultDirPerm)
+	}
+}
