@@ -4,27 +4,58 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
+
+	"github.com/tky0065/go-starter-kit/pkg/utils"
 )
 
-// Valid Go module name pattern
-var validGoModuleNamePattern = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_-]*$`)
-
-// validateGoModuleName validates that a module name is valid for Go modules.
-// Valid names must:
-// - Start with a letter or number
-// - Contain only letters, numbers, hyphens, or underscores
-// - Not be empty
-func validateGoModuleName(name string) error {
-	if name == "" {
-		return fmt.Errorf("module name cannot be empty")
+// getDirectoriesForTemplate returns the list of directories to create based on the template type.
+// Minimal template has fewer directories (no auth, user, handlers, repository).
+// Full template has all directories for complete hexagonal architecture.
+func getDirectoriesForTemplate(template string) []string {
+	// Common directories for all templates
+	commonDirs := []string{
+		"cmd",
+		"internal/adapters/http",
+		"internal/infrastructure/database",
+		"internal/infrastructure/server",
+		"pkg/config",
+		"pkg/logger",
+		"docs",
+		"deployments",
+		".github/workflows",
 	}
 
-	if !validGoModuleNamePattern.MatchString(name) {
-		return fmt.Errorf("invalid module name '%s': must start with a letter or number and contain only letters, numbers, hyphens, or underscores", name)
+	switch template {
+	case TemplateMinimal:
+		// Minimal template: only basic infrastructure, no auth
+		return commonDirs
+	case TemplateFull, TemplateGraphQL:
+		// Full template: includes auth, user management, handlers, repository
+		fullDirs := append(commonDirs,
+			"pkg/auth",
+			"internal/domain",
+			"internal/domain/user",
+			"internal/interfaces",
+			"internal/models",
+			"internal/adapters/middleware",
+			"internal/adapters/handlers",
+			"internal/adapters/repository",
+		)
+		return fullDirs
+	default:
+		// Default to full template directories (defensive programming)
+		fullDirs := append(commonDirs,
+			"pkg/auth",
+			"internal/domain",
+			"internal/domain/user",
+			"internal/interfaces",
+			"internal/models",
+			"internal/adapters/middleware",
+			"internal/adapters/handlers",
+			"internal/adapters/repository",
+		)
+		return fullDirs
 	}
-
-	return nil
 }
 
 // FileGenerator represents a file to be generated
@@ -33,18 +64,37 @@ type FileGenerator struct {
 	Content string
 }
 
-// generateProjectFiles creates all the initial project files with templates
-func generateProjectFiles(projectPath, projectName string) error {
+// generateProjectFiles creates all the initial project files with templates.
+// The template parameter specifies the type of project to generate (minimal, full, graphql).
+// For this story (6.1), only the "full" template is implemented. Other templates will be implemented in future stories.
+// This switch statement clarifies intent and returns an explicit error for unimplemented templates.
+func generateProjectFiles(projectPath, projectName, template string) error {
 	// Validate that the project directory exists
 	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
 		return fmt.Errorf("project directory does not exist: %s", projectPath)
 	}
 
 	// Validate the module name
-	if err := validateGoModuleName(projectName); err != nil {
+	if err := utils.ValidateGoModuleName(projectName); err != nil { // Updated call
 		return err
 	}
 
+	switch template {
+	case "full":
+		return generateFullTemplateFiles(projectPath, projectName)
+	case "minimal":
+		return generateMinimalTemplateFiles(projectPath, projectName)
+	case "graphql":
+		return fmt.Errorf("template '%s' is not yet implemented (planned for Epic 6, Story 6.4). Please use 'full' or 'minimal'", template)
+	default:
+		// This case should ideally not be reached if validateTemplate is called beforehand.
+		return fmt.Errorf("unsupported template '%s'", template)
+	}
+}
+
+// generateFullTemplateFiles generates all files for the "full" template.
+// This function was extracted from the original generateProjectFiles to improve modularity.
+func generateFullTemplateFiles(projectPath, projectName string) error {
 	// Create templates instance
 	templates := NewProjectTemplates(projectName)
 
@@ -189,6 +239,118 @@ func generateProjectFiles(projectPath, projectName string) error {
 		{
 			Path:    filepath.Join(projectPath, "setup.sh"),
 			Content: templates.SetupScriptTemplate(),
+		},
+	}
+
+	// Write all files
+	for _, file := range files {
+		// Ensure the directory exists
+		if err := os.MkdirAll(filepath.Dir(file.Path), 0755); err != nil {
+			return fmt.Errorf("failed to create directory for %s: %w", file.Path, err)
+		}
+
+		if err := os.WriteFile(file.Path, []byte(file.Content), 0644); err != nil {
+			return fmt.Errorf("failed to write file %s: %w", file.Path, err)
+		}
+	}
+
+	// Make setup.sh executable
+	setupPath := filepath.Join(projectPath, "setup.sh")
+	if err := os.Chmod(setupPath, 0755); err != nil {
+		return fmt.Errorf("failed to make setup.sh executable: %w", err)
+	}
+
+	return nil
+}
+
+// generateMinimalTemplateFiles generates all files for the "minimal" template.
+// This template includes basic infrastructure without authentication.
+func generateMinimalTemplateFiles(projectPath, projectName string) error {
+	// Create templates instance
+	templates := NewProjectTemplates(projectName)
+
+	// Define all files to generate for minimal template
+	// Note: No auth-related files (pkg/auth, internal/domain/user, handlers, repository)
+	files := []FileGenerator{
+		{
+			Path:    filepath.Join(projectPath, "go.mod"),
+			Content: templates.MinimalGoModTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "cmd", "main.go"),
+			Content: templates.MinimalMainGoTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "pkg", "config", "env.go"),
+			Content: templates.ConfigTemplate(), // Same as full template
+		},
+		{
+			Path:    filepath.Join(projectPath, "pkg", "logger", "logger.go"),
+			Content: templates.LoggerTemplate(), // Same as full template
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "adapters", "http", "health.go"),
+			Content: templates.HealthHandlerTemplate(), // Same as full template
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "adapters", "http", "routes.go"),
+			Content: templates.MinimalRoutesTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "infrastructure", "database", "database.go"),
+			Content: templates.MinimalDatabaseTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "infrastructure", "server", "server.go"),
+			Content: templates.MinimalServerTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "Dockerfile"),
+			Content: templates.DockerfileTemplate(), // Same as full template
+		},
+		{
+			Path:    filepath.Join(projectPath, "docker-compose.yml"),
+			Content: templates.MinimalDockerComposeTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "Makefile"),
+			Content: templates.MakefileTemplate(), // Same as full template
+		},
+		{
+			Path:    filepath.Join(projectPath, ".env.example"),
+			Content: templates.MinimalEnvTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, ".gitignore"),
+			Content: templates.GitignoreTemplate(), // Same as full template
+		},
+		{
+			Path:    filepath.Join(projectPath, ".golangci.yml"),
+			Content: templates.GolangCILintTemplate(), // Same as full template
+		},
+		{
+			Path:    filepath.Join(projectPath, ".github", "workflows", "ci.yml"),
+			Content: templates.GitHubActionsWorkflowTemplate(), // Same as full template
+		},
+		{
+			Path:    filepath.Join(projectPath, "README.md"),
+			Content: templates.MinimalReadmeTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "docs", "README.md"),
+			Content: templates.MinimalDocsReadmeTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "docs", "docs.go"),
+			Content: templates.SwaggerDocsTemplate(), // Same as full template
+		},
+		{
+			Path:    filepath.Join(projectPath, "docs", "quick-start.md"),
+			Content: templates.MinimalQuickStartTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "setup.sh"),
+			Content: templates.MinimalSetupScriptTemplate(),
 		},
 	}
 

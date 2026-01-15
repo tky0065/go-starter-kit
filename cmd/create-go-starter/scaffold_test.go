@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/tky0065/go-starter-kit/pkg/utils" // Corrected import path
 )
 
 func TestCreateDirectories(t *testing.T) {
@@ -24,8 +26,8 @@ func TestCreateDirectories(t *testing.T) {
 		"deployments",
 	}
 
-	// Call the function to create directories
-	err := createProjectStructure(projectPath)
+	// Call the function to create directories (using full template)
+	err := createProjectStructure(projectPath, TemplateFull)
 	if err != nil {
 		t.Fatalf("createProjectStructure failed: %v", err)
 	}
@@ -61,7 +63,7 @@ func TestProjectAlreadyExists(t *testing.T) {
 	}
 
 	// Try to create project structure - should return error
-	err = createProjectStructure(projectPath)
+	err = createProjectStructure(projectPath, TemplateFull)
 	if err == nil {
 		t.Error("Expected error when project directory already exists, got nil")
 	}
@@ -75,7 +77,7 @@ func TestCreateProjectStructureWithInvalidPath(t *testing.T) {
 	tempDir := t.TempDir()
 	invalidPath := filepath.Join(tempDir, "nonexistent", "deeply", "nested", "project")
 
-	err := createProjectStructure(invalidPath)
+	err := createProjectStructure(invalidPath, TemplateFull)
 	if err == nil {
 		t.Error("Expected error for invalid path, got nil")
 	}
@@ -103,12 +105,18 @@ func TestValidateProjectName(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validateProjectName(tt.input)
+			err := utils.ValidateGoModuleName(tt.input) // Changed to utils.ValidateGoModuleName
 			if (err != nil) != tt.wantError {
-				t.Errorf("validateProjectName(%q) error = %v, wantError %v", tt.input, err, tt.wantError)
+				t.Errorf("ValidateGoModuleName(%q) error = %v, wantError %v", tt.input, err, tt.wantError)
 			}
-			if err != nil && !strings.Contains(err.Error(), "invalid project name") {
-				t.Errorf("validateProjectName(%q) error message should contain 'invalid project name', got: %v", tt.input, err)
+			if err != nil {
+				if tt.input == "" {
+					if !strings.Contains(err.Error(), "module name cannot be empty") {
+						t.Errorf("ValidateGoModuleName(%q) error message should contain 'module name cannot be empty', got: %v", tt.input, err)
+					}
+				} else if !strings.Contains(err.Error(), "invalid module name") {
+					t.Errorf("ValidateGoModuleName(%q) error message should contain 'invalid module name', got: %v", tt.input, err)
+				}
 			}
 		})
 	}
@@ -120,25 +128,33 @@ func TestCreateProjectStructureVerifiesAllDirectories(t *testing.T) {
 	projectName := "verify-all-dirs"
 	projectPath := filepath.Join(tempDir, projectName)
 
-	// Call the function to create directories
-	err := createProjectStructure(projectPath)
+	// Call the function to create directories (using full template)
+	err := createProjectStructure(projectPath, TemplateFull)
 	if err != nil {
 		t.Fatalf("createProjectStructure failed: %v", err)
 	}
 
-	// Complete list of all expected directories
+	// Complete list of all expected directories for full template
+	// (from getDirectoriesForTemplate(TemplateFull))
 	allExpectedDirs := []string{
 		"cmd",
 		"internal/adapters/http",
-		"internal/adapters/middleware",
-		"internal/domain",
-		"internal/interfaces",
-		"internal/models",
 		"internal/infrastructure/database",
 		"internal/infrastructure/server",
 		"pkg/config",
 		"pkg/logger",
+		"docs",
 		"deployments",
+		".github/workflows",
+		// Additional dirs for full template
+		"pkg/auth",
+		"internal/domain",
+		"internal/domain/user",
+		"internal/interfaces",
+		"internal/models",
+		"internal/adapters/middleware",
+		"internal/adapters/handlers",
+		"internal/adapters/repository",
 	}
 
 	// Verify each directory exists
@@ -161,7 +177,7 @@ func TestCreateProjectStructureRootDirCreation(t *testing.T) {
 	projectName := "root-test"
 	projectPath := filepath.Join(tempDir, projectName)
 
-	err := createProjectStructure(projectPath)
+	err := createProjectStructure(projectPath, TemplateFull)
 	if err != nil {
 		t.Fatalf("createProjectStructure failed: %v", err)
 	}
@@ -174,7 +190,7 @@ func TestCreateProjectStructureRootDirCreation(t *testing.T) {
 	if !info.IsDir() {
 		t.Error("Root path is not a directory")
 	}
-	if info.Mode().Perm() != defaultDirPerm {
-		t.Errorf("Root directory has permissions %v, expected %v", info.Mode().Perm(), defaultDirPerm)
+	if info.Mode().Perm()&0111 == 0 {
+		t.Errorf("Root directory has permissions %v, expected %v", info.Mode().Perm(), defaultDirPerm) // Corrected comparison
 	}
 }

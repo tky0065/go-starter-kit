@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/tky0065/go-starter-kit/pkg/utils" // Added for shared validation
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -14,13 +15,13 @@ func TestGenerateProjectFiles(t *testing.T) {
 	projectName := "test-project"
 	projectPath := filepath.Join(tempDir, projectName)
 
-	// Create the project structure first
-	if err := createProjectStructure(projectPath); err != nil {
+	// Create the project structure first (using full template)
+	if err := createProjectStructure(projectPath, TemplateFull); err != nil {
 		t.Fatalf("Failed to create project structure: %v", err)
 	}
 
 	// Generate project files
-	if err := generateProjectFiles(projectPath, projectName); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate); err != nil {
 		t.Fatalf("generateProjectFiles() error = %v", err)
 	}
 
@@ -85,7 +86,7 @@ func TestGenerateProjectFiles(t *testing.T) {
 
 func TestGenerateProjectFilesWithInvalidPath(t *testing.T) {
 	// Test with non-existent directory
-	err := generateProjectFiles("/non/existent/path", "test-project")
+	err := generateProjectFiles("/non/existent/path", "test-project", DefaultTemplate)
 	if err == nil {
 		t.Error("generateProjectFiles() should return error for non-existent path")
 	}
@@ -146,9 +147,9 @@ func TestValidateGoModuleName(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validateGoModuleName(tt.modName)
+			err := utils.ValidateGoModuleName(tt.modName) // Changed to utils.ValidateGoModuleName
 			if (err != nil) != tt.wantErr {
-				t.Errorf("validateGoModuleName(%s) error = %v, wantErr %v", tt.modName, err, tt.wantErr)
+				t.Errorf("ValidateGoModuleName(%s) error = %v, wantErr %v", tt.modName, err, tt.wantErr)
 			}
 		})
 	}
@@ -165,7 +166,8 @@ func TestGenerateProjectFilesWithInvalidModuleName(t *testing.T) {
 	}
 
 	// Test with empty module name
-	err := generateProjectFiles(projectPath, "")
+	var err error // Declared err here
+	err = generateProjectFiles(projectPath, "", DefaultTemplate)
 	if err == nil {
 		t.Error("generateProjectFiles() should return error for empty module name")
 	}
@@ -174,9 +176,12 @@ func TestGenerateProjectFilesWithInvalidModuleName(t *testing.T) {
 	}
 
 	// Test with invalid module name
-	err = generateProjectFiles(projectPath, "-invalid")
+	err = generateProjectFiles(projectPath, "-invalid", DefaultTemplate)
 	if err == nil {
 		t.Error("generateProjectFiles() should return error for invalid module name")
+	}
+	if !strings.Contains(err.Error(), "invalid module name") {
+		t.Errorf("Error message should mention 'invalid module name', got: %v", err)
 	}
 }
 
@@ -186,13 +191,13 @@ func TestGenerateProjectFilesCreatesAllRequiredFiles(t *testing.T) {
 	projectName := "complete-test-project"
 	projectPath := filepath.Join(tempDir, projectName)
 
-	// Create the project structure first
-	if err := createProjectStructure(projectPath); err != nil {
+	// Create the project structure first (using full template)
+	if err := createProjectStructure(projectPath, TemplateFull); err != nil {
 		t.Fatalf("Failed to create project structure: %v", err)
 	}
 
 	// Generate project files
-	if err := generateProjectFiles(projectPath, projectName); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate); err != nil {
 		t.Fatalf("generateProjectFiles() error = %v", err)
 	}
 
@@ -265,13 +270,13 @@ func TestE2EGeneratedProjectBuilds(t *testing.T) {
 	projectName := "e2e-test-project"
 	projectPath := filepath.Join(tempDir, projectName)
 
-	// Create the complete project structure
-	if err := createProjectStructure(projectPath); err != nil {
+	// Create the complete project structure (using full template)
+	if err := createProjectStructure(projectPath, TemplateFull); err != nil {
 		t.Fatalf("Failed to create project structure: %v", err)
 	}
 
 	// Generate all project files
-	if err := generateProjectFiles(projectPath, projectName); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate); err != nil {
 		t.Fatalf("Failed to generate project files: %v", err)
 	}
 
@@ -338,12 +343,12 @@ func TestGoModTidyWorkflow(t *testing.T) {
 	projectName := "test-mod-tidy-workflow"
 	projectPath := filepath.Join(tmpDir, projectName)
 
-	// Create project structure and files
-	if err := createProjectStructure(projectPath); err != nil {
+	// Create project structure and files (using full template)
+	if err := createProjectStructure(projectPath, TemplateFull); err != nil {
 		t.Fatalf("Failed to create project structure: %v", err)
 	}
 
-	if err := generateProjectFiles(projectPath, projectName); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate); err != nil {
 		t.Fatalf("Failed to generate project files: %v", err)
 	}
 

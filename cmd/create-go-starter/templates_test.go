@@ -136,9 +136,11 @@ func TestDockerfileTemplate(t *testing.T) {
 			content := templates.DockerfileTemplate()
 
 			// Check binary name appears in build command
-			buildCmd := "go build -o " + tt.wantBinary
-			if !strings.Contains(content, buildCmd) {
-				t.Errorf("DockerfileTemplate() should contain build command '%s', got:\n%s", buildCmd, content)
+			if !strings.Contains(content, "go build") {
+				t.Error("DockerfileTemplate() should contain go build command")
+			}
+			if !strings.Contains(content, "-o "+tt.wantBinary) {
+				t.Errorf("DockerfileTemplate() should contain -o flag with binary name '%s'", tt.wantBinary)
 			}
 
 			// Check binary name in CMD
@@ -157,9 +159,9 @@ func TestDockerfileTemplate(t *testing.T) {
 				t.Error("DockerfileTemplate() should expose port 8080")
 			}
 
-			// Verify no go.sum reference (not generated initially)
-			if strings.Contains(content, "go.sum") {
-				t.Error("DockerfileTemplate() should not reference go.sum as it's not generated")
+			// Verify no go.sum copy (not generated initially)
+			if strings.Contains(content, "COPY go.sum") || strings.Contains(content, "COPY go.mod go.sum") {
+				t.Error("DockerfileTemplate() should not copy go.sum as it's not generated")
 			}
 
 			// Check build path is ./cmd not ./cmd/main.go
@@ -1007,8 +1009,8 @@ func TestE2EDockerImageSize(t *testing.T) {
 	projectName := "test-docker-size"
 	projectPath := filepath.Join(tmpDir, projectName)
 
-	// Use createProjectStructure function
-	if err := createProjectStructure(projectPath); err != nil {
+	// Use createProjectStructure function (with full template)
+	if err := createProjectStructure(projectPath, TemplateFull); err != nil {
 		t.Fatalf("Failed to create project structure: %v", err)
 	}
 

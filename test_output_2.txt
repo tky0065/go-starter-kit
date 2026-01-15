@@ -1,0 +1,428 @@
+=== RUN   TestColors
+--- PASS: TestColors (0.00s)
+=== RUN   TestCopyEnvFile
+--- PASS: TestCopyEnvFile (0.00s)
+=== RUN   TestCopyEnvFileSkipsIfExists
+--- PASS: TestCopyEnvFileSkipsIfExists (0.00s)
+=== RUN   TestCopyEnvFileErrorsIfNoExample
+--- PASS: TestCopyEnvFileErrorsIfNoExample (0.00s)
+=== RUN   TestEnvTemplateContainsRequiredVariables
+--- PASS: TestEnvTemplateContainsRequiredVariables (0.00s)
+=== RUN   TestCopyEnvFileWithUnreadableFile
+--- PASS: TestCopyEnvFileWithUnreadableFile (0.00s)
+=== RUN   TestCopyEnvFileWriteError
+--- PASS: TestCopyEnvFileWriteError (0.00s)
+=== RUN   TestGenerateProjectFiles
+--- PASS: TestGenerateProjectFiles (0.01s)
+=== RUN   TestGenerateProjectFilesWithInvalidPath
+--- PASS: TestGenerateProjectFilesWithInvalidPath (0.00s)
+=== RUN   TestValidateGoModuleName
+=== RUN   TestValidateGoModuleName/valid_simple_name
+=== RUN   TestValidateGoModuleName/valid_with_hyphens
+=== RUN   TestValidateGoModuleName/valid_with_underscores
+=== RUN   TestValidateGoModuleName/valid_with_numbers
+=== RUN   TestValidateGoModuleName/invalid_with_spaces
+=== RUN   TestValidateGoModuleName/invalid_starting_with_hyphen
+=== RUN   TestValidateGoModuleName/invalid_starting_with_underscore
+=== RUN   TestValidateGoModuleName/invalid_with_special_chars
+=== RUN   TestValidateGoModuleName/empty_name
+--- PASS: TestValidateGoModuleName (0.00s)
+    --- PASS: TestValidateGoModuleName/valid_simple_name (0.00s)
+    --- PASS: TestValidateGoModuleName/valid_with_hyphens (0.00s)
+    --- PASS: TestValidateGoModuleName/valid_with_underscores (0.00s)
+    --- PASS: TestValidateGoModuleName/valid_with_numbers (0.00s)
+    --- PASS: TestValidateGoModuleName/invalid_with_spaces (0.00s)
+    --- PASS: TestValidateGoModuleName/invalid_starting_with_hyphen (0.00s)
+    --- PASS: TestValidateGoModuleName/invalid_starting_with_underscore (0.00s)
+    --- PASS: TestValidateGoModuleName/invalid_with_special_chars (0.00s)
+    --- PASS: TestValidateGoModuleName/empty_name (0.00s)
+=== RUN   TestGenerateProjectFilesWithInvalidModuleName
+--- PASS: TestGenerateProjectFilesWithInvalidModuleName (0.00s)
+=== RUN   TestGenerateProjectFilesCreatesAllRequiredFiles
+--- PASS: TestGenerateProjectFilesCreatesAllRequiredFiles (0.01s)
+=== RUN   TestE2EGeneratedProjectBuilds
+=== RUN   TestE2EGeneratedProjectBuilds/BuildGeneratedProject
+=== RUN   TestE2EGeneratedProjectBuilds/GoModVerify
+=== RUN   TestE2EGeneratedProjectBuilds/GoModValidation
+--- PASS: TestE2EGeneratedProjectBuilds (12.94s)
+    --- PASS: TestE2EGeneratedProjectBuilds/BuildGeneratedProject (12.52s)
+    --- PASS: TestE2EGeneratedProjectBuilds/GoModVerify (0.41s)
+    --- PASS: TestE2EGeneratedProjectBuilds/GoModValidation (0.01s)
+=== RUN   TestGoModTidyWorkflow
+=== RUN   TestGoModTidyWorkflow/GoModTidyExecution
+    generator_test.go:378: ✅ go mod tidy executed successfully
+=== RUN   TestGoModTidyWorkflow/DependenciesValid
+    generator_test.go:393: ✅ Dependencies downloaded successfully
+--- PASS: TestGoModTidyWorkflow (7.41s)
+    --- PASS: TestGoModTidyWorkflow/GoModTidyExecution (7.37s)
+    --- PASS: TestGoModTidyWorkflow/DependenciesValid (0.03s)
+=== RUN   TestIsGitAvailable
+--- PASS: TestIsGitAvailable (0.00s)
+=== RUN   TestInitGitRepoSuccess
+--- PASS: TestInitGitRepoSuccess (0.04s)
+=== RUN   TestInitGitRepoWithFiles
+--- PASS: TestInitGitRepoWithFiles (0.03s)
+=== RUN   TestInitGitRepoInvalidPath
+--- PASS: TestInitGitRepoInvalidPath (0.00s)
+=== RUN   TestInitGitRepoEmptyDirectory
+--- PASS: TestInitGitRepoEmptyDirectory (0.03s)
+=== RUN   TestIsGitAvailableReturnsBool
+--- PASS: TestIsGitAvailableReturnsBool (0.00s)
+=== RUN   TestInitGitRepoCommitMessage
+--- PASS: TestInitGitRepoCommitMessage (0.03s)
+=== RUN   TestE2EGitIntegration
+--- PASS: TestE2EGitIntegration (1.78s)
+=== RUN   TestHelpFlag
+--- PASS: TestHelpFlag (1.64s)
+=== RUN   TestHelpFlagShorthand
+--- PASS: TestHelpFlagShorthand (0.00s)
+=== RUN   TestMissingProjectName
+--- PASS: TestMissingProjectName (0.00s)
+=== RUN   TestValidProjectName
+--- PASS: TestValidProjectName (0.09s)
+=== RUN   TestInvalidProjectName
+=== RUN   TestInvalidProjectName/../evil-path
+=== RUN   TestInvalidProjectName/my/project
+=== RUN   TestInvalidProjectName/my_project
+=== RUN   TestInvalidProjectName/_invalid
+--- PASS: TestInvalidProjectName (0.06s)
+    --- PASS: TestInvalidProjectName/../evil-path (0.00s)
+    --- PASS: TestInvalidProjectName/my/project (0.03s)
+    --- PASS: TestInvalidProjectName/my_project (0.02s)
+    --- PASS: TestInvalidProjectName/_invalid (0.00s)
+=== RUN   TestColorOutput
+--- PASS: TestColorOutput (0.13s)
+=== RUN   TestRunFunction
+[32mCreating project: test-run-project (template: full)[0m
+📁 Creating directories...
+[32m✅ Structure created[0m
+📝 Generating core files...
+[32m✅ Files generated successfully[0m
+🔑 Configuring environment...
+🔧 Initializing Git repository...
+[32m✅ Git repository initialized with initial commit[0m
+
+[32m════════════════════════════════════════════════════════════════[0m
+[32m🎉 Project 'test-run-project' created successfully![0m
+[32m════════════════════════════════════════════════════════════════[0m
+
+📋 Next steps - Initial setup:
+
+[32mOPTION 1: Automatic setup (Recommended) 🚀[0m
+  cd test-run-project
+  ./setup.sh
+
+[32mOPTION 2: Manual setup[0m
+
+1️⃣  Navigate to your project:
+    cd test-run-project
+
+2️⃣  Configure PostgreSQL (choose one option):
+
+    Option A - Docker (Recommended):
+docker run -d --name postgres \
+      -e POSTGRES_DB=test-run-project \
+      -e POSTGRES_PASSWORD=postgres \
+      -p 5432:5432 \
+      postgres:16-alpine
+
+    Option B - Local PostgreSQL:
+    # macOS: brew install postgresql && brew services start postgresql
+    # Linux: sudo apt install postgresql && sudo systemctl start postgresql
+    createdb test-run-project
+
+3️⃣  Generate JWT secret (REQUIRED):
+    openssl rand -base64 32
+
+    Then edit .env and add:
+    JWT_SECRET=<generated_secret>
+
+4️⃣  Start the application:
+    make run
+
+5️⃣  Verify installation:
+    curl http://localhost:8080/health
+    # Should return: {"status":"ok"}
+
+[32m📚 Full documentation:[0m
+   - Quick Start Guide: test-run-project/docs/quick-start.md
+   - README:            test-run-project/README.md
+
+[32m⚠️  IMPORTANT:[0m
+   • PostgreSQL MUST be started before launching the application
+   • JWT_SECRET MUST be configured in .env
+   • The .env file was automatically created from .env.example
+
+[32m✨ Happy developing with test-run-project![0m
+--- PASS: TestRunFunction (0.08s)
+=== RUN   TestRunFunctionWithInvalidName
+[32mCreating project: ../invalid-path (template: full)[0m
+📁 Creating directories...
+    main_test.go:225: Expected 'invalid project name' error, got: directory ../invalid-path already exists. Please choose a different name or remove the existing directory
+--- FAIL: TestRunFunctionWithInvalidName (0.00s)
+=== RUN   TestRunFunctionWithEmptyName
+[32mCreating project:  (template: full)[0m
+📁 Creating directories...
+--- PASS: TestRunFunctionWithEmptyName (0.00s)
+=== RUN   TestRunFunctionWithExistingDirectory
+[32mCreating project: existing-project (template: full)[0m
+📁 Creating directories...
+--- PASS: TestRunFunctionWithExistingDirectory (0.00s)
+=== RUN   TestPrintSuccessMessage
+
+[32m════════════════════════════════════════════════════════════════[0m
+[32m🎉 Project 'test-project' created successfully![0m
+[32m════════════════════════════════════════════════════════════════[0m
+
+📋 Next steps - Initial setup:
+
+[32mOPTION 1: Automatic setup (Recommended) 🚀[0m
+  cd test-project
+  ./setup.sh
+
+[32mOPTION 2: Manual setup[0m
+
+1️⃣  Navigate to your project:
+    cd test-project
+
+2️⃣  Configure PostgreSQL (choose one option):
+
+    Option A - Docker (Recommended):
+docker run -d --name postgres \
+      -e POSTGRES_DB=test-project \
+      -e POSTGRES_PASSWORD=postgres \
+      -p 5432:5432 \
+      postgres:16-alpine
+
+    Option B - Local PostgreSQL:
+    # macOS: brew install postgresql && brew services start postgresql
+    # Linux: sudo apt install postgresql && sudo systemctl start postgresql
+    createdb test-project
+
+3️⃣  Generate JWT secret (REQUIRED):
+    openssl rand -base64 32
+
+    Then edit .env and add:
+    JWT_SECRET=<generated_secret>
+
+4️⃣  Start the application:
+    make run
+
+5️⃣  Verify installation:
+    curl http://localhost:8080/health
+    # Should return: {"status":"ok"}
+
+[32m📚 Full documentation:[0m
+   - Quick Start Guide: test-project/docs/quick-start.md
+   - README:            test-project/README.md
+
+[32m⚠️  IMPORTANT:[0m
+   • PostgreSQL MUST be started before launching the application
+   • JWT_SECRET MUST be configured in .env
+   • The .env file was automatically created from .env.example
+
+[32m✨ Happy developing with test-project![0m
+--- PASS: TestPrintSuccessMessage (0.00s)
+=== RUN   TestValidateTemplateValid
+=== RUN   TestValidateTemplateValid/minimal_template
+=== RUN   TestValidateTemplateValid/full_template
+=== RUN   TestValidateTemplateValid/graphql_template
+--- PASS: TestValidateTemplateValid (0.00s)
+    --- PASS: TestValidateTemplateValid/minimal_template (0.00s)
+    --- PASS: TestValidateTemplateValid/full_template (0.00s)
+    --- PASS: TestValidateTemplateValid/graphql_template (0.00s)
+=== RUN   TestValidateTemplateInvalid
+=== RUN   TestValidateTemplateInvalid/empty_template
+=== RUN   TestValidateTemplateInvalid/unknown_template
+=== RUN   TestValidateTemplateInvalid/invalid_case
+=== RUN   TestValidateTemplateInvalid/invalid_spacing
+=== RUN   TestValidateTemplateInvalid/invalid_template
+--- PASS: TestValidateTemplateInvalid (0.00s)
+    --- PASS: TestValidateTemplateInvalid/empty_template (0.00s)
+    --- PASS: TestValidateTemplateInvalid/unknown_template (0.00s)
+    --- PASS: TestValidateTemplateInvalid/invalid_case (0.00s)
+    --- PASS: TestValidateTemplateInvalid/invalid_spacing (0.00s)
+    --- PASS: TestValidateTemplateInvalid/invalid_template (0.00s)
+=== RUN   TestTemplateDefaultValue
+--- PASS: TestTemplateDefaultValue (0.00s)
+=== RUN   TestValidTemplatesContains
+--- PASS: TestValidTemplatesContains (0.00s)
+=== RUN   TestTemplateFlagParsing
+=== RUN   TestTemplateFlagParsing/minimal_template_flag
+=== RUN   TestTemplateFlagParsing/full_template_flag
+=== RUN   TestTemplateFlagParsing/graphql_template_flag
+--- PASS: TestTemplateFlagParsing (0.08s)
+    --- PASS: TestTemplateFlagParsing/minimal_template_flag (0.00s)
+    --- PASS: TestTemplateFlagParsing/full_template_flag (0.07s)
+    --- PASS: TestTemplateFlagParsing/graphql_template_flag (0.00s)
+=== RUN   TestTemplateFlagDefault
+--- PASS: TestTemplateFlagDefault (0.08s)
+=== RUN   TestInvalidTemplateFlagError
+--- PASS: TestInvalidTemplateFlagError (0.00s)
+=== RUN   TestHelpShowsTemplateFlag
+    main_test.go:465: Expected template flag definition in help, got: Usage: create-go-starter [options] <project-name>
+        
+        Options:
+          -h	Show help message (shorthand)
+          -help
+            	Show help message
+          -template string
+            	Template type to generate (default "full")
+        
+        Templates:
+          minimal   Basic REST API with Swagger (no authentication)
+          full      Complete API with JWT auth, user management, and Swagger (default)
+          graphql   GraphQL API with gqlgen and GraphQL Playground
+--- FAIL: TestHelpShowsTemplateFlag (0.00s)
+=== RUN   TestCreateDirectories
+--- PASS: TestCreateDirectories (0.00s)
+=== RUN   TestProjectAlreadyExists
+--- PASS: TestProjectAlreadyExists (0.00s)
+=== RUN   TestCreateProjectStructureWithInvalidPath
+--- PASS: TestCreateProjectStructureWithInvalidPath (0.00s)
+=== RUN   TestValidateProjectName
+=== RUN   TestValidateProjectName/valid_alphanumeric
+=== RUN   TestValidateProjectName/valid_with_hyphens
+=== RUN   TestValidateProjectName/valid_with_underscores
+=== RUN   TestValidateProjectName/valid_mixed
+=== RUN   TestValidateProjectName/valid_starts_with_number
+=== RUN   TestValidateProjectName/invalid_starts_with_hyphen
+=== RUN   TestValidateProjectName/invalid_starts_with_underscore
+=== RUN   TestValidateProjectName/invalid_with_slash
+=== RUN   TestValidateProjectName/invalid_with_dots
+=== RUN   TestValidateProjectName/invalid_with_spaces
+=== RUN   TestValidateProjectName/invalid_with_special_chars
+=== RUN   TestValidateProjectName/invalid_empty
+--- PASS: TestValidateProjectName (0.00s)
+    --- PASS: TestValidateProjectName/valid_alphanumeric (0.00s)
+    --- PASS: TestValidateProjectName/valid_with_hyphens (0.00s)
+    --- PASS: TestValidateProjectName/valid_with_underscores (0.00s)
+    --- PASS: TestValidateProjectName/valid_mixed (0.00s)
+    --- PASS: TestValidateProjectName/valid_starts_with_number (0.00s)
+    --- PASS: TestValidateProjectName/invalid_starts_with_hyphen (0.00s)
+    --- PASS: TestValidateProjectName/invalid_starts_with_underscore (0.00s)
+    --- PASS: TestValidateProjectName/invalid_with_slash (0.00s)
+    --- PASS: TestValidateProjectName/invalid_with_dots (0.00s)
+    --- PASS: TestValidateProjectName/invalid_with_spaces (0.00s)
+    --- PASS: TestValidateProjectName/invalid_with_special_chars (0.00s)
+    --- PASS: TestValidateProjectName/invalid_empty (0.00s)
+=== RUN   TestCreateProjectStructureVerifiesAllDirectories
+--- PASS: TestCreateProjectStructureVerifiesAllDirectories (0.00s)
+=== RUN   TestCreateProjectStructureRootDirCreation
+--- PASS: TestCreateProjectStructureRootDirCreation (0.00s)
+=== RUN   TestE2ESmokeTestValidation
+=== RUN   TestE2ESmokeTestValidation/AC1_ProjectGeneration
+    smoke_test.go:39: ✅ AC#1: Project generated without errors
+=== RUN   TestE2ESmokeTestValidation/AC1_VerifyStructure
+    smoke_test.go:66: ✅ AC#1: All essential files present
+=== RUN   TestE2ESmokeTestValidation/AC2_Compilation
+    smoke_test.go:84: ✅ AC#2: Compilation successful
+=== RUN   TestE2ESmokeTestValidation/AC2_InternalTests
+    smoke_test.go:104: ✅ AC#2: Tests passed
+=== RUN   TestE2ESmokeTestValidation/AC3_LintCompliance
+    smoke_test.go:131: Lint output: Error: can't load config: unsupported version of the configuration: "" See https://golangci-lint.run/docs/product/migration-guide for migration instructions
+        The command is terminated due to an error: can't load config: unsupported version of the configuration: "" See https://golangci-lint.run/docs/product/migration-guide for migration instructions
+    smoke_test.go:132: ⚠️ AC#3: Lint found issues (may be acceptable)
+=== RUN   TestE2ESmokeTestValidation/AC4_ValidateContent
+    smoke_test.go:177: ✅ AC#4: Generated content is valid
+=== RUN   TestE2ESmokeTestValidation/AC5_AutomationTools
+    smoke_test.go:210: ✅ AC#5: Automation tools in place
+=== NAME  TestE2ESmokeTestValidation
+    smoke_test.go:213: 🎉 All smoke test validations passed!
+--- PASS: TestE2ESmokeTestValidation (8.24s)
+    --- PASS: TestE2ESmokeTestValidation/AC1_ProjectGeneration (0.00s)
+    --- PASS: TestE2ESmokeTestValidation/AC1_VerifyStructure (0.00s)
+    --- PASS: TestE2ESmokeTestValidation/AC2_Compilation (7.81s)
+    --- PASS: TestE2ESmokeTestValidation/AC2_InternalTests (0.30s)
+    --- PASS: TestE2ESmokeTestValidation/AC3_LintCompliance (0.13s)
+    --- PASS: TestE2ESmokeTestValidation/AC4_ValidateContent (0.00s)
+    --- PASS: TestE2ESmokeTestValidation/AC5_AutomationTools (0.00s)
+=== RUN   TestE2ESmokeTestViaScript
+    smoke_test.go:242: ✅ smoke_test.sh exists and is executable
+--- PASS: TestE2ESmokeTestViaScript (0.00s)
+=== RUN   TestSmokeTestReportGeneration
+    smoke_test.go:302: ✅ Report generation validation passed
+--- PASS: TestSmokeTestReportGeneration (0.00s)
+=== RUN   TestNewProjectTemplates
+--- PASS: TestNewProjectTemplates (0.00s)
+=== RUN   TestGoModTemplate
+=== RUN   TestGoModTemplate/simple_project_name
+=== RUN   TestGoModTemplate/project_with_hyphens
+=== RUN   TestGoModTemplate/project_with_underscores
+--- PASS: TestGoModTemplate (0.00s)
+    --- PASS: TestGoModTemplate/simple_project_name (0.00s)
+    --- PASS: TestGoModTemplate/project_with_hyphens (0.00s)
+    --- PASS: TestGoModTemplate/project_with_underscores (0.00s)
+=== RUN   TestMainGoTemplate
+=== RUN   TestMainGoTemplate/basic_project
+=== RUN   TestMainGoTemplate/project_with_special_chars
+--- PASS: TestMainGoTemplate (0.00s)
+    --- PASS: TestMainGoTemplate/basic_project (0.00s)
+    --- PASS: TestMainGoTemplate/project_with_special_chars (0.00s)
+=== RUN   TestDockerfileTemplate
+=== RUN   TestDockerfileTemplate/simple_binary_name
+=== RUN   TestDockerfileTemplate/binary_with_hyphens
+--- PASS: TestDockerfileTemplate (0.00s)
+    --- PASS: TestDockerfileTemplate/simple_binary_name (0.00s)
+    --- PASS: TestDockerfileTemplate/binary_with_hyphens (0.00s)
+=== RUN   TestMakefileTemplate
+=== RUN   TestMakefileTemplate/basic_makefile
+=== RUN   TestMakefileTemplate/makefile_with_special_chars
+--- PASS: TestMakefileTemplate (0.00s)
+    --- PASS: TestMakefileTemplate/basic_makefile (0.00s)
+    --- PASS: TestMakefileTemplate/makefile_with_special_chars (0.00s)
+=== RUN   TestEnvTemplate
+--- PASS: TestEnvTemplate (0.00s)
+=== RUN   TestGitignoreTemplate
+--- PASS: TestGitignoreTemplate (0.00s)
+=== RUN   TestReadmeTemplate
+--- PASS: TestReadmeTemplate (0.00s)
+=== RUN   TestDockerComposeTemplate
+--- PASS: TestDockerComposeTemplate (0.00s)
+=== RUN   TestConfigTemplate
+--- PASS: TestConfigTemplate (0.00s)
+=== RUN   TestLoggerTemplate
+--- PASS: TestLoggerTemplate (0.00s)
+=== RUN   TestDatabaseTemplate
+--- PASS: TestDatabaseTemplate (0.00s)
+=== RUN   TestServerTemplate
+--- PASS: TestServerTemplate (0.00s)
+=== RUN   TestHealthHandlerTemplate
+--- PASS: TestHealthHandlerTemplate (0.00s)
+=== RUN   TestUpdatedMainGoTemplate
+--- PASS: TestUpdatedMainGoTemplate (0.00s)
+=== RUN   TestUserEntityTemplate
+--- PASS: TestUserEntityTemplate (0.00s)
+=== RUN   TestUserRefreshTokenTemplate
+--- PASS: TestUserRefreshTokenTemplate (0.00s)
+=== RUN   TestUserServiceTemplate
+--- PASS: TestUserServiceTemplate (0.00s)
+=== RUN   TestUserRepositoryTemplate
+--- PASS: TestUserRepositoryTemplate (0.00s)
+=== RUN   TestAuthHandlerTemplate
+--- PASS: TestAuthHandlerTemplate (0.00s)
+=== RUN   TestUserHandlerTemplate
+--- PASS: TestUserHandlerTemplate (0.00s)
+=== RUN   TestJWTAuthTemplate
+--- PASS: TestJWTAuthTemplate (0.00s)
+=== RUN   TestJWTMiddlewareTemplate
+--- PASS: TestJWTMiddlewareTemplate (0.00s)
+=== RUN   TestUserInterfacesTemplate
+--- PASS: TestUserInterfacesTemplate (0.00s)
+=== RUN   TestUserRepositoryInterfaceTemplate
+--- PASS: TestUserRepositoryInterfaceTemplate (0.00s)
+=== RUN   TestUserModuleTemplate
+--- PASS: TestUserModuleTemplate (0.00s)
+=== RUN   TestRepositoryModuleTemplate
+--- PASS: TestRepositoryModuleTemplate (0.00s)
+=== RUN   TestAuthModuleTemplate
+--- PASS: TestAuthModuleTemplate (0.00s)
+=== RUN   TestHandlerModuleTemplate
+--- PASS: TestHandlerModuleTemplate (0.00s)
+=== RUN   TestE2EDockerImageSize
+    templates_test.go:1083: Docker image size: 21.8MB
+    templates_test.go:1095: ✅ Docker image size 21.8MB is under 50MB requirement
+--- PASS: TestE2EDockerImageSize (2.69s)
+FAIL
+FAIL	github.com/tky0065/go-starter-kit/cmd/create-go-starter	36.430s
+FAIL

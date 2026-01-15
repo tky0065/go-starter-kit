@@ -230,10 +230,10 @@ func TestE2EGitIntegration(t *testing.T) {
 
 	// Verify output mentions git initialization
 	outputStr := string(output)
-	if !strings.Contains(outputStr, "Initialisation du dépôt Git") {
+	if !strings.Contains(outputStr, "Initializing Git repository") {
 		t.Error("Expected git initialization message in output")
 	}
-	if !strings.Contains(outputStr, "Dépôt Git initialisé") {
+	if !strings.Contains(outputStr, "Git repository initialized") {
 		t.Error("Expected git success message in output")
 	}
 

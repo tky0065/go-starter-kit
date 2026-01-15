@@ -71,7 +71,6 @@ development_status:
   4-4-automatisation-de-la-qualite: done
   4-5-integration-continue: done
   epic-4-retrospective: optional
-
   # Epic 5
   epic-5: done
   5-1-initialisation-git-automatique: done
@@ -81,3 +80,12 @@ development_status:
   5-5-documentation-des-fonctions-publiques-du-code-genere: done
   5-6-validation-finale-et-smoke-tests: done
   epic-5-retrospective: optional
+
+  # Epic 6 - Templates Multiples
+  epic-6: in-progress
+  6-1-flag-cli-pour-selection-de-template: done
+  6-2-template-minimal: done
+  6-3-refactoring-du-template-full: done
+  6-4-template-graphql: ready-for-dev
+  6-5-documentation-et-aide-cli: ready-for-dev
+  epic-6-retrospective: optional

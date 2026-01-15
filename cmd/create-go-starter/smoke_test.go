@@ -26,13 +26,13 @@ func TestE2ESmokeTestValidation(t *testing.T) {
 
 	// AC#1: Test project generation without errors
 	t.Run("AC1_ProjectGeneration", func(t *testing.T) {
-		// Create project structure
-		if err := createProjectStructure(projectPath); err != nil {
+		// Create project structure (using full template)
+		if err := createProjectStructure(projectPath, TemplateFull); err != nil {
 			t.Fatalf("Failed to create project structure: %v", err)
 		}
 
 		// Generate project files
-		if err := generateProjectFiles(projectPath, projectName); err != nil {
+		if err := generateProjectFiles(projectPath, projectName, DefaultTemplate); err != nil {
 			t.Fatalf("Failed to generate project files: %v", err)
 		}
 
