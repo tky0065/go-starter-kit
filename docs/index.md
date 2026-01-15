@@ -4,7 +4,7 @@ Un outil CLI puissant pour générer des projets Go prêts pour la production en
 
 ## :material-party-popper: Statut du projet
 
-**MVP COMPLET** :material-check-circle:{ style="color: green" } - Toutes les fonctionnalités prévues ont été implémentées et validées (janvier 2026)
+**MVP COMPLET** - Toutes les fonctionnalités prévues ont été implémentées et validées (janvier 2026)
 
 - **6 Epics complétées** avec 26 user stories implémentées
 - **26 exigences fonctionnelles** satisfaites à 100%
