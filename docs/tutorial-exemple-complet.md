@@ -141,7 +141,7 @@ blog-api/
 └── README.md
 ```
 
-✅ **Checkpoint 1**: Le projet est généré avec succès.
+:material-check-circle: **Checkpoint 1**: Le projet est généré avec succès.
 
 ---
 
@@ -305,7 +305,7 @@ curl -X GET http://localhost:8080/api/v1/users \
 ]
 ```
 
-✅ **Checkpoint 2**: Le projet de base fonctionne parfaitement avec User et Auth.
+:material-check-circle: **Checkpoint 2**: Le projet de base fonctionne parfaitement avec User et Auth.
 
 ---
 
@@ -1311,7 +1311,7 @@ curl -X DELETE http://localhost:8080/api/v1/posts/1 \
 
 **Code retourné**: 204 No Content
 
-✅ **Checkpoint 3**: L'API Posts fonctionne complètement!
+:material-check-circle: **Checkpoint 3**: L'API Posts fonctionne complètement!
 
 ---
 
@@ -1452,7 +1452,7 @@ commentRoutes.Delete("/:id", commentHandler.Delete)
 
 Dans `migrations.go`, ajouter `&models.Comment{}`.
 
-✅ **Checkpoint 4**: Les commentaires sont fonctionnels!
+:material-check-circle: **Checkpoint 4**: Les commentaires sont fonctionnels!
 
 ---
 
@@ -1535,18 +1535,18 @@ curl http://localhost:8080/health
 
 ## Conclusion
 
-Félicitations! 🎉 Vous avez créé une API Blog complète avec:
+Félicitations! :material-party-popper: Vous avez créé une API Blog complète avec:
 
-✅ **Authentification JWT** (User, Login, Register)
-✅ **Articles** (CRUD complet avec slug, tags, publish/unpublish)
-✅ **Commentaires** (Create, List, Delete)
-✅ **Relations** (Post → Author, Comment → Post + Author)
-✅ **Pagination** (Limit/Offset)
-✅ **Tests unitaires**
-✅ **Déploiement Docker**
-✅ **Architecture hexagonale**
-✅ **Logging structuré**
-✅ **Error handling centralisé**
+:material-check-circle: **Authentification JWT** (User, Login, Register)
+:material-check-circle: **Articles** (CRUD complet avec slug, tags, publish/unpublish)
+:material-check-circle: **Commentaires** (Create, List, Delete)
+:material-check-circle: **Relations** (Post → Author, Comment → Post + Author)
+:material-check-circle: **Pagination** (Limit/Offset)
+:material-check-circle: **Tests unitaires**
+:material-check-circle: **Déploiement Docker**
+:material-check-circle: **Architecture hexagonale**
+:material-check-circle: **Logging structuré**
+:material-check-circle: **Error handling centralisé**
 
 ### Résumé de ce que vous avez appris
 
@@ -1582,4 +1582,4 @@ Pour aller plus loin:
 - [Fiber documentation](https://docs.gofiber.io/)
 - [GORM documentation](https://gorm.io/docs/)
 
-**Bon coding!** 🚀
+**Bon coding!** :material-rocket-launch:

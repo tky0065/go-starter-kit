@@ -367,7 +367,7 @@ Suivez les conventions Go:
 **Exemples**:
 
 ```go
-// ✅ Bon
+// :material-check-circle: Bon
 projectName string
 validateProjectName() error
 GenerateFiles() error
@@ -393,7 +393,7 @@ const (
 **Toujours** gérer les erreurs explicitement:
 
 ```go
-// ✅ Bon
+// :material-check-circle: Bon
 if err != nil {
     return fmt.Errorf("failed to create file %s: %w", path, err)
 }
@@ -594,4 +594,4 @@ Chaque contribution, grande ou petite, fait une différence. 🙏
 
 ---
 
-**Bon coding et merci de contribuer!** 🚀
+**Bon coding et merci de contribuer!** :material-rocket-launch:

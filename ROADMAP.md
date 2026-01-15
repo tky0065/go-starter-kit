@@ -2,26 +2,26 @@
 
 Ce document présente la vision et les prochaines étapes pour l'évolution de `create-go-starter`.
 
-## 🎉 Version Actuelle: v1.0.0 (MVP Complete)
+## :material-party-popper: Version Actuelle: v1.0.0 (MVP Complete)
 
 **Date de release**: 15 janvier 2026  
-**Statut**: ✅ Production Ready
+**Statut**: :material-check-circle: Production Ready
 
 ### Fonctionnalités Disponibles
 
-- ✅ 3 templates de projet (minimal, full, graphql)
-- ✅ Architecture hexagonale
-- ✅ JWT Authentication (access + refresh tokens)
-- ✅ User CRUD complet
-- ✅ API REST avec Fiber v2
-- ✅ API GraphQL avec gqlgen
-- ✅ PostgreSQL + GORM
-- ✅ Swagger/OpenAPI docs
-- ✅ Docker multi-stage optimisé
-- ✅ GitHub Actions CI/CD
-- ✅ Tests complets (unitaires + intégration)
-- ✅ Initialisation Git automatique
-- ✅ Installation dépendances automatique
+- :material-check-circle: 3 templates de projet (minimal, full, graphql)
+- :material-check-circle: Architecture hexagonale
+- :material-check-circle: JWT Authentication (access + refresh tokens)
+- :material-check-circle: User CRUD complet
+- :material-check-circle: API REST avec Fiber v2
+- :material-check-circle: API GraphQL avec gqlgen
+- :material-check-circle: PostgreSQL + GORM
+- :material-check-circle: Swagger/OpenAPI docs
+- :material-check-circle: Docker multi-stage optimisé
+- :material-check-circle: GitHub Actions CI/CD
+- :material-check-circle: Tests complets (unitaires + intégration)
+- :material-check-circle: Initialisation Git automatique
+- :material-check-circle: Installation dépendances automatique
 
 **Métriques**:
 - 6/6 Epics complétées
@@ -30,11 +30,11 @@ Ce document présente la vision et les prochaines étapes pour l'évolution de `
 
 ---
 
-## 🚀 Growth Features (Post-MVP)
+## :material-rocket-launch: Growth Features (Post-MVP)
 
 Fonctionnalités planifiées pour élargir la base d'utilisateurs après validation du MVP.
 
-### Epic 7: Support Multi-Base de Données 🗄️
+### Epic 7: Support Multi-Base de Données :material-database:
 
 **Objectif**: Permettre aux utilisateurs de choisir leur base de données préférée.
 
@@ -70,7 +70,7 @@ Fonctionnalités planifiées pour élargir la base d'utilisateurs après validat
 
 ---
 
-### Epic 8: CRUD Scaffolding Generator 🏗️
+### Epic 8: CRUD Scaffolding Generator :material-office-building:
 
 **Objectif**: Générer automatiquement du code CRUD pour de nouveaux modèles.
 
@@ -111,7 +111,7 @@ create-go-starter add-model Todo --fields "title:string,completed:bool,dueDate:t
 
 ---
 
-### Epic 9: Observabilité Avancée 📊
+### Epic 9: Observabilité Avancée :material-chart-bar:
 
 **Objectif**: Ajouter monitoring et observabilité pour projets production.
 
@@ -184,7 +184,7 @@ create-go-starter add-model Todo --fields "title:string,completed:bool,dueDate:t
 
 ---
 
-## 🔮 Vision Long-Terme (Future)
+## :material-crystal-ball: Vision Long-Terme (Future)
 
 Transformation en plateforme écosystémique communautaire.
 
@@ -238,7 +238,7 @@ Transformation en plateforme écosystémique communautaire.
 
 ---
 
-## 📋 Backlog d'Améliorations Mineures
+## :material-clipboard-list: Backlog d'Améliorations Mineures
 
 Améliorations continues pour versions patch (v1.0.x, v1.1.x, etc.).
 
@@ -306,7 +306,7 @@ Améliorations continues pour versions patch (v1.0.x, v1.1.x, etc.).
 
 ---
 
-## 🗳️ Community Feedback
+## :material-vote: Community Feedback
 
 Nous écoutons activement la communauté! Si vous avez des idées ou suggestions:
 
@@ -316,7 +316,7 @@ Nous écoutons activement la communauté! Si vous avez des idées ou suggestions
 
 ---
 
-## 📊 Métriques de Succès
+## :material-chart-bar: Métriques de Succès
 
 ### Objectifs 3 Mois (Avril 2026)
 
@@ -335,7 +335,7 @@ Nous écoutons activement la communauté! Si vous avez des idées ou suggestions
 
 ---
 
-## 🤝 Comment Contribuer
+## :material-handshake: Comment Contribuer
 
 Vous souhaitez contribuer à ces fonctionnalités? Consultez:
 

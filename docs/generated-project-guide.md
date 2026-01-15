@@ -580,7 +580,7 @@ type AuthResponse struct {
 **Pourquoi un package séparé?**
 
 - **Évite les cycles**: Avant, `interfaces` → `domain/user` → `interfaces` (❌ cycle!)
-- **Maintenant**: `interfaces` → `models` ← `domain/user` (✅ pas de cycle)
+- **Maintenant**: `interfaces` → `models` ← `domain/user` (:material-check-circle: pas de cycle)
 - **Clarté**: Séparation entre entities (models) et business logic (domain)
 
 #### `/internal/domain`
@@ -2826,7 +2826,7 @@ db.Exec("UPDATE users SET email = ? WHERE id = ?", newEmail, userID)
        db.Model(&user).Association("RefreshTokens").Find(&tokens)
    }
 
-   // ✅ Single query
+   // :material-check-circle: Single query
    db.Preload("RefreshTokens").Find(&users)
    ```
 
@@ -3144,7 +3144,7 @@ Production checklist:
   // ❌ BAD
   logger.Info().Str("password", password).Msg("User login")
 
-  // ✅ GOOD
+  // :material-check-circle: GOOD
   logger.Info().Str("email", email).Msg("User login")
   ```
 - [ ] **Environment variables**: Secrets dans .env (pas dans code)
@@ -3710,7 +3710,7 @@ logger.Fatal().
 
 #### Best practices
 
-**✅ BON - Structured logging**:
+**:material-check-circle: BON - Structured logging**:
 
 ```go
 logger.Info().
@@ -3726,7 +3726,7 @@ logger.Info().
 logger.Info().Msgf("User %s logged in after %v", userID, elapsed)
 ```
 
-**✅ BON - Pas de secrets**:
+**:material-check-circle: BON - Pas de secrets**:
 
 ```go
 logger.Info().Str("email", email).Msg("User login attempt")
@@ -3841,7 +3841,7 @@ package user
 
 import "mon-projet/internal/adapters/repository"  // NO!
 
-// ✅ GOOD - Domain only imports interfaces
+// :material-check-circle: GOOD - Domain only imports interfaces
 package user
 
 import "mon-projet/internal/interfaces"
@@ -3863,7 +3863,7 @@ Toujours via fx.Provide, pas de variables globales:
 // ❌ BAD - Global variable
 var db *gorm.DB
 
-// ✅ GOOD - Injection
+// :material-check-circle: GOOD - Injection
 type UserService struct {
     db *gorm.DB
 }
@@ -3921,7 +3921,7 @@ Toujours gérer les erreurs, ne pas utiliser `panic`:
 // ❌ BAD
 user := getUserByID(id)  // What if error?
 
-// ✅ GOOD
+// :material-check-circle: GOOD
 user, err := getUserByID(id)
 if err != nil {
     return nil, fmt.Errorf("failed to get user: %w", err)
@@ -3955,7 +3955,7 @@ if err != nil {
 **Wrap errors avec contexte**:
 
 ```go
-// ✅ GOOD
+// :material-check-circle: GOOD
 if err != nil {
     return fmt.Errorf("failed to create user %s: %w", email, err)
 }
@@ -3977,7 +3977,7 @@ func (s *UserService) GetByID(id uint) (int, *User, error) {
     return 404, nil, errors.New("not found")
 }
 
-// ✅ GOOD - Service returning domain error
+// :material-check-circle: GOOD - Service returning domain error
 func (s *UserService) GetByID(id uint) (*User, error) {
     return nil, domain.NewNotFoundError("User not found", "USER_NOT_FOUND", nil)
 }
@@ -4046,7 +4046,7 @@ for _, user := range users {
     db.Model(&user).Association("Posts").Find(&posts)
 }
 
-// ✅ Single query with Preload
+// :material-check-circle: Single query with Preload
 db.Preload("Posts").Find(&users)
 ```
 
@@ -4102,7 +4102,7 @@ Ce guide couvre tous les aspects du développement avec les projets générés p
   - [fx](https://uber-go.github.io/fx/)
   - [zerolog](https://github.com/rs/zerolog)
 
-**Bon développement!** 🚀
+**Bon développement!** :material-rocket-launch:
 
 Si vous rencontrez des problèmes ou avez des questions, consultez:
 - [Issues GitHub](https://github.com/tky0065/go-starter-kit/issues)

@@ -419,7 +419,7 @@ func initGitRepo(projectPath string) error  // Initialise le repo et crée le co
 
 **Intégration**:
 - Appelé dans `main.go` après `copyEnvFile()` et avant `printSuccessMessage()`
-- Messages: "🔧 Setting up Git repository..." et "✅ Git repository initialized"
+- Messages: ":material-wrench: Setting up Git repository..." et ":material-check-circle: Git repository initialized"
 
 ## Patterns et conventions
 

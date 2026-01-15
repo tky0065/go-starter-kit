@@ -40,20 +40,20 @@ create-go-starter mon-projet --template graphql    # API GraphQL
 
 | Fonctionnalité | minimal | full | graphql |
 |----------------|---------|------|---------|
-| **API REST** | ✅ | ✅ | ❌ |
-| **API GraphQL** | ❌ | ❌ | ✅ |
-| **Authentification JWT** | ❌ | ✅ | ❌ |
-| **Gestion utilisateurs** | ❌ | ✅ | ✅ |
-| **Documentation Swagger** | ✅ | ✅ | ❌ |
-| **GraphQL Playground** | ❌ | ❌ | ✅ |
-| **Base de données (GORM)** | ✅ | ✅ | ✅ |
-| **PostgreSQL** | ✅ | ✅ | ✅ |
-| **Dependency Injection (fx)** | ✅ | ✅ | ✅ |
-| **Logging structuré (zerolog)** | ✅ | ✅ | ✅ |
-| **Architecture hexagonale** | ✅ | ✅ | ✅ |
-| **Tests unitaires** | ✅ | ✅ | ✅ |
-| **Docker** | ✅ | ✅ | ✅ |
-| **CI/CD (GitHub Actions)** | ✅ | ✅ | ✅ |
+| **API REST** | :material-check-circle: | :material-check-circle: | ❌ |
+| **API GraphQL** | ❌ | ❌ | :material-check-circle: |
+| **Authentification JWT** | ❌ | :material-check-circle: | ❌ |
+| **Gestion utilisateurs** | ❌ | :material-check-circle: | :material-check-circle: |
+| **Documentation Swagger** | :material-check-circle: | :material-check-circle: | ❌ |
+| **GraphQL Playground** | ❌ | ❌ | :material-check-circle: |
+| **Base de données (GORM)** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **PostgreSQL** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **Dependency Injection (fx)** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **Logging structuré (zerolog)** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **Architecture hexagonale** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **Tests unitaires** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **Docker** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **CI/CD (GitHub Actions)** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
 
 ### Différences structurelles majeures
 
@@ -111,10 +111,10 @@ GET    /health                      # Health check
 POST   /api/v1/auth/register        # Inscription utilisateur
 POST   /api/v1/auth/login           # Connexion (retourne access + refresh tokens)
 POST   /api/v1/auth/refresh         # Rafraîchir l'access token
-GET    /api/v1/users                # Liste utilisateurs (🔒 JWT requis)
-GET    /api/v1/users/:id            # Récupère utilisateur (🔒 JWT requis)
-PUT    /api/v1/users/:id            # Met à jour utilisateur (🔒 JWT requis)
-DELETE /api/v1/users/:id            # Supprime utilisateur (🔒 JWT requis)
+GET    /api/v1/users                # Liste utilisateurs (:material-lock: JWT requis)
+GET    /api/v1/users/:id            # Récupère utilisateur (:material-lock: JWT requis)
+PUT    /api/v1/users/:id            # Met à jour utilisateur (:material-lock: JWT requis)
+DELETE /api/v1/users/:id            # Supprime utilisateur (:material-lock: JWT requis)
 GET    /swagger/*                   # Documentation Swagger UI
 ```
 
@@ -249,11 +249,11 @@ Le nom du projet doit respecter certaines règles:
 ### Exemples valides
 
 ```bash
-create-go-starter mon-projet           ✅
-create-go-starter my-awesome-api       ✅
-create-go-starter user_service         ✅
-create-go-starter app2024              ✅
-create-go-starter MonProjet            ✅
+create-go-starter mon-projet           :material-check-circle:
+create-go-starter my-awesome-api       :material-check-circle:
+create-go-starter user_service         :material-check-circle:
+create-go-starter app2024              :material-check-circle:
+create-go-starter MonProjet            :material-check-circle:
 ```
 
 ### Exemples invalides
@@ -646,17 +646,17 @@ Build multi-stage optimisé:
 
 Une fois le projet créé, vous avez deux options pour configurer votre projet:
 
-### Option A: Configuration automatique avec setup.sh (Recommandé) 🚀
+### Option A: Configuration automatique avec setup.sh (Recommandé) :material-rocket-launch:
 
 Le CLI génère automatiquement un script `setup.sh` qui automatise toute la configuration initiale.
 
 **Fonctionnalités du script**:
-- ✅ Vérification des prérequis (Go, OpenSSL, Docker)
-- ✅ Installation des dépendances Go (`go mod tidy`)
-- ✅ Génération automatique du JWT secret
-- ✅ Configuration de PostgreSQL (Docker ou local)
-- ✅ Exécution des tests
-- ✅ Vérification de l'installation
+- :material-check-circle: Vérification des prérequis (Go, OpenSSL, Docker)
+- :material-check-circle: Installation des dépendances Go (`go mod tidy`)
+- :material-check-circle: Génération automatique du JWT secret
+- :material-check-circle: Configuration de PostgreSQL (Docker ou local)
+- :material-check-circle: Exécution des tests
+- :material-check-circle: Vérification de l'installation
 
 **Utilisation**:
 
@@ -847,4 +847,4 @@ Maintenant que vous comprenez la structure, consultez:
 - **Testez régulièrement**: `make test` avant chaque commit
 - **Utilisez le linter**: `make lint` pour maintenir la qualité
 
-Bon développement! 🚀
+Bon développement! :material-rocket-launch:

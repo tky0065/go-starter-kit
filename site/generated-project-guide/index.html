@@ -4831,7 +4831,7 @@
 <p><strong>Pourquoi un package séparé?</strong></p>
 <ul>
 <li><strong>Évite les cycles</strong>: Avant, <code>interfaces</code> → <code>domain/user</code> → <code>interfaces</code> (❌ cycle!)</li>
-<li><strong>Maintenant</strong>: <code>interfaces</code> → <code>models</code> ← <code>domain/user</code> (✅ pas de cycle)</li>
+<li><strong>Maintenant</strong>: <code>interfaces</code> → <code>models</code> ← <code>domain/user</code> (<span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span> pas de cycle)</li>
 <li><strong>Clarté</strong>: Séparation entre entities (models) et business logic (domain)</li>
 </ul>
 <h4 id="internaldomain"><code>/internal/domain</code><a class="headerlink" href="#internaldomain" title="Permanent link">&para;</a></h4>
@@ -6892,7 +6892,7 @@
 <a id="__codelineno-111-3" name="__codelineno-111-3" href="#__codelineno-111-3"></a><span class="w">    </span><span class="nx">db</span><span class="p">.</span><span class="nx">Model</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">user</span><span class="p">).</span><span class="nx">Association</span><span class="p">(</span><span class="s">&quot;RefreshTokens&quot;</span><span class="p">).</span><span class="nx">Find</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">tokens</span><span class="p">)</span>
 <a id="__codelineno-111-4" name="__codelineno-111-4" href="#__codelineno-111-4"></a><span class="p">}</span>
 <a id="__codelineno-111-5" name="__codelineno-111-5" href="#__codelineno-111-5"></a>
-<a id="__codelineno-111-6" name="__codelineno-111-6" href="#__codelineno-111-6"></a><span class="c1">// ✅ Single query</span>
+<a id="__codelineno-111-6" name="__codelineno-111-6" href="#__codelineno-111-6"></a><span class="c1">// :material-check-circle: Single query</span>
 <a id="__codelineno-111-7" name="__codelineno-111-7" href="#__codelineno-111-7"></a><span class="nx">db</span><span class="p">.</span><span class="nx">Preload</span><span class="p">(</span><span class="s">&quot;RefreshTokens&quot;</span><span class="p">).</span><span class="nx">Find</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">users</span><span class="p">)</span>
 </code></pre></div></p>
 </li>
@@ -7211,7 +7211,7 @@
   <div class="highlight"><pre><span></span><code><a id="__codelineno-125-1" name="__codelineno-125-1" href="#__codelineno-125-1"></a><span class="c1">// ❌ BAD</span>
 <a id="__codelineno-125-2" name="__codelineno-125-2" href="#__codelineno-125-2"></a><span class="nx">logger</span><span class="p">.</span><span class="nx">Info</span><span class="p">().</span><span class="nx">Str</span><span class="p">(</span><span class="s">&quot;password&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">password</span><span class="p">).</span><span class="nx">Msg</span><span class="p">(</span><span class="s">&quot;User login&quot;</span><span class="p">)</span>
 <a id="__codelineno-125-3" name="__codelineno-125-3" href="#__codelineno-125-3"></a>
-<a id="__codelineno-125-4" name="__codelineno-125-4" href="#__codelineno-125-4"></a><span class="c1">// ✅ GOOD</span>
+<a id="__codelineno-125-4" name="__codelineno-125-4" href="#__codelineno-125-4"></a><span class="c1">// :material-check-circle: GOOD</span>
 <a id="__codelineno-125-5" name="__codelineno-125-5" href="#__codelineno-125-5"></a><span class="nx">logger</span><span class="p">.</span><span class="nx">Info</span><span class="p">().</span><span class="nx">Str</span><span class="p">(</span><span class="s">&quot;email&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">email</span><span class="p">).</span><span class="nx">Msg</span><span class="p">(</span><span class="s">&quot;User login&quot;</span><span class="p">)</span>
 </code></pre></div></li>
 <li>[ ] <strong>Environment variables</strong>: Secrets dans .env (pas dans code)</li>
@@ -7719,7 +7719,7 @@
 </tbody>
 </table>
 <h4 id="best-practices">Best practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h4>
-<p><strong>✅ BON - Structured logging</strong>:</p>
+<p><strong><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span> BON - Structured logging</strong>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-149-1" name="__codelineno-149-1" href="#__codelineno-149-1"></a><span class="nx">logger</span><span class="p">.</span><span class="nx">Info</span><span class="p">().</span>
 <a id="__codelineno-149-2" name="__codelineno-149-2" href="#__codelineno-149-2"></a><span class="w">    </span><span class="nx">Str</span><span class="p">(</span><span class="s">&quot;user_id&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">userID</span><span class="p">).</span>
 <a id="__codelineno-149-3" name="__codelineno-149-3" href="#__codelineno-149-3"></a><span class="w">    </span><span class="nx">Str</span><span class="p">(</span><span class="s">&quot;action&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;login&quot;</span><span class="p">).</span>
@@ -7729,7 +7729,7 @@
 <p><strong>❌ MAUVAIS - String formatting</strong>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-150-1" name="__codelineno-150-1" href="#__codelineno-150-1"></a><span class="nx">logger</span><span class="p">.</span><span class="nx">Info</span><span class="p">().</span><span class="nx">Msgf</span><span class="p">(</span><span class="s">&quot;User %s logged in after %v&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">userID</span><span class="p">,</span><span class="w"> </span><span class="nx">elapsed</span><span class="p">)</span>
 </code></pre></div>
-<p><strong>✅ BON - Pas de secrets</strong>:</p>
+<p><strong><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span> BON - Pas de secrets</strong>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-151-1" name="__codelineno-151-1" href="#__codelineno-151-1"></a><span class="nx">logger</span><span class="p">.</span><span class="nx">Info</span><span class="p">().</span><span class="nx">Str</span><span class="p">(</span><span class="s">&quot;email&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">email</span><span class="p">).</span><span class="nx">Msg</span><span class="p">(</span><span class="s">&quot;User login attempt&quot;</span><span class="p">)</span>
 </code></pre></div>
 <p><strong>❌ MAUVAIS - Logging secrets</strong>:</p>
@@ -7815,7 +7815,7 @@
 <a id="__codelineno-156-3" name="__codelineno-156-3" href="#__codelineno-156-3"></a>
 <a id="__codelineno-156-4" name="__codelineno-156-4" href="#__codelineno-156-4"></a><span class="kn">import</span><span class="w"> </span><span class="s">&quot;mon-projet/internal/adapters/repository&quot;</span><span class="w">  </span><span class="c1">// NO!</span>
 <a id="__codelineno-156-5" name="__codelineno-156-5" href="#__codelineno-156-5"></a>
-<a id="__codelineno-156-6" name="__codelineno-156-6" href="#__codelineno-156-6"></a><span class="c1">// ✅ GOOD - Domain only imports interfaces</span>
+<a id="__codelineno-156-6" name="__codelineno-156-6" href="#__codelineno-156-6"></a><span class="c1">// :material-check-circle: GOOD - Domain only imports interfaces</span>
 <a id="__codelineno-156-7" name="__codelineno-156-7" href="#__codelineno-156-7"></a><span class="kn">package</span><span class="w"> </span><span class="nx">user</span>
 <a id="__codelineno-156-8" name="__codelineno-156-8" href="#__codelineno-156-8"></a>
 <a id="__codelineno-156-9" name="__codelineno-156-9" href="#__codelineno-156-9"></a><span class="kn">import</span><span class="w"> </span><span class="s">&quot;mon-projet/internal/interfaces&quot;</span>
@@ -7832,7 +7832,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-157-1" name="__codelineno-157-1" href="#__codelineno-157-1"></a><span class="c1">// ❌ BAD - Global variable</span>
 <a id="__codelineno-157-2" name="__codelineno-157-2" href="#__codelineno-157-2"></a><span class="kd">var</span><span class="w"> </span><span class="nx">db</span><span class="w"> </span><span class="o">*</span><span class="nx">gorm</span><span class="p">.</span><span class="nx">DB</span>
 <a id="__codelineno-157-3" name="__codelineno-157-3" href="#__codelineno-157-3"></a>
-<a id="__codelineno-157-4" name="__codelineno-157-4" href="#__codelineno-157-4"></a><span class="c1">// ✅ GOOD - Injection</span>
+<a id="__codelineno-157-4" name="__codelineno-157-4" href="#__codelineno-157-4"></a><span class="c1">// :material-check-circle: GOOD - Injection</span>
 <a id="__codelineno-157-5" name="__codelineno-157-5" href="#__codelineno-157-5"></a><span class="kd">type</span><span class="w"> </span><span class="nx">UserService</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-157-6" name="__codelineno-157-6" href="#__codelineno-157-6"></a><span class="w">    </span><span class="nx">db</span><span class="w"> </span><span class="o">*</span><span class="nx">gorm</span><span class="p">.</span><span class="nx">DB</span>
 <a id="__codelineno-157-7" name="__codelineno-157-7" href="#__codelineno-157-7"></a><span class="p">}</span>
@@ -7872,7 +7872,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-161-1" name="__codelineno-161-1" href="#__codelineno-161-1"></a><span class="c1">// ❌ BAD</span>
 <a id="__codelineno-161-2" name="__codelineno-161-2" href="#__codelineno-161-2"></a><span class="nx">user</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">getUserByID</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span><span class="w">  </span><span class="c1">// What if error?</span>
 <a id="__codelineno-161-3" name="__codelineno-161-3" href="#__codelineno-161-3"></a>
-<a id="__codelineno-161-4" name="__codelineno-161-4" href="#__codelineno-161-4"></a><span class="c1">// ✅ GOOD</span>
+<a id="__codelineno-161-4" name="__codelineno-161-4" href="#__codelineno-161-4"></a><span class="c1">// :material-check-circle: GOOD</span>
 <a id="__codelineno-161-5" name="__codelineno-161-5" href="#__codelineno-161-5"></a><span class="nx">user</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">getUserByID</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span>
 <a id="__codelineno-161-6" name="__codelineno-161-6" href="#__codelineno-161-6"></a><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-161-7" name="__codelineno-161-7" href="#__codelineno-161-7"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Errorf</span><span class="p">(</span><span class="s">&quot;failed to get user: %w&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span>
@@ -7896,7 +7896,7 @@
 - Exemples: <code>hashPassword</code>, <code>validateEmail</code></p>
 <h3 id="error-handling-patterns">Error handling patterns<a class="headerlink" href="#error-handling-patterns" title="Permanent link">&para;</a></h3>
 <p><strong>Wrap errors avec contexte</strong>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-162-1" name="__codelineno-162-1" href="#__codelineno-162-1"></a><span class="c1">// ✅ GOOD</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-162-1" name="__codelineno-162-1" href="#__codelineno-162-1"></a><span class="c1">// :material-check-circle: GOOD</span>
 <a id="__codelineno-162-2" name="__codelineno-162-2" href="#__codelineno-162-2"></a><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-162-3" name="__codelineno-162-3" href="#__codelineno-162-3"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Errorf</span><span class="p">(</span><span class="s">&quot;failed to create user %s: %w&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">email</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span>
 <a id="__codelineno-162-4" name="__codelineno-162-4" href="#__codelineno-162-4"></a><span class="p">}</span>
@@ -7912,7 +7912,7 @@
 <a id="__codelineno-164-3" name="__codelineno-164-3" href="#__codelineno-164-3"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">404</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">&quot;not found&quot;</span><span class="p">)</span>
 <a id="__codelineno-164-4" name="__codelineno-164-4" href="#__codelineno-164-4"></a><span class="p">}</span>
 <a id="__codelineno-164-5" name="__codelineno-164-5" href="#__codelineno-164-5"></a>
-<a id="__codelineno-164-6" name="__codelineno-164-6" href="#__codelineno-164-6"></a><span class="c1">// ✅ GOOD - Service returning domain error</span>
+<a id="__codelineno-164-6" name="__codelineno-164-6" href="#__codelineno-164-6"></a><span class="c1">// :material-check-circle: GOOD - Service returning domain error</span>
 <a id="__codelineno-164-7" name="__codelineno-164-7" href="#__codelineno-164-7"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">*</span><span class="nx">UserService</span><span class="p">)</span><span class="w"> </span><span class="nx">GetByID</span><span class="p">(</span><span class="nx">id</span><span class="w"> </span><span class="kt">uint</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">User</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-164-8" name="__codelineno-164-8" href="#__codelineno-164-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">domain</span><span class="p">.</span><span class="nx">NewNotFoundError</span><span class="p">(</span><span class="s">&quot;User not found&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;USER_NOT_FOUND&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">)</span>
 <a id="__codelineno-164-9" name="__codelineno-164-9" href="#__codelineno-164-9"></a><span class="p">}</span>
@@ -7964,7 +7964,7 @@
 <a id="__codelineno-169-3" name="__codelineno-169-3" href="#__codelineno-169-3"></a><span class="w">    </span><span class="nx">db</span><span class="p">.</span><span class="nx">Model</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">user</span><span class="p">).</span><span class="nx">Association</span><span class="p">(</span><span class="s">&quot;Posts&quot;</span><span class="p">).</span><span class="nx">Find</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">posts</span><span class="p">)</span>
 <a id="__codelineno-169-4" name="__codelineno-169-4" href="#__codelineno-169-4"></a><span class="p">}</span>
 <a id="__codelineno-169-5" name="__codelineno-169-5" href="#__codelineno-169-5"></a>
-<a id="__codelineno-169-6" name="__codelineno-169-6" href="#__codelineno-169-6"></a><span class="c1">// ✅ Single query with Preload</span>
+<a id="__codelineno-169-6" name="__codelineno-169-6" href="#__codelineno-169-6"></a><span class="c1">// :material-check-circle: Single query with Preload</span>
 <a id="__codelineno-169-7" name="__codelineno-169-7" href="#__codelineno-169-7"></a><span class="nx">db</span><span class="p">.</span><span class="nx">Preload</span><span class="p">(</span><span class="s">&quot;Posts&quot;</span><span class="p">).</span><span class="nx">Find</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">users</span><span class="p">)</span>
 </code></pre></div>
 <p><strong>2. Context - Toujours passer context.Context</strong></p>
@@ -8006,7 +8006,7 @@
 <li><a href="https://uber-go.github.io/fx/">fx</a></li>
 <li><a href="https://github.com/rs/zerolog">zerolog</a></li>
 </ul>
-<p><strong>Bon développement!</strong> 🚀</p>
+<p><strong>Bon développement!</strong> <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m13.13 22.19-1.63-3.83c1.57-.58 3.04-1.36 4.4-2.27zM5.64 12.5l-3.83-1.63 6.1-2.77C7 9.46 6.22 10.93 5.64 12.5M21.61 2.39S16.66.269 11 5.93c-2.19 2.19-3.5 4.6-4.35 6.71-.28.75-.09 1.57.46 2.13l2.13 2.12c.55.56 1.37.74 2.12.46A19.1 19.1 0 0 0 18.07 13c5.66-5.66 3.54-10.61 3.54-10.61m-7.07 7.07c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0c.77.78.78 2.05 0 2.83s-2.05.78-2.83 0m-5.66 7.07-1.41-1.41zM6.24 22l3.64-3.64c-.34-.09-.67-.24-.97-.45L4.83 22zM2 22h1.41l4.77-4.76-1.42-1.41L2 20.59zm0-2.83 4.09-4.08c-.21-.3-.36-.62-.45-.97L2 17.76z"/></svg></span></p>
 <p>Si vous rencontrez des problèmes ou avez des questions, consultez:
 - <a href="https://github.com/tky0065/go-starter-kit/issues">Issues GitHub</a>
 - <a href="https://github.com/tky0065/go-starter-kit/discussions">Discussions GitHub</a></p>

@@ -7,11 +7,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [1.0.0] - 2026-01-15
 
-### 🎉 MVP Complete - Production Ready
+### :material-party-popper: MVP Complete - Production Ready
 
 Premier release officiel de `create-go-starter`, un générateur CLI pour créer des projets Go prêts pour la production avec architecture hexagonale.
 
-### ✨ Fonctionnalités Ajoutées
+### :material-sparkles: Fonctionnalités Ajoutées
 
 #### Templates de Projet (Epic 6)
 - **3 templates au choix** via le flag `--template`:
@@ -63,16 +63,16 @@ Premier release officiel de `create-go-starter`, un générateur CLI pour créer
 - **Script setup.sh** pour configuration automatique du projet
 - **Documentation inline** avec GoDoc pour toutes les fonctions publiques
 
-### 📊 Métriques de Qualité
+### :material-chart-bar: Métriques de Qualité
 
-- ✅ **26/26** exigences fonctionnelles satisfaites (100%)
-- ✅ **13/13** exigences non-fonctionnelles validées (100%)
-- ✅ **6/6** epics complétées
-- ✅ **26** user stories implémentées
-- ✅ **100%** de couverture des acceptance criteria
-- ✅ Validation end-to-end réussie pour tous les templates
+- :material-check-circle: **26/26** exigences fonctionnelles satisfaites (100%)
+- :material-check-circle: **13/13** exigences non-fonctionnelles validées (100%)
+- :material-check-circle: **6/6** epics complétées
+- :material-check-circle: **26** user stories implémentées
+- :material-check-circle: **100%** de couverture des acceptance criteria
+- :material-check-circle: Validation end-to-end réussie pour tous les templates
 
-### 📚 Documentation
+### :material-book-open-page-variant: Documentation
 
 - Guide d'installation complet
 - Guide d'utilisation avec exemples
@@ -81,13 +81,13 @@ Premier release officiel de `create-go-starter`, un générateur CLI pour créer
 - Quick start guide
 - GitHub Pages: https://tky0065.github.io/go-starter-kit/
 
-### 🔧 Configuration Requise
+### :material-wrench: Configuration Requise
 
 - Go 1.23+ (recommandé: 1.25.5)
 - PostgreSQL 12+ (ou Docker pour exécution via conteneur)
 - Git (optionnel, pour initialisation automatique)
 
-### 📦 Installation
+### :material-package-variant: Installation
 
 ```bash
 # Installation globale depuis GitHub
@@ -97,7 +97,7 @@ go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@v1.0.0
 go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@latest
 ```
 
-### 🚀 Utilisation
+### :material-rocket-launch: Utilisation
 
 ```bash
 # Template par défaut (full)
@@ -110,12 +110,12 @@ create-go-starter --template=minimal mon-projet
 create-go-starter --template=graphql mon-projet
 ```
 
-### 🐛 Corrections de Bugs
+### :material-bug: Corrections de Bugs
 
 - Fix: Ajout des imports manquants (`fmt`, `time`) dans le template de tests GraphQL
 - Fix: Gestion correcte du flag `--template` (nécessite `--template=value` ou position avant le nom)
 
-### 🔒 Sécurité
+### :material-lock: Sécurité
 
 - Tokens JWT sécurisés avec expiration configurable
 - Refresh tokens avec rotation automatique
@@ -123,7 +123,7 @@ create-go-starter --template=graphql mon-projet
 - Validation stricte des entrées utilisateur
 - Configuration des secrets via variables d'environnement
 
-### 📁 Epics Complétées
+### :material-folder: Epics Complétées
 
 1. **Epic 1** - CLI Generator Base
    - Installation de l'outil CLI

@@ -6,9 +6,9 @@
 
 Un outil CLI puissant pour générer des projets Go prêts pour la production en quelques secondes.
 
-## 🎉 Statut du projet
+## :material-party-popper: Statut du projet
 
-**✅ MVP COMPLET** - Toutes les fonctionnalités prévues ont été implémentées et validées (janvier 2026)
+**:material-check-circle: MVP COMPLET** - Toutes les fonctionnalités prévues ont été implémentées et validées (janvier 2026)
 
 - **6 Epics complétées** avec 26 user stories implémentées
 - **26 exigences fonctionnelles** satisfaites à 100%
@@ -126,7 +126,7 @@ Pour plus de détails sur les différences entre templates, consultez le [guide 
 
 ### Lancer le projet généré
 
-#### Option 1: Configuration automatique (Recommandé) 🚀
+#### Option 1: Configuration automatique (Recommandé) :material-rocket-launch:
 
 ```bash
 cd mon-super-projet
