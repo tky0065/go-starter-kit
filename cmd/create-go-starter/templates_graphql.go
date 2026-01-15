@@ -1406,7 +1406,9 @@ func (t *ProjectTemplates) GraphQLResolverTestTemplate() string {
 
 import (
 	"context"
+	"fmt"
 	"testing"
+	"time"
 
 	"` + t.projectName + `/graph/model"
 	"` + t.projectName + `/internal/models"
