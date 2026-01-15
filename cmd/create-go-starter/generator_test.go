@@ -393,3 +393,195 @@ func TestGoModTidyWorkflow(t *testing.T) {
 		t.Logf("✅ Dependencies downloaded successfully")
 	})
 }
+
+// TestGenerateGraphQLTemplateFiles tests the GraphQL template generation
+func TestGenerateGraphQLTemplateFiles(t *testing.T) {
+	tempDir := t.TempDir()
+	projectName := "graphql-test-project"
+	projectPath := filepath.Join(tempDir, projectName)
+
+	// Create the project structure first (using graphql template)
+	if err := createProjectStructure(projectPath, TemplateGraphQL); err != nil {
+		t.Fatalf("Failed to create project structure: %v", err)
+	}
+
+	// Generate GraphQL project files
+	if err := generateProjectFiles(projectPath, projectName, TemplateGraphQL); err != nil {
+		t.Fatalf("generateProjectFiles(graphql) error = %v", err)
+	}
+
+	// List of all expected GraphQL template files
+	expectedFiles := []string{
+		"go.mod",
+		"cmd/main.go",
+		"gqlgen.yml",
+		"graph/schema.graphqls",
+		"graph/resolver.go",
+		"graph/schema.resolvers.go",
+		"graph/generate.go",
+		"graph/model/models.go",
+		"graph/generated/generated.go",
+		"internal/infrastructure/server/server.go",
+		"internal/infrastructure/database/database.go",
+		"internal/infrastructure/database/user_repository.go",
+		"internal/interfaces/user_repository.go",
+		"internal/models/user.go",
+		"pkg/config/env.go",
+		"pkg/logger/logger.go",
+		".env.example",
+		".gitignore",
+		".golangci.yml",
+		".github/workflows/ci.yml",
+		"Dockerfile",
+		"docker-compose.yml",
+		"Makefile",
+		"README.md",
+		"docs/README.md",
+		"docs/quick-start.md",
+		"setup.sh",
+	}
+
+	for _, file := range expectedFiles {
+		filePath := filepath.Join(projectPath, file)
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			t.Errorf("Expected GraphQL file %s does not exist", file)
+		}
+	}
+
+	// Test that go.mod contains gqlgen dependencies
+	goModPath := filepath.Join(projectPath, "go.mod")
+	content, err := os.ReadFile(goModPath)
+	if err != nil {
+		t.Errorf("Failed to read go.mod: %v", err)
+	}
+	if !strings.Contains(string(content), "github.com/99designs/gqlgen") {
+		t.Error("go.mod should contain gqlgen dependency")
+	}
+	if !strings.Contains(string(content), "github.com/gofiber/adaptor") {
+		t.Error("go.mod should contain gofiber/adaptor dependency")
+	}
+
+	// Test that gqlgen.yml contains correct configuration
+	gqlgenPath := filepath.Join(projectPath, "gqlgen.yml")
+	content, err = os.ReadFile(gqlgenPath)
+	if err != nil {
+		t.Errorf("Failed to read gqlgen.yml: %v", err)
+	}
+	if !strings.Contains(string(content), "graph/generated/generated.go") {
+		t.Error("gqlgen.yml should configure generated output path")
+	}
+
+	// Test that schema.graphqls contains expected types
+	schemaPath := filepath.Join(projectPath, "graph", "schema.graphqls")
+	content, err = os.ReadFile(schemaPath)
+	if err != nil {
+		t.Errorf("Failed to read schema.graphqls: %v", err)
+	}
+	if !strings.Contains(string(content), "type User") {
+		t.Error("schema.graphqls should contain User type")
+	}
+	if !strings.Contains(string(content), "type Query") {
+		t.Error("schema.graphqls should contain Query type")
+	}
+
+	// Verify setup.sh is executable
+	setupPath := filepath.Join(projectPath, "setup.sh")
+	info, err := os.Stat(setupPath)
+	if err != nil {
+		t.Fatalf("Failed to stat setup.sh: %v", err)
+	}
+	if info.Mode().Perm()&0111 == 0 {
+		t.Error("setup.sh should be executable")
+	}
+}
+
+// TestGetDirectoriesForGraphQLTemplate tests that correct directories are created for GraphQL template
+func TestGetDirectoriesForGraphQLTemplate(t *testing.T) {
+	dirs := getDirectoriesForTemplate(TemplateGraphQL)
+
+	// Check for GraphQL-specific directories
+	expectedDirs := []string{
+		"graph",
+		"graph/model",
+		"graph/generated",
+		"internal/interfaces",
+		"internal/models",
+	}
+
+	for _, expected := range expectedDirs {
+		found := false
+		for _, dir := range dirs {
+			if dir == expected {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("Expected directory %s not found in GraphQL template directories", expected)
+		}
+	}
+
+	// Check that auth-related directories are NOT included (GraphQL template doesn't need JWT auth)
+	authDirs := []string{
+		"pkg/auth",
+		"internal/domain/user",
+		"internal/adapters/handlers",
+	}
+	for _, authDir := range authDirs {
+		for _, dir := range dirs {
+			if dir == authDir {
+				t.Errorf("GraphQL template should not include %s directory", authDir)
+			}
+		}
+	}
+}
+
+// TestE2EGraphQLProjectBuilds is an end-to-end test that verifies
+// a generated GraphQL project can pass go mod tidy
+func TestE2EGraphQLProjectBuilds(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping E2E test in short mode")
+	}
+
+	// Create a temporary directory for testing
+	tempDir := t.TempDir()
+	projectName := "e2e-graphql-project"
+	projectPath := filepath.Join(tempDir, projectName)
+
+	// Create the complete project structure (using graphql template)
+	if err := createProjectStructure(projectPath, TemplateGraphQL); err != nil {
+		t.Fatalf("Failed to create project structure: %v", err)
+	}
+
+	// Generate all project files
+	if err := generateProjectFiles(projectPath, projectName, TemplateGraphQL); err != nil {
+		t.Fatalf("Failed to generate project files: %v", err)
+	}
+
+	// Run go mod tidy to verify all dependencies are valid
+	t.Run("GoModTidy", func(t *testing.T) {
+		cmd := exec.Command("go", "mod", "tidy")
+		cmd.Dir = projectPath
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Errorf("go mod tidy failed for GraphQL project: %v\nOutput:\n%s", err, string(output))
+			return
+		}
+		t.Logf("✅ go mod tidy executed successfully for GraphQL project")
+	})
+
+	// Verify go.mod is valid
+	t.Run("GoModValidation", func(t *testing.T) {
+		cmd := exec.Command("go", "list", "-m")
+		cmd.Dir = projectPath
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Errorf("go list -m failed: %v\nOutput:\n%s", err, string(output))
+		}
+
+		// Check that the module name is correct
+		if !strings.Contains(string(output), projectName) {
+			t.Errorf("Module name should be '%s', got: %s", projectName, string(output))
+		}
+	})
+}

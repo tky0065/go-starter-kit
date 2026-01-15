@@ -29,7 +29,17 @@ func getDirectoriesForTemplate(template string) []string {
 	case TemplateMinimal:
 		// Minimal template: only basic infrastructure, no auth
 		return commonDirs
-	case TemplateFull, TemplateGraphQL:
+	case TemplateGraphQL:
+		// GraphQL template: includes graph directories for gqlgen
+		graphqlDirs := append(commonDirs,
+			"internal/interfaces",
+			"internal/models",
+			"graph",
+			"graph/model",
+			"graph/generated",
+		)
+		return graphqlDirs
+	case TemplateFull:
 		// Full template: includes auth, user management, handlers, repository
 		fullDirs := append(commonDirs,
 			"pkg/auth",
@@ -85,7 +95,7 @@ func generateProjectFiles(projectPath, projectName, template string) error {
 	case "minimal":
 		return generateMinimalTemplateFiles(projectPath, projectName)
 	case "graphql":
-		return fmt.Errorf("template '%s' is not yet implemented (planned for Epic 6, Story 6.4). Please use 'full' or 'minimal'", template)
+		return generateGraphQLTemplateFiles(projectPath, projectName)
 	default:
 		// This case should ideally not be reached if validateTemplate is called beforehand.
 		return fmt.Errorf("unsupported template '%s'", template)
@@ -351,6 +361,158 @@ func generateMinimalTemplateFiles(projectPath, projectName string) error {
 		{
 			Path:    filepath.Join(projectPath, "setup.sh"),
 			Content: templates.MinimalSetupScriptTemplate(),
+		},
+	}
+
+	// Write all files
+	for _, file := range files {
+		// Ensure the directory exists
+		if err := os.MkdirAll(filepath.Dir(file.Path), 0755); err != nil {
+			return fmt.Errorf("failed to create directory for %s: %w", file.Path, err)
+		}
+
+		if err := os.WriteFile(file.Path, []byte(file.Content), 0644); err != nil {
+			return fmt.Errorf("failed to write file %s: %w", file.Path, err)
+		}
+	}
+
+	// Make setup.sh executable
+	setupPath := filepath.Join(projectPath, "setup.sh")
+	if err := os.Chmod(setupPath, 0755); err != nil {
+		return fmt.Errorf("failed to make setup.sh executable: %w", err)
+	}
+
+	return nil
+}
+
+// generateGraphQLTemplateFiles generates all files for the "graphql" template.
+// This template includes GraphQL support with gqlgen, gofiber/adaptor, and GORM.
+func generateGraphQLTemplateFiles(projectPath, projectName string) error {
+	// Create templates instance
+	templates := NewProjectTemplates(projectName)
+
+	// Define all files to generate for GraphQL template
+	files := []FileGenerator{
+		// Core Go files
+		{
+			Path:    filepath.Join(projectPath, "go.mod"),
+			Content: templates.GraphQLGoModTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "cmd", "main.go"),
+			Content: templates.GraphQLMainGoTemplate(),
+		},
+		// GraphQL files
+		{
+			Path:    filepath.Join(projectPath, "gqlgen.yml"),
+			Content: templates.GqlGenYmlTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "graph", "schema.graphqls"),
+			Content: templates.GraphQLSchemaTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "graph", "resolver.go"),
+			Content: templates.GraphQLResolverTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "graph", "schema.resolvers.go"),
+			Content: templates.GraphQLSchemaResolversTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "graph", "generate.go"),
+			Content: templates.GraphQLGenerateGoTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "graph", "schema.resolvers_test.go"),
+			Content: templates.GraphQLResolverTestTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "graph", "model", "models.go"),
+			Content: templates.GraphQLModelTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "graph", "generated", "generated.go"),
+			Content: templates.GraphQLGeneratedTemplate(),
+		},
+		// Infrastructure
+		{
+			Path:    filepath.Join(projectPath, "internal", "infrastructure", "server", "server.go"),
+			Content: templates.GraphQLServerTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "infrastructure", "database", "database.go"),
+			Content: templates.GraphQLDatabaseTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "infrastructure", "database", "user_repository.go"),
+			Content: templates.GraphQLUserRepositoryTemplate(),
+		},
+		// Domain
+		{
+			Path:    filepath.Join(projectPath, "internal", "interfaces", "user_repository.go"),
+			Content: templates.GraphQLInterfacesTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "models", "user.go"),
+			Content: templates.GraphQLModelsUserTemplate(),
+		},
+		// Packages
+		{
+			Path:    filepath.Join(projectPath, "pkg", "config", "env.go"),
+			Content: templates.ConfigTemplate(), // Reuse from base templates
+		},
+		{
+			Path:    filepath.Join(projectPath, "pkg", "logger", "logger.go"),
+			Content: templates.LoggerTemplate(), // Reuse from base templates
+		},
+		// Configuration files
+		{
+			Path:    filepath.Join(projectPath, ".env.example"),
+			Content: templates.GraphQLEnvTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, ".gitignore"),
+			Content: templates.GitignoreTemplate(), // Reuse from base templates
+		},
+		{
+			Path:    filepath.Join(projectPath, ".golangci.yml"),
+			Content: templates.GolangCILintTemplate(), // Reuse from base templates
+		},
+		{
+			Path:    filepath.Join(projectPath, ".github", "workflows", "ci.yml"),
+			Content: templates.GitHubActionsWorkflowTemplate(), // Reuse from base templates
+		},
+		// Build files
+		{
+			Path:    filepath.Join(projectPath, "Dockerfile"),
+			Content: templates.DockerfileTemplate(), // Reuse from base templates
+		},
+		{
+			Path:    filepath.Join(projectPath, "docker-compose.yml"),
+			Content: templates.GraphQLDockerComposeTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "Makefile"),
+			Content: templates.GraphQLMakefileTemplate(),
+		},
+		// Documentation
+		{
+			Path:    filepath.Join(projectPath, "README.md"),
+			Content: templates.GraphQLReadmeTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "docs", "README.md"),
+			Content: templates.GraphQLDocsReadmeTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "docs", "quick-start.md"),
+			Content: templates.GraphQLQuickStartTemplate(),
+		},
+		// Setup script
+		{
+			Path:    filepath.Join(projectPath, "setup.sh"),
+			Content: templates.GraphQLSetupScriptTemplate(),
 		},
 	}
 

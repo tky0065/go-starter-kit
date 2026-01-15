@@ -382,7 +382,7 @@ func TestTemplateFlagParsing(t *testing.T) {
 			name:           "graphql template flag",
 			args:           []string{"--template=graphql", "test-proj-graphql"},
 			wantInOutput:   "template: graphql",
-			wantNoErr:      false, // Should return error because graphql is not implemented yet
+			wantNoErr:      true, // GraphQL template is now implemented
 			cleanupProject: "test-proj-graphql",
 		},
 	}

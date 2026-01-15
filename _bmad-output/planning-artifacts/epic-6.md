@@ -146,7 +146,7 @@ Options:
 
 ## Critères de succès
 
-- [ ] Les 3 templates génèrent des projets fonctionnels
-- [ ] Les tests couvrent tous les templates
-- [ ] La documentation est mise à jour
-- [ ] Le flag --help affiche correctement les options
+- [x] Les 3 templates génèrent des projets fonctionnels
+- [x] Les tests couvrent tous les templates
+- [x] La documentation est mise à jour
+- [x] Le flag --help affiche correctement les options

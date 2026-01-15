@@ -82,10 +82,10 @@ development_status:
   epic-5-retrospective: optional
 
   # Epic 6 - Templates Multiples
-  epic-6: in-progress
+  epic-6: done
   6-1-flag-cli-pour-selection-de-template: done
   6-2-template-minimal: done
   6-3-refactoring-du-template-full: done
-  6-4-template-graphql: ready-for-dev
-  6-5-documentation-et-aide-cli: ready-for-dev
+  6-4-template-graphql: done
+  6-5-documentation-et-aide-cli: done
   epic-6-retrospective: optional
