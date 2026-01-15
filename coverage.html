@@ -1,0 +1,3612 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>create-go-starter: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/tky0065/go-starter-kit/cmd/create-go-starter/deps.go (72.2%)</option>
+				
+				<option value="file1">github.com/tky0065/go-starter-kit/cmd/create-go-starter/generator.go (80.0%)</option>
+				
+				<option value="file2">github.com/tky0065/go-starter-kit/cmd/create-go-starter/git.go (70.0%)</option>
+				
+				<option value="file3">github.com/tky0065/go-starter-kit/cmd/create-go-starter/main.go (19.4%)</option>
+				
+				<option value="file4">github.com/tky0065/go-starter-kit/cmd/create-go-starter/templates.go (100.0%)</option>
+				
+				<option value="file5">github.com/tky0065/go-starter-kit/cmd/create-go-starter/templates_user.go (88.9%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "context"
+        "fmt"
+        "os/exec"
+        "time"
+)
+
+// dependencyInstallTimeout is the maximum duration for go mod tidy
+const dependencyInstallTimeout = 2 * time.Minute
+
+// isGoAvailable checks if Go is installed and available in the system PATH.
+// Returns true if Go is available, false otherwise.
+func isGoAvailable() bool <span class="cov8" title="1">{
+        _, err := exec.LookPath("go")
+        return err == nil
+}</span>
+
+// installGoDependencies runs "go mod tidy" in the given project path to download
+// and install all Go dependencies. It uses a context with timeout to prevent
+// blocking indefinitely in case of network issues.
+// If Go is not available, it prints a warning and returns nil (non-fatal).
+// Returns an error if Go is available but the operation fails.
+func installGoDependencies(projectPath string) error <span class="cov8" title="1">{
+        if !isGoAvailable() </span><span class="cov0" title="0">{
+                fmt.Println("⚠️  Go n'est pas installé. Installation des dépendances ignorée.")
+                fmt.Println("   Vous pouvez installer les dépendances manuellement plus tard avec:")
+                fmt.Println("   cd " + projectPath + " &amp;&amp; go mod tidy")
+                return nil
+        }</span>
+
+        <span class="cov8" title="1">fmt.Println("📦 Installation des dépendances...")
+
+        // Create context with 2 minute timeout
+        ctx, cancel := context.WithTimeout(context.Background(), dependencyInstallTimeout)
+        defer cancel()
+
+        // Execute go mod tidy with context for timeout support
+        cmd := exec.CommandContext(ctx, "go", "mod", "tidy")
+        cmd.Dir = projectPath
+
+        output, err := cmd.CombinedOutput()
+        if err != nil </span><span class="cov8" title="1">{
+                // Check if error is due to timeout
+                if ctx.Err() == context.DeadlineExceeded </span><span class="cov0" title="0">{
+                        return fmt.Errorf("l'installation des dépendances a dépassé le délai de 2 minutes. Vérifiez votre connexion internet et réessayez avec: cd %s &amp;&amp; go mod tidy", projectPath)
+                }</span>
+                <span class="cov8" title="1">return fmt.Errorf("échec de l'installation des dépendances: %w (output: %s)", err, string(output))</span>
+        }
+
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package main
+
+import (
+        "fmt"
+        "os"
+        "path/filepath"
+        "regexp"
+)
+
+// Valid Go module name pattern
+var validGoModuleNamePattern = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_-]*$`)
+
+// validateGoModuleName validates that a module name is valid for Go modules.
+// Valid names must:
+// - Start with a letter or number
+// - Contain only letters, numbers, hyphens, or underscores
+// - Not be empty
+func validateGoModuleName(name string) error <span class="cov8" title="1">{
+        if name == "" </span><span class="cov8" title="1">{
+                return fmt.Errorf("module name cannot be empty")
+        }</span>
+
+        <span class="cov8" title="1">if !validGoModuleNamePattern.MatchString(name) </span><span class="cov8" title="1">{
+                return fmt.Errorf("invalid module name '%s': must start with a letter or number and contain only letters, numbers, hyphens, or underscores", name)
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// FileGenerator represents a file to be generated
+type FileGenerator struct {
+        Path    string
+        Content string
+}
+
+// generateProjectFiles creates all the initial project files with templates
+func generateProjectFiles(projectPath, projectName string) error <span class="cov8" title="1">{
+        // Validate that the project directory exists
+        if _, err := os.Stat(projectPath); os.IsNotExist(err) </span><span class="cov8" title="1">{
+                return fmt.Errorf("project directory does not exist: %s", projectPath)
+        }</span>
+
+        // Validate the module name
+        <span class="cov8" title="1">if err := validateGoModuleName(projectName); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        // Create templates instance
+        <span class="cov8" title="1">templates := NewProjectTemplates(projectName)
+
+        // Define all files to generate
+        files := []FileGenerator{
+                {
+                        Path:    filepath.Join(projectPath, "go.mod"),
+                        Content: templates.GoModTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "cmd", "main.go"),
+                        Content: templates.UpdatedMainGoTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "pkg", "config", "env.go"),
+                        Content: templates.ConfigTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "pkg", "logger", "logger.go"),
+                        Content: templates.LoggerTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "pkg", "auth", "jwt.go"),
+                        Content: templates.JWTAuthTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "pkg", "auth", "middleware.go"),
+                        Content: templates.JWTMiddlewareTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "pkg", "auth", "module.go"),
+                        Content: templates.AuthModuleTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "domain", "errors.go"),
+                        Content: templates.DomainErrorsTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "models", "user.go"),
+                        Content: templates.ModelsUserTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "domain", "user", "service.go"),
+                        Content: templates.UserServiceTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "domain", "user", "module.go"),
+                        Content: templates.UserModuleTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "interfaces", "services.go"),
+                        Content: templates.UserInterfacesTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "interfaces", "user_repository.go"),
+                        Content: templates.UserRepositoryInterfaceTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "adapters", "middleware", "error_handler.go"),
+                        Content: templates.ErrorHandlerMiddlewareTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "adapters", "repository", "user_repository.go"),
+                        Content: templates.UserRepositoryTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "adapters", "repository", "module.go"),
+                        Content: templates.RepositoryModuleTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "adapters", "handlers", "auth_handler.go"),
+                        Content: templates.AuthHandlerTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "adapters", "handlers", "user_handler.go"),
+                        Content: templates.UserHandlerTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "adapters", "handlers", "module.go"),
+                        Content: templates.HandlerModuleTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "adapters", "http", "health.go"),
+                        Content: templates.HealthHandlerTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "adapters", "http", "routes.go"),
+                        Content: templates.RoutesTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "infrastructure", "database", "database.go"),
+                        Content: templates.DatabaseTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "internal", "infrastructure", "server", "server.go"),
+                        Content: templates.ServerTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "Dockerfile"),
+                        Content: templates.DockerfileTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "docker-compose.yml"),
+                        Content: templates.DockerComposeTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "Makefile"),
+                        Content: templates.MakefileTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, ".env.example"),
+                        Content: templates.EnvTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, ".gitignore"),
+                        Content: templates.GitignoreTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, ".golangci.yml"),
+                        Content: templates.GolangCILintTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, ".github", "workflows", "ci.yml"),
+                        Content: templates.GitHubActionsWorkflowTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "README.md"),
+                        Content: templates.ReadmeTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "docs", "README.md"),
+                        Content: templates.DocsReadmeTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "docs", "docs.go"),
+                        Content: templates.SwaggerDocsTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "docs", "quick-start.md"),
+                        Content: templates.QuickStartTemplate(),
+                },
+                {
+                        Path:    filepath.Join(projectPath, "setup.sh"),
+                        Content: templates.SetupScriptTemplate(),
+                },
+        }
+
+        // Write all files
+        for _, file := range files </span><span class="cov8" title="1">{
+                // Ensure the directory exists
+                if err := os.MkdirAll(filepath.Dir(file.Path), 0755); err != nil </span><span class="cov0" title="0">{
+                        return fmt.Errorf("failed to create directory for %s: %w", file.Path, err)
+                }</span>
+
+                <span class="cov8" title="1">if err := os.WriteFile(file.Path, []byte(file.Content), 0644); err != nil </span><span class="cov0" title="0">{
+                        return fmt.Errorf("failed to write file %s: %w", file.Path, err)
+                }</span>
+        }
+
+        // Make setup.sh executable
+        <span class="cov8" title="1">setupPath := filepath.Join(projectPath, "setup.sh")
+        if err := os.Chmod(setupPath, 0755); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to make setup.sh executable: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package main
+
+import (
+        "fmt"
+        "os/exec"
+)
+
+// isGitAvailable checks if git is installed and available in the system PATH.
+// Returns true if git is available, false otherwise.
+func isGitAvailable() bool <span class="cov8" title="1">{
+        _, err := exec.LookPath("git")
+        return err == nil
+}</span>
+
+// initGitRepo initializes a git repository in the given project path,
+// stages all files, and creates an initial commit.
+// If git is not available, it prints a warning and returns nil (non-fatal).
+// Returns an error only if git is available but the operation fails.
+func initGitRepo(projectPath string) error <span class="cov8" title="1">{
+        if !isGitAvailable() </span><span class="cov0" title="0">{
+                fmt.Println("⚠️  Git n'est pas installé. Initialisation Git ignorée.")
+                fmt.Println("   Vous pouvez initialiser le dépôt manuellement plus tard avec:")
+                fmt.Println("   cd " + projectPath + " &amp;&amp; git init &amp;&amp; git add . &amp;&amp; git commit -m \"Initial commit\"")
+                return nil
+        }</span>
+
+        // git init
+        <span class="cov8" title="1">cmd := exec.Command("git", "init")
+        cmd.Dir = projectPath
+        if output, err := cmd.CombinedOutput(); err != nil </span><span class="cov8" title="1">{
+                return fmt.Errorf("failed to initialize git repository: %w (output: %s)", err, string(output))
+        }</span>
+
+        // git add .
+        <span class="cov8" title="1">cmd = exec.Command("git", "add", ".")
+        cmd.Dir = projectPath
+        if output, err := cmd.CombinedOutput(); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to stage files: %w (output: %s)", err, string(output))
+        }</span>
+
+        // git commit -m "Initial commit from go-starter-kit"
+        // Use --allow-empty in case there are no files (edge case)
+        <span class="cov8" title="1">cmd = exec.Command("git", "commit", "--allow-empty", "-m", "Initial commit from go-starter-kit")
+        cmd.Dir = projectPath
+        if output, err := cmd.CombinedOutput(); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to create initial commit: %w (output: %s)", err, string(output))
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package main
+
+import (
+        "flag"
+        "fmt"
+        "os"
+        "path/filepath"
+        "regexp"
+)
+
+// ANSI color codes
+const (
+        ColorGreen = "\033[32m"
+        ColorRed   = "\033[31m"
+        ColorReset = "\033[0m"
+)
+
+// Directory permissions for created folders
+const defaultDirPerm os.FileMode = 0755
+
+// Valid project name pattern (alphanumeric, hyphens, underscores)
+var validProjectNamePattern = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_-]*$`)
+
+// Green returns the string wrapped in green ANSI code
+func Green(msg string) string <span class="cov8" title="1">{
+        return ColorGreen + msg + ColorReset
+}</span>
+
+// Red returns the string wrapped in red ANSI code
+func Red(msg string) string <span class="cov8" title="1">{
+        return ColorRed + msg + ColorReset
+}</span>
+
+// validateProjectName checks if the project name contains only valid characters.
+// Valid names must start with alphanumeric and contain only alphanumeric, hyphens, or underscores.
+func validateProjectName(name string) error <span class="cov8" title="1">{
+        if !validProjectNamePattern.MatchString(name) </span><span class="cov8" title="1">{
+                return fmt.Errorf("invalid project name '%s': must start with a letter or number and contain only letters, numbers, hyphens, or underscores", name)
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+// createProjectStructure creates the hexagonal architecture directory structure.
+// It returns an error if the directory already exists or if creation fails.
+func createProjectStructure(projectPath string) error <span class="cov8" title="1">{
+        // Check if project directory already exists
+        if _, err := os.Stat(projectPath); err == nil </span><span class="cov8" title="1">{
+                return fmt.Errorf("directory %s already exists. Please choose a different name or remove the existing directory", projectPath)
+        }</span>
+
+        // Define the directory structure (Hexagonal Architecture Lite)
+        <span class="cov8" title="1">directories := []string{
+                "cmd",
+                "internal/adapters/http",
+                "internal/adapters/middleware",
+                "internal/domain",
+                "internal/interfaces",
+                "internal/models",
+                "internal/infrastructure/database",
+                "internal/infrastructure/server",
+                "pkg/config",
+                "pkg/logger",
+                "deployments",
+        }
+
+        // Create the project root directory
+        if err := os.Mkdir(projectPath, defaultDirPerm); err != nil </span><span class="cov8" title="1">{
+                return fmt.Errorf("failed to create project directory: %w", err)
+        }</span>
+
+        // Create each subdirectory
+        <span class="cov8" title="1">for _, dir := range directories </span><span class="cov8" title="1">{
+                fullPath := filepath.Join(projectPath, dir)
+                if err := os.MkdirAll(fullPath, defaultDirPerm); err != nil </span><span class="cov0" title="0">{
+                        return fmt.Errorf("failed to create directory %s: %w", dir, err)
+                }</span>
+        }
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// copyEnvFile copies the generated .env.example to .env if .env doesn't already exist.
+func copyEnvFile(projectPath string) error <span class="cov8" title="1">{
+        envExamplePath := filepath.Join(projectPath, ".env.example")
+        envPath := filepath.Join(projectPath, ".env")
+
+        // Check if .env.example exists
+        if _, err := os.Stat(envExamplePath); os.IsNotExist(err) </span><span class="cov8" title="1">{
+                return fmt.Errorf(".env.example not found: %w", err)
+        }</span>
+
+        // Check if .env already exists
+        <span class="cov8" title="1">if _, err := os.Stat(envPath); err == nil </span><span class="cov8" title="1">{
+                // .env already exists, skip copying
+                return nil
+        }</span>
+
+        // Read .env.example
+        <span class="cov8" title="1">content, err := os.ReadFile(envExamplePath)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to read .env.example: %w", err)
+        }</span>
+
+        // Write to .env
+        <span class="cov8" title="1">if err := os.WriteFile(envPath, content, 0644); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to create .env file: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+func main() <span class="cov0" title="0">{
+        // Parse flags
+        help := flag.Bool("help", false, "Show help message")
+        flag.BoolVar(help, "h", false, "Show help message (shorthand)")
+
+        flag.Usage = func() </span><span class="cov0" title="0">{
+                fmt.Fprintf(os.Stderr, "Usage: create-go-starter [options] &lt;project-name&gt;\n\n")
+                fmt.Fprintf(os.Stderr, "Options:\n")
+                flag.PrintDefaults()
+        }</span>
+
+        <span class="cov0" title="0">flag.Parse()
+
+        if *help </span><span class="cov0" title="0">{
+                flag.Usage()
+                os.Exit(0)
+        }</span>
+
+        <span class="cov0" title="0">args := flag.Args()
+        if len(args) &lt; 1 </span><span class="cov0" title="0">{
+                fmt.Fprintln(os.Stderr, Red("Error: Project name is required"))
+                flag.Usage()
+                os.Exit(1)
+        }</span>
+
+        <span class="cov0" title="0">projectName := args[0]
+
+        // Validate project name
+        if err := validateProjectName(projectName); err != nil </span><span class="cov0" title="0">{
+                fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("Error: %v", err)))
+                os.Exit(1)
+        }</span>
+
+        // Display start message
+        <span class="cov0" title="0">fmt.Println(Green(fmt.Sprintf("Creating project: %s", projectName)))
+
+        // Use project name as directory path (relative to current directory)
+        projectPath := projectName
+
+        // Display progress message
+        fmt.Println("📁 Création des répertoires...")
+
+        // Create the project structure
+        if err := createProjectStructure(projectPath); err != nil </span><span class="cov0" title="0">{
+                fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("Error: %v", err)))
+                os.Exit(1)
+        }</span>
+
+        <span class="cov0" title="0">fmt.Println(Green("✅ Structure terminée"))
+
+        // Generate project files with dynamic context injection
+        fmt.Println("📝 Génération des fichiers de base...")
+
+        if err := generateProjectFiles(projectPath, projectName); err != nil </span><span class="cov0" title="0">{
+                fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("Error: %v", err)))
+                os.Exit(1)
+        }</span>
+
+        // Display success message
+        <span class="cov0" title="0">fmt.Println(Green("✅ Fichiers générés avec succès"))
+
+        // Copy .env.example to .env
+        fmt.Println("🔑 Configuration de l'environnement...")
+        if err := copyEnvFile(projectPath); err != nil </span><span class="cov0" title="0">{
+                fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("Error: %v", err)))
+                os.Exit(1)
+        }</span>
+
+        // Initialize Git repository (AC: 1, 2, 3, 4, 5)
+        <span class="cov0" title="0">fmt.Println("🔧 Initialisation du dépôt Git...")
+        if err := initGitRepo(projectPath); err != nil </span><span class="cov0" title="0">{
+                // Non-fatal: warn user but continue
+                fmt.Println(Red(fmt.Sprintf("⚠️  Avertissement Git: %v", err)))
+                fmt.Println("   Vous pouvez initialiser le dépôt manuellement plus tard.")
+        }</span> else<span class="cov0" title="0"> if isGitAvailable() </span><span class="cov0" title="0">{
+                fmt.Println(Green("✅ Dépôt Git initialisé avec un commit initial"))
+        }</span>
+
+        // Install Go dependencies (Story 5.2 - runs after git init per AC6)
+        <span class="cov0" title="0">if err := installGoDependencies(projectPath); err != nil </span><span class="cov0" title="0">{
+                // Non-fatal: warn user but continue
+                fmt.Println(Red(fmt.Sprintf("⚠️  %v", err)))
+                fmt.Println("   Vous pouvez installer les dépendances manuellement plus tard.")
+        }</span> else<span class="cov0" title="0"> if isGoAvailable() </span><span class="cov0" title="0">{
+                fmt.Println(Green("✅ Dépendances installées"))
+        }</span>
+
+        // Display success message with detailed setup instructions
+        <span class="cov0" title="0">fmt.Printf("\n%s\n", Green("════════════════════════════════════════════════════════════════"))
+        fmt.Printf("%s\n", Green("🎉 Projet '"+projectName+"' créé avec succès!"))
+        fmt.Printf("%s\n\n", Green("════════════════════════════════════════════════════════════════"))
+
+        fmt.Println("📋 Prochaines étapes - Configuration initiale:")
+        fmt.Println()
+
+        fmt.Println(Green("OPTION 1: Configuration automatique (Recommandé) 🚀"))
+        fmt.Println("  cd " + projectName)
+        fmt.Println("  ./setup.sh")
+        fmt.Println()
+
+        fmt.Println(Green("OPTION 2: Configuration manuelle"))
+        fmt.Println()
+        fmt.Println("1️⃣  Naviguer vers le projet:")
+        fmt.Println("    cd " + projectName)
+        fmt.Println()
+
+        fmt.Println("2️⃣  Configurer PostgreSQL (choisir une option):")
+        fmt.Println()
+        fmt.Println("    Option A - Docker (Recommandé):")
+        fmt.Println("    docker run -d --name postgres \\")
+        fmt.Println("      -e POSTGRES_DB=" + projectName + " \\")
+        fmt.Println("      -e POSTGRES_PASSWORD=postgres \\")
+        fmt.Println("      -p 5432:5432 \\")
+        fmt.Println("      postgres:16-alpine")
+        fmt.Println()
+        fmt.Println("    Option B - PostgreSQL local:")
+        fmt.Println("    # macOS: brew install postgresql &amp;&amp; brew services start postgresql")
+        fmt.Println("    # Linux: sudo apt install postgresql &amp;&amp; sudo systemctl start postgresql")
+        fmt.Println("    createdb " + projectName)
+        fmt.Println()
+
+        fmt.Println("3️⃣  Générer le JWT secret (OBLIGATOIRE):")
+        fmt.Println("    openssl rand -base64 32")
+        fmt.Println()
+        fmt.Println("    Puis éditer .env et ajouter:")
+        fmt.Println("    JWT_SECRET=&lt;le_secret_généré&gt;")
+        fmt.Println()
+
+        fmt.Println("4️⃣  Lancer l'application:")
+        fmt.Println("    make run")
+        fmt.Println()
+
+        fmt.Println("5️⃣  Vérifier l'installation:")
+        fmt.Println("    curl http://localhost:8080/health")
+        fmt.Println("    # Devrait retourner: {\"status\":\"ok\"}")
+        fmt.Println()
+
+        fmt.Println(Green("📚 Documentation complète:"))
+        fmt.Println("   - Guide rapide: " + projectName + "/docs/quick-start.md")
+        fmt.Println("   - README:       " + projectName + "/README.md")
+        fmt.Println()
+
+        fmt.Println(Green("⚠️  IMPORTANT:"))
+        fmt.Println("   • PostgreSQL DOIT être démarré avant de lancer l'application")
+        fmt.Println("   • JWT_SECRET DOIT être configuré dans .env")
+        fmt.Println("   • Le fichier .env a été créé automatiquement depuis .env.example")
+        fmt.Println()
+
+        fmt.Println(Green("✨ Bon développement avec " + projectName + "!"))</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package main
+
+// ProjectTemplates holds all the templates for project file generation
+type ProjectTemplates struct {
+        projectName string
+}
+
+// NewProjectTemplates creates a new templates instance with the given project name
+func NewProjectTemplates(projectName string) *ProjectTemplates <span class="cov8" title="1">{
+        return &amp;ProjectTemplates{
+                projectName: projectName,
+        }
+}</span>
+
+// GoModTemplate returns the go.mod file content
+func (t *ProjectTemplates) GoModTemplate() string <span class="cov8" title="1">{
+        return `module ` + t.projectName + `
+
+go 1.25.5
+
+require (
+        github.com/go-playground/validator/v10 v10.30.1
+        github.com/gofiber/contrib/jwt v1.1.2
+        github.com/gofiber/fiber/v2 v2.52.10
+        github.com/golang-jwt/jwt/v5 v5.3.0
+        github.com/joho/godotenv v1.5.1
+        github.com/rs/zerolog v1.33.0
+        github.com/swaggo/fiber-swagger v1.3.0
+        github.com/swaggo/swag v1.16.4
+        go.uber.org/fx v1.24.0
+        golang.org/x/crypto v0.32.0
+        gorm.io/driver/postgres v1.5.11
+        gorm.io/gorm v1.31.1
+)
+`
+}</span>
+
+// MainGoTemplate returns the main.go file content
+func (t *ProjectTemplates) MainGoTemplate() string <span class="cov8" title="1">{
+        return `package main
+
+import (
+        "fmt"
+)
+
+func main() {
+        // TODO: This is a placeholder main.go
+        // Infrastructure components (Fiber, GORM, fx) will be added in Story 1.4
+        fmt.Println("` + t.projectName + ` - Project structure initialized")
+        fmt.Println("Next steps:")
+        fmt.Println("  1. Run 'go mod tidy' to fetch dependencies")
+        fmt.Println("  2. Implement your application logic")
+        fmt.Println("  3. Run 'make build' to build the binary")
+}
+`
+}</span>
+
+// DockerfileTemplate returns the Dockerfile content
+func (t *ProjectTemplates) DockerfileTemplate() string <span class="cov8" title="1">{
+        return `# Build stage
+FROM golang:1.25-alpine AS builder
+
+WORKDIR /app
+
+# Copy go mod files
+COPY go.mod ./
+RUN go mod tidy
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -o ` + t.projectName + ` ./cmd
+
+# Runtime stage
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+# Copy the binary from builder
+COPY --from=builder /app/` + t.projectName + ` .
+
+# Expose port
+EXPOSE 8080
+
+# Run the binary
+CMD ["./` + t.projectName + `"]
+`
+}</span>
+
+// GolangCILintTemplate returns the .golangci.yml file content
+func (t *ProjectTemplates) GolangCILintTemplate() string <span class="cov8" title="1">{
+        return `run:
+  timeout: 5m
+  tests: false # Don't lint test files strictly
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck      # Check for unchecked errors
+    - gosimple      # Simplify code
+    - govet         # Vet examines Go source code
+    - ineffassign   # Detect ineffectual assignments
+    - staticcheck   # Advanced Go linter
+    - typecheck     # Type-check Go code
+    - unused        # Check for unused constants, variables, functions and types
+    - gocyclo       # Compute cyclomatic complexities
+    - gofmt         # Check formatting
+    - gosec         # Security-focused linter (basic)
+
+linters-settings:
+  gocyclo:
+    min-complexity: 15
+  gosec:
+    excludes:
+      - G404 # Allow weak random number generator in non-crypto contexts
+`
+}</span>
+
+// MakefileTemplate returns the Makefile content
+func (t *ProjectTemplates) MakefileTemplate() string <span class="cov8" title="1">{
+        return `.PHONY: help build run test clean dev lint test-coverage
+
+# Binary name
+BINARY_NAME=` + t.projectName + `
+
+help: ## Display this help message
+        @echo "Available targets:"
+        @grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-15s %s\n", $$1, $$2}'
+
+build: ## Build the application
+        @echo "Building $(BINARY_NAME)..."
+        @go build -o $(BINARY_NAME) ./cmd
+        @echo "Build complete: $(BINARY_NAME)"
+
+run: ## Run the application
+        @echo "Running $(BINARY_NAME)..."
+        @go run ./cmd
+
+dev: ## Run the application with air for hot reload
+        @echo "Starting development server with hot reload..."
+        @air
+
+lint: ## Run linter
+        @echo "Running linter..."
+        @golangci-lint run ./...
+
+test: ## Run tests with race detection
+        @echo "Running tests..."
+        @go test -v -race ./...
+
+test-coverage: ## Run tests with coverage report
+        @echo "Running tests with coverage..."
+        @go test -v -race -coverprofile=coverage.out ./...
+        @go tool cover -html=coverage.out -o coverage.html
+        @echo "Coverage report generated: coverage.html"
+
+swagger: ## Generate Swagger documentation
+        @echo "Generating Swagger documentation..."
+        @swag init -g cmd/main.go --output docs
+        @echo "Swagger documentation generated in docs/ directory"
+        @echo "Run the application and visit http://localhost:8080/swagger/index.html"
+
+clean: ## Clean build artifacts
+        @echo "Cleaning..."
+        @rm -f $(BINARY_NAME)
+        @echo "Clean complete"
+
+docker-build: ## Build docker image
+        @echo "Building Docker image..."
+        @docker build -t $(BINARY_NAME):latest .
+
+docker-run: ## Run docker container
+        @echo "Running Docker container..."
+        @docker run -p 8080:8080 $(BINARY_NAME):latest
+`
+}</span>
+
+// EnvTemplate returns the .env.example file content
+func (t *ProjectTemplates) EnvTemplate() string <span class="cov8" title="1">{
+        return `# Application Configuration
+APP_NAME=` + t.projectName + `
+APP_ENV=development
+APP_PORT=8080
+
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=` + t.projectName + `
+DB_SSLMODE=disable
+
+# JWT Configuration
+# IMPORTANT: Generate a secure random secret for production!
+# Example: openssl rand -base64 32
+JWT_SECRET=
+JWT_EXPIRY=24h
+`
+}</span>
+
+// GitignoreTemplate returns the .gitignore file content
+func (t *ProjectTemplates) GitignoreTemplate() string <span class="cov8" title="1">{
+        return `# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+` + t.projectName + `
+
+# Test binary, built with 'go test -c'
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# Environment files
+.env
+.env.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+`
+}</span>
+
+// DockerComposeTemplate returns the docker-compose.yml file content
+func (t *ProjectTemplates) DockerComposeTemplate() string <span class="cov8" title="1">{
+        return `version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: ` + t.projectName + `_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ` + t.projectName + `
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ` + t.projectName + `_network
+
+  # Application API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ` + t.projectName + `_api
+    environment:
+      APP_NAME: ` + t.projectName + `
+      APP_ENV: development
+      APP_PORT: 8080
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: ` + t.projectName + `
+      DB_SSLMODE: disable
+      JWT_SECRET: dev-secret-change-in-production
+      JWT_EXPIRY: 24h
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ` + t.projectName + `_network
+    volumes:
+      - .:/app
+    command: /app/` + t.projectName + `
+
+volumes:
+  postgres_data:
+
+networks:
+  ` + t.projectName + `_network:
+    driver: bridge
+`
+}</span>
+
+// ReadmeTemplate returns the README.md file content
+func (t *ProjectTemplates) ReadmeTemplate() string <span class="cov8" title="1">{
+        return `# ` + t.projectName + `
+
+Application backend Go générée avec create-go-starter. Architecture hexagonale complète avec authentification JWT, API REST, et intégration PostgreSQL.
+
+## Fonctionnalités
+
+- **Architecture hexagonale** (Ports &amp; Adapters) - Séparation claire des responsabilités
+- **Authentification JWT** - Access tokens + Refresh tokens avec rotation sécurisée
+- **API REST** avec Fiber v2 - Framework web haute performance
+- **Base de données** - GORM avec PostgreSQL et migrations automatiques
+- **Injection de dépendances** - uber-go/fx pour architecture modulaire
+- **Tests complets** - Tests unitaires et d'intégration
+- **Documentation Swagger** - API documentée automatiquement avec OpenAPI
+- **Docker** - Build multi-stage optimisé
+- **CI/CD** - Pipeline GitHub Actions pré-configuré
+- **Logging structuré** - rs/zerolog pour logs professionnels
+
+## Prérequis
+
+- **Go 1.25+** - [Télécharger](https://golang.org/dl/)
+- **PostgreSQL** - Base de données (peut être lancée via Docker)
+- **Docker** (optionnel) - Pour containerisation
+- **Make** - Pour les commandes de build
+- **swag** (optionnel) - Pour régénérer la documentation Swagger
+  ` + "```bash" + `
+  go install github.com/swaggo/swag/cmd/swag@latest
+  ` + "```" + `
+
+## Installation rapide
+
+### 1. Installer les dépendances
+
+` + "```bash" + `
+go mod tidy
+` + "```" + `
+
+### 2. Configurer l'environnement
+
+Le fichier ` + "`.env`" + ` a déjà été créé depuis ` + "`.env.example`" + `. Éditez-le pour ajouter votre JWT secret:
+
+` + "```bash" + `
+# Générer un JWT secret sécurisé
+openssl rand -base64 32
+
+# Éditer .env et ajouter le secret
+nano .env
+` + "```" + `
+
+Ajoutez dans ` + "`.env`" + `:
+` + "```" + `
+JWT_SECRET=&lt;votre_secret_généré&gt;
+` + "```" + `
+
+### 3. Lancer PostgreSQL
+
+**Option A: Docker (recommandé)**
+
+` + "```bash" + `
+docker run -d \
+  --name postgres \
+  -e POSTGRES_DB=` + t.projectName + ` \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:16-alpine
+` + "```" + `
+
+**Option B: PostgreSQL local**
+
+` + "```bash" + `
+# macOS
+brew install postgresql
+brew services start postgresql
+createdb ` + t.projectName + `
+
+# Linux
+sudo apt install postgresql
+sudo systemctl start postgresql
+sudo -u postgres createdb ` + t.projectName + `
+` + "```" + `
+
+### 4. Lancer l'application
+
+` + "```bash" + `
+make run
+` + "```" + `
+
+L'API sera disponible sur ` + "`http://localhost:8080`" + `
+
+### 5. Tester
+
+` + "```bash" + `
+# Health check
+curl http://localhost:8080/health
+
+# Register un utilisateur
+curl -X POST http://localhost:8080/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123"}'
+
+# Login
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123"}'
+` + "```" + `
+
+## Documentation
+
+Pour plus de détails, consultez la documentation complète dans le dossier ` + "`docs/`" + `:
+
+- **[Quick Start](./docs/quick-start.md)** - Démarrage en 5 minutes
+- **[Documentation complète](./docs/)** - Guides complets
+
+## Architecture
+
+Ce projet suit l'architecture hexagonale (Ports and Adapters):
+
+` + "```" + `
+` + t.projectName + `/
+├── cmd/                     # Point d'entrée
+│   └── main.go              # Bootstrap avec fx
+├── internal/
+│   ├── domain/              # Logique métier (cœur)
+│   │   ├── user/            # Domaine User
+│   │   │   ├── entity.go    # Entités
+│   │   │   └── service.go   # Logique métier
+│   │   └── errors.go        # Erreurs métier
+│   ├── adapters/            # Adapters (HTTP, DB)
+│   │   ├── handlers/        # HTTP handlers
+│   │   ├── middleware/      # Middleware Fiber
+│   │   └── repository/      # Implémentation GORM
+│   ├── infrastructure/      # Infrastructure
+│   │   ├── database/        # Configuration DB
+│   │   └── server/          # Configuration Fiber
+│   └── interfaces/          # Ports (interfaces)
+├── pkg/                     # Packages réutilisables
+│   ├── auth/                # JWT utilities
+│   ├── config/              # Configuration
+│   └── logger/              # Logger
+├── .env                     # Configuration (créé automatiquement)
+├── .env.example             # Template
+├── Dockerfile               # Build Docker
+├── Makefile                 # Commandes
+└── go.mod                   # Dépendances
+` + "```" + `
+
+**Principe**: Le domaine (` + "`internal/domain`" + `) ne dépend de rien. Toutes les dépendances pointent vers le domaine via des interfaces (` + "`internal/interfaces`" + `).
+
+## API Endpoints
+
+### Authentication (Public)
+
+- ` + "`POST /api/v1/auth/register`" + ` - Créer un compte
+- ` + "`POST /api/v1/auth/login`" + ` - Se connecter
+- ` + "`POST /api/v1/auth/refresh`" + ` - Rafraîchir le token
+
+### Users (Protected - JWT required)
+
+- ` + "`GET /api/v1/users`" + ` - Liste des utilisateurs
+- ` + "`GET /api/v1/users/:id`" + ` - Détails d'un utilisateur
+- ` + "`PUT /api/v1/users/:id`" + ` - Mettre à jour
+- ` + "`DELETE /api/v1/users/:id`" + ` - Supprimer (soft delete)
+
+### Health
+
+- ` + "`GET /health`" + ` - Health check
+
+## Développement
+
+### Commandes Make
+
+| Commande | Description |
+|----------|-------------|
+| ` + "`make help`" + ` | Afficher l'aide |
+| ` + "`make run`" + ` | Lancer l'application |
+| ` + "`make build`" + ` | Compiler le binaire |
+| ` + "`make test`" + ` | Tests avec race detector |
+| ` + "`make test-coverage`" + ` | Tests + rapport HTML |
+| ` + "`make lint`" + ` | golangci-lint |
+| ` + "`make clean`" + ` | Nettoyer artifacts |
+| ` + "`make docker-build`" + ` | Build image Docker |
+| ` + "`make docker-run`" + ` | Run conteneur Docker |
+
+### Tests
+
+` + "```bash" + `
+# Tous les tests
+make test
+
+# Tests avec coverage
+make test-coverage
+
+# Ouvrir le rapport
+open coverage.html  # macOS
+xdg-open coverage.html  # Linux
+` + "```" + `
+
+### Linting
+
+` + "```bash" + `
+make lint
+` + "```" + `
+
+## Stack technique
+
+| Composant | Bibliothèque | Description |
+|-----------|-------------|-------------|
+| Web Framework | [Fiber](https://gofiber.io/) v2 | Framework HTTP rapide |
+| ORM | [GORM](https://gorm.io/) | ORM avec PostgreSQL |
+| DI | [fx](https://uber-go.github.io/fx/) | Dependency injection |
+| Logging | [zerolog](https://github.com/rs/zerolog) | Logger structuré |
+| JWT | [golang-jwt](https://github.com/golang-jwt/jwt) v5 | Authentification |
+| Validation | [validator](https://github.com/go-playground/validator) v10 | Validation |
+| Swagger | [swaggo](https://github.com/swaggo/swag) | Documentation API |
+
+## Variables d'environnement
+
+Fichier ` + "`.env`" + `:
+
+` + "```bash" + `
+# Application
+APP_NAME=` + t.projectName + `
+APP_ENV=development
+APP_PORT=8080
+
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=` + t.projectName + `
+DB_SSLMODE=disable
+
+# JWT
+JWT_SECRET=                  # À REMPLIR!
+JWT_EXPIRY=15m               # 15 minutes
+REFRESH_TOKEN_EXPIRY=168h    # 7 jours
+` + "```" + `
+
+## Déploiement
+
+### Docker
+
+` + "```bash" + `
+# Build
+make docker-build
+
+# Run
+docker run -p 8080:8080 \
+  -e DB_HOST=host.docker.internal \
+  -e JWT_SECRET=&lt;secret&gt; \
+  ` + t.projectName + `:latest
+` + "```" + `
+
+### Docker Compose
+
+Si disponible:
+
+` + "```bash" + `
+docker-compose up -d
+` + "```" + `
+
+## Contribuer
+
+1. Fork le projet
+2. Créer une branche (` + "`git checkout -b feature/ma-fonctionnalite`" + `)
+3. Commit (` + "`git commit -m 'feat: ajouter fonctionnalité'`" + `)
+4. Push (` + "`git push origin feature/ma-fonctionnalite`" + `)
+5. Ouvrir une Pull Request
+
+## Sécurité
+
+- ✅ JWT avec secrets forts
+- ✅ Passwords hashés avec bcrypt
+- ✅ Validation des entrées
+- ✅ Soft deletes
+- ✅ GORM prévient SQL injection
+- ✅ Error handling centralisé
+
+**Production checklist**:
+- [ ] Générer JWT_SECRET fort (` + "`openssl rand -base64 32`" + `)
+- [ ] HTTPS/TLS activé
+- [ ] DB_SSLMODE=require
+- [ ] Rate limiting configuré
+- [ ] CORS configuré
+- [ ] Secrets dans gestionnaire de secrets
+
+## Licence
+
+MIT
+
+---
+
+**Généré avec [create-go-starter](https://github.com/tky0065/go-starter-kit)** 🚀
+`
+}</span>
+
+// LoggerTemplate returns the pkg/logger/logger.go file content
+func (t *ProjectTemplates) LoggerTemplate() string <span class="cov8" title="1">{
+        return `package logger
+
+import (
+        "os"
+
+        "github.com/rs/zerolog"
+        "go.uber.org/fx"
+)
+
+// Module provides the logger dependency via fx
+var Module = fx.Module("logger",
+        fx.Provide(NewLogger),
+)
+
+// NewLogger creates a new zerolog logger instance
+func NewLogger() zerolog.Logger {
+        // Use JSON format in production, console format in development
+        env := os.Getenv("APP_ENV")
+
+        var logger zerolog.Logger
+        if env == "production" {
+                logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
+        } else {
+                logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Logger()
+        }
+
+        return logger
+}
+`
+}</span>
+
+// DatabaseTemplate returns the internal/infrastructure/database/database.go file content
+func (t *ProjectTemplates) DatabaseTemplate() string <span class="cov8" title="1">{
+        return `package database
+
+import (
+        "context"
+        "fmt"
+
+        "github.com/rs/zerolog"
+        "go.uber.org/fx"
+        "gorm.io/driver/postgres"
+        "gorm.io/gorm"
+
+        "` + t.projectName + `/internal/models"
+        "` + t.projectName + `/pkg/config"
+)
+
+// Module provides the database dependency via fx
+var Module = fx.Module("database",
+        fx.Provide(NewDatabase),
+        fx.Invoke(registerHooks),
+)
+
+// NewDatabase creates a new GORM database connection
+func NewDatabase(logger zerolog.Logger) (*gorm.DB, error) {
+        // Build DSN from environment variables
+        dsn := fmt.Sprintf(
+                "host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+                config.GetEnv("DB_HOST", "localhost"),
+                config.GetEnv("DB_PORT", "5432"),
+                config.GetEnv("DB_USER", "postgres"),
+                config.GetEnv("DB_PASSWORD", "postgres"),
+                config.GetEnv("DB_NAME", "` + t.projectName + `"),
+                config.GetEnv("DB_SSLMODE", "disable"),
+        )
+
+        db, err := gorm.Open(postgres.Open(dsn), &amp;gorm.Config{})
+        if err != nil {
+                return nil, fmt.Errorf("failed to connect to database: %w", err)
+        }
+
+        logger.Info().Msg("Successfully connected to database")
+
+        // Configure connection pool
+        sqlDB, err := db.DB()
+        if err != nil {
+                return nil, fmt.Errorf("failed to get database instance: %w", err)
+        }
+
+        // Set connection pool parameters
+        sqlDB.SetMaxOpenConns(25)
+        sqlDB.SetMaxIdleConns(5)
+        sqlDB.SetConnMaxLifetime(5 * 60) // 5 minutes
+
+        // AutoMigrate database schemas
+        if err := db.AutoMigrate(&amp;models.User{}, &amp;models.RefreshToken{}); err != nil {
+                return nil, fmt.Errorf("failed to run database migrations: %w", err)
+        }
+
+        logger.Info().Msg("Database migrations completed successfully")
+        logger.Info().Msg("Database connection pool configured and ready")
+
+        return db, nil
+}
+
+// registerHooks registers lifecycle hooks for graceful shutdown
+func registerHooks(lifecycle fx.Lifecycle, db *gorm.DB, logger zerolog.Logger) {
+        lifecycle.Append(fx.Hook{
+                OnStop: func(ctx context.Context) error {
+                        logger.Info().Msg("Closing database connection")
+                        sqlDB, err := db.DB()
+                        if err != nil {
+                                return err
+                        }
+                        return sqlDB.Close()
+                },
+        })
+}
+
+`
+}</span>
+
+// ServerTemplate returns the internal/infrastructure/server/server.go file content
+func (t *ProjectTemplates) ServerTemplate() string <span class="cov8" title="1">{
+        return `package server
+
+import (
+        "context"
+
+        "github.com/gofiber/fiber/v2"
+        "github.com/rs/zerolog"
+        "go.uber.org/fx"
+        "gorm.io/gorm"
+
+        "` + t.projectName + `/pkg/config"
+        httpRoutes "` + t.projectName + `/internal/adapters/http"
+        "` + t.projectName + `/internal/adapters/middleware"
+
+        // Swagger docs - generated by swag init
+        _ "` + t.projectName + `/docs"
+)
+
+// Module provides the Fiber server dependency via fx
+var Module = fx.Module("server",
+        fx.Provide(NewServer),
+        fx.Invoke(registerHooks),
+        fx.Invoke(httpRoutes.RegisterRoutes),
+)
+
+// NewServer creates and configures a new Fiber application
+func NewServer(logger zerolog.Logger, db *gorm.DB) *fiber.App {
+        app := fiber.New(fiber.Config{
+                AppName:      "` + t.projectName + `",
+                ErrorHandler: middleware.ErrorHandler,
+                // Increase buffer sizes to prevent "Request Header Fields Too Large" errors
+                ReadBufferSize:  16384, // 16KB (default is 4KB)
+                WriteBufferSize: 16384,
+        })
+
+        // Ignore common browser requests (favicon, apple-touch-icon)
+        // These would otherwise pollute error logs
+        app.Get("/favicon.ico", func(c *fiber.Ctx) error {
+                return c.SendStatus(fiber.StatusNoContent)
+        })
+        app.Get("/apple-touch-icon*.png", func(c *fiber.Ctx) error {
+                return c.SendStatus(fiber.StatusNoContent)
+        })
+
+        logger.Info().Msg("Fiber server initialized with centralized error handler")
+
+        return app
+}
+
+// registerHooks registers lifecycle hooks for server startup and shutdown
+func registerHooks(lifecycle fx.Lifecycle, app *fiber.App, logger zerolog.Logger) {
+        lifecycle.Append(fx.Hook{
+                OnStart: func(ctx context.Context) error {
+                        port := config.GetEnv("APP_PORT", "8080")
+                        logger.Info().Str("port", port).Msg("Starting Fiber server")
+
+                        // Start server in background goroutine
+                        go func() {
+                                if err := app.Listen(":" + port); err != nil {
+                                        logger.Error().Err(err).Msg("Server stopped unexpectedly")
+                                }
+                        }()
+
+                        return nil
+                },
+                OnStop: func(ctx context.Context) error {
+                        logger.Info().Msg("Shutting down Fiber server gracefully")
+                        return app.ShutdownWithContext(ctx)
+                },
+        })
+}
+
+`
+}</span>
+
+// HealthHandlerTemplate returns the internal/adapters/http/health.go file content
+func (t *ProjectTemplates) HealthHandlerTemplate() string <span class="cov8" title="1">{
+        return `package http
+
+import (
+        "github.com/gofiber/fiber/v2"
+)
+
+// HealthResponse represents the health check response
+type HealthResponse struct {
+        Status string ` + "`json:\"status\"`" + `
+}
+
+// RegisterHealthRoutes registers health check routes
+func RegisterHealthRoutes(app *fiber.App) {
+        app.Get("/health", healthHandler)
+}
+
+// healthHandler handles health check requests
+func healthHandler(c *fiber.Ctx) error {
+        return c.JSON(HealthResponse{
+                Status: "ok",
+        })
+}
+`
+}</span>
+
+// ConfigTemplate returns the pkg/config/env.go file content
+func (t *ProjectTemplates) ConfigTemplate() string <span class="cov8" title="1">{
+        return `package config
+
+import "os"
+
+// GetEnv retrieves an environment variable with a fallback default value
+func GetEnv(key, defaultValue string) string {
+        if value := os.Getenv(key); value != "" {
+                return value
+        }
+        return defaultValue
+}
+`
+}</span>
+
+// UpdatedMainGoTemplate returns the updated cmd/main.go file content with fx integration
+func (t *ProjectTemplates) UpdatedMainGoTemplate() string <span class="cov8" title="1">{
+        return `package main
+
+import (
+        "log"
+
+        "github.com/joho/godotenv"
+        "go.uber.org/fx"
+
+        "` + t.projectName + `/internal/adapters/handlers"
+        "` + t.projectName + `/internal/adapters/repository"
+        "` + t.projectName + `/internal/domain/user"
+        "` + t.projectName + `/internal/infrastructure/database"
+        "` + t.projectName + `/internal/infrastructure/server"
+        "` + t.projectName + `/pkg/auth"
+        "` + t.projectName + `/pkg/logger"
+)
+
+// @title ` + t.projectName + ` API
+// @version 1.0
+// @description A Go starter kit with authentication, user management, and CRUD operations
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.email support@example.com
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:8080
+// @BasePath /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
+
+func main() {
+        // Load environment variables from .env file
+        // This is primarily for local development; in production, use system environment variables
+        if err := godotenv.Load(); err != nil {
+                log.Println("Warning: .env file not found or couldn't be loaded")
+        }
+
+        fx.New(
+                // Core infrastructure
+                logger.Module,
+                database.Module,
+
+                // Authentication &amp; authorization
+                auth.Module,
+
+                // Domain services
+                user.Module,
+
+                // Data persistence
+                repository.Module,
+
+                // HTTP handlers
+                handlers.Module,
+
+                // HTTP server (must be last as it depends on handlers)
+                server.Module,
+        ).Run()
+}
+`
+}</span>
+
+// GitHubActionsWorkflowTemplate returns the .github/workflows/ci.yml file content
+func (t *ProjectTemplates) GitHubActionsWorkflowTemplate() string <span class="cov8" title="1">{
+        return `name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  quality:
+    name: Quality &amp; Security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: false # golangci-lint-action handles its own caching
+
+      - name: Run Linter
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.60
+          args: --timeout=5m
+
+  test:
+    name: Test &amp; Build
+    runs-on: ubuntu-latest
+    needs: quality # Run tests only if lint passes
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ` + t.projectName + `
+        ports:
+          - 5432:5432
+        options: &gt;-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      - name: Run Tests
+        run: make test
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: ` + t.projectName + `
+          DB_SSLMODE: disable
+
+      - name: Build Check
+        run: go build -v ./...
+`
+}</span>
+
+// DocsReadmeTemplate returns the docs/README.md file content (navigation hub)
+func (t *ProjectTemplates) DocsReadmeTemplate() string <span class="cov8" title="1">{
+        return `# Documentation ` + t.projectName + `
+
+Documentation complète pour le projet ` + t.projectName + `.
+
+## Table des matières
+
+1. [Démarrage rapide](./quick-start.md)
+
+## Aide rapide
+
+- **Lancer le projet**: ` + "`make run`" + `
+- **Tests**: ` + "`make test`" + `
+- **API Health**: ` + "`http://localhost:8080/health`" + `
+
+## Ressources
+
+- [create-go-starter Documentation](https://github.com/tky0065/go-starter-kit)
+- [Fiber Documentation](https://docs.gofiber.io/)
+- [GORM Documentation](https://gorm.io/docs/)
+`
+}</span>
+
+// SwaggerDocsTemplate returns a placeholder docs/docs.go file
+// This file will be overwritten when running 'make swagger' (swag init)
+// but is needed for the project to compile before swagger generation
+func (t *ProjectTemplates) SwaggerDocsTemplate() string <span class="cov8" title="1">{
+        return `// Package docs provides Swagger documentation for the API.
+// This is a placeholder file that allows the project to compile
+// before running 'make swagger' to generate the actual documentation.
+//
+// Run 'make swagger' to generate the complete Swagger documentation.
+// This will overwrite this file with the generated content.
+package docs
+
+import "github.com/swaggo/swag"
+
+const docTemplate = ` + "`" + `{
+    "swagger": "2.0",
+    "info": {
+        "description": "` + t.projectName + ` API - Run 'make swagger' to generate complete documentation",
+        "title": "` + t.projectName + ` API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {}
+}` + "`" + `
+
+// SwaggerInfo holds exported Swagger Info so clients can modify it
+var SwaggerInfo = &amp;swag.Spec{
+        Version:          "1.0",
+        Host:             "localhost:8080",
+        BasePath:         "/api/v1",
+        Schemes:          []string{},
+        Title:            "` + t.projectName + ` API",
+        Description:      "` + t.projectName + ` API - Run 'make swagger' to generate complete documentation",
+        InfoInstanceName: "swagger",
+        SwaggerTemplate:  docTemplate,
+        LeftDelim:        "{{",
+        RightDelim:       "}}",
+}
+
+func init() {
+        swag.Register(SwaggerInfo.InstanceName(), SwaggerInfo)
+}
+`
+}</span>
+
+// QuickStartTemplate returns the docs/quick-start.md file content
+func (t *ProjectTemplates) QuickStartTemplate() string <span class="cov8" title="1">{
+        return `# Démarrage rapide
+
+Guide pour lancer ` + t.projectName + ` en 5 minutes.
+
+## Prérequis
+
+- Go 1.25+
+- PostgreSQL (ou Docker)
+
+## Installation
+
+### 1. Installer les dépendances
+
+` + "```bash" + `
+go mod tidy
+` + "```" + `
+
+### 2. Configurer la base de données
+
+**Option A: PostgreSQL local**
+
+` + "```bash" + `
+# macOS
+brew install postgresql
+brew services start postgresql
+createdb ` + t.projectName + `
+
+# Linux
+sudo apt install postgresql
+sudo systemctl start postgresql
+sudo -u postgres createdb ` + t.projectName + `
+` + "```" + `
+
+**Option B: Docker (recommandé)**
+
+` + "```bash" + `
+docker run -d \
+  --name postgres \
+  -e POSTGRES_DB=` + t.projectName + ` \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:16-alpine
+` + "```" + `
+
+### 3. Configurer l'environnement
+
+Le fichier ` + "`.env`" + ` a déjà été créé. Générez un JWT secret:
+
+` + "```bash" + `
+# Générer un secret fort
+openssl rand -base64 32
+
+# Éditer .env
+nano .env
+` + "```" + `
+
+Ajoutez dans ` + "`.env`" + `:
+` + "```bash" + `
+JWT_SECRET=&lt;secret_généré_ci-dessus&gt;
+` + "```" + `
+
+### 4. Lancer l'application
+
+` + "```bash" + `
+make run
+` + "```" + `
+
+L'API sera disponible sur ` + "`http://localhost:8080`" + `
+
+### 5. Tester
+
+` + "```bash" + `
+# Health check
+curl http://localhost:8080/health
+# {"status":"ok"}
+` + "```" + `
+
+## Premier utilisateur
+
+### Register
+
+` + "```bash" + `
+curl -X POST http://localhost:8080/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"password123"}'
+` + "```" + `
+
+Réponse (exemple):
+` + "```json" + `
+{
+  "status": "success",
+  "data": {
+    "access_token": "eyJhbGc...",
+    "refresh_token": "eyJhbGc...",
+    "token_type": "Bearer",
+    "expires_in": 900
+  }
+}
+` + "```" + `
+
+### Login
+
+` + "```bash" + `
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"password123"}'
+` + "```" + `
+
+### Utiliser l'access token
+
+` + "```bash" + `
+# Sauvegarder le token (remplacez par votre token)
+TOKEN="eyJhbGc..."
+
+# Lister les utilisateurs
+curl -X GET http://localhost:8080/api/v1/users \
+  -H "Authorization: Bearer $TOKEN"
+` + "```" + `
+
+## Endpoints disponibles
+
+### Public (sans auth)
+
+- ` + "`GET /health`" + ` - Health check
+- ` + "`POST /api/v1/auth/register`" + ` - Créer un compte
+- ` + "`POST /api/v1/auth/login`" + ` - Se connecter
+- ` + "`POST /api/v1/auth/refresh`" + ` - Rafraîchir le token
+
+### Protected (JWT required)
+
+- ` + "`GET /api/v1/users`" + ` - Liste des utilisateurs
+- ` + "`GET /api/v1/users/:id`" + ` - Détails d'un utilisateur
+- ` + "`PUT /api/v1/users/:id`" + ` - Mettre à jour
+- ` + "`DELETE /api/v1/users/:id`" + ` - Supprimer (soft delete)
+
+## Développement
+
+### Commandes utiles
+
+` + "```bash" + `
+# Lancer l'app
+make run
+
+# Tests
+make test
+
+# Tests avec coverage
+make test-coverage
+
+# Linting
+make lint
+
+# Build
+make build
+
+# Docker
+make docker-build
+make docker-run
+` + "```" + `
+
+### Structure du projet
+
+` + "```" + `
+` + t.projectName + `/
+├── cmd/main.go                  # Point d'entrée (fx bootstrap)
+├── internal/
+│   ├── domain/                  # Logique métier
+│   │   ├── user/                # Domaine User
+│   │   └── errors.go            # Erreurs métier
+│   ├── adapters/                # HTTP handlers, middleware, repository
+│   ├── infrastructure/          # DB, server config
+│   └── interfaces/              # Ports (interfaces)
+├── pkg/                         # Packages réutilisables (auth, config, logger)
+├── .env                         # Configuration
+└── Makefile                     # Commandes
+` + "```" + `
+
+## Dépannage
+
+### Erreur: "connection refused" sur DB
+
+Vérifiez que PostgreSQL est démarré:
+
+` + "```bash" + `
+# Docker
+docker ps | grep postgres
+
+# Local
+brew services list  # macOS
+systemctl status postgresql  # Linux
+` + "```" + `
+
+### Erreur: "Invalid JWT secret"
+
+Assurez-vous que ` + "`JWT_SECRET`" + ` est défini dans ` + "`.env`" + `:
+
+` + "```bash" + `
+cat .env | grep JWT_SECRET
+` + "```" + `
+
+Si vide, générez-en un:
+
+` + "```bash" + `
+echo "JWT_SECRET=$(openssl rand -base64 32)" &gt;&gt; .env
+` + "```" + `
+
+### Port 8080 déjà utilisé
+
+Changez ` + "`APP_PORT`" + ` dans ` + "`.env`" + `:
+
+` + "```bash" + `
+APP_PORT=3000
+` + "```" + `
+
+## Prochaines étapes
+
+- Lisez le README principal pour plus de détails
+- Consultez le code dans ` + "`internal/domain/user/`" + ` pour comprendre la structure
+- Ajoutez vos propres domaines en suivant le pattern User
+- Déployez avec Docker: ` + "`make docker-build &amp;&amp; make docker-run`" + `
+
+Bon développement! 🚀
+`
+}</span>
+
+// SetupScriptTemplate returns the setup.sh file content for automated project setup
+func (t *ProjectTemplates) SetupScriptTemplate() string <span class="cov8" title="1">{
+        return `#!/bin/bash
+
+# setup.sh - Automated setup script for ` + t.projectName + `
+# This script configures your development environment with all required dependencies
+
+set -e  # Exit on error
+
+# Color codes for output
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# Helper functions
+print_success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+print_info() {
+    echo -e "${YELLOW}ℹ️  $1${NC}"
+}
+
+print_error() {
+    echo -e "${RED}❌ $1${NC}"
+}
+
+print_step() {
+    echo -e "\n${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${GREEN}$1${NC}"
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+}
+
+# Check if command exists
+command_exists() {
+    command -v "$1" &gt;/dev/null 2&gt;&amp;1
+}
+
+# Welcome message
+echo -e "\n${GREEN}╔════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${GREEN}║  Configuration automatique de ` + t.projectName + `${NC}"
+echo -e "${GREEN}╚════════════════════════════════════════════════════════════════╝${NC}\n"
+
+# ============================================================================
+# STEP 1: Check Prerequisites
+# ============================================================================
+print_step "Étape 1/6: Vérification des prérequis"
+
+MISSING_DEPS=0
+
+# Check Go
+if command_exists go; then
+    GO_VERSION=$(go version | awk '{print $3}')
+    print_success "Go est installé: $GO_VERSION"
+else
+    print_error "Go n'est pas installé. Installez Go 1.25+ depuis https://golang.org/dl/"
+    MISSING_DEPS=1
+fi
+
+# Check openssl
+if command_exists openssl; then
+    print_success "OpenSSL est installé"
+else
+    print_error "OpenSSL n'est pas installé. Installez avec: brew install openssl (macOS) ou apt install openssl (Linux)"
+    MISSING_DEPS=1
+fi
+
+# Check Docker (optional but recommended)
+if command_exists docker; then
+    print_success "Docker est installé"
+    DOCKER_AVAILABLE=1
+else
+    print_info "Docker n'est pas installé (optionnel). PostgreSQL devra être installé localement."
+    DOCKER_AVAILABLE=0
+fi
+
+# Check psql (PostgreSQL client)
+if command_exists psql; then
+    print_success "Client PostgreSQL (psql) est installé"
+    PSQL_AVAILABLE=1
+else
+    print_info "Client PostgreSQL (psql) n'est pas installé (optionnel)"
+    PSQL_AVAILABLE=0
+fi
+
+if [ $MISSING_DEPS -eq 1 ]; then
+    print_error "Des dépendances obligatoires sont manquantes. Installez-les et relancez ce script."
+    exit 1
+fi
+
+# ============================================================================
+# STEP 2: Install Go Dependencies
+# ============================================================================
+print_step "Étape 2/6: Installation des dépendances Go"
+
+print_info "Exécution de 'go mod tidy'..."
+if go mod tidy; then
+    print_success "Dépendances Go installées avec succès"
+else
+    print_error "Échec de l'installation des dépendances Go"
+    exit 1
+fi
+
+# Install swag CLI silently for Swagger documentation
+if ! command_exists swag; then
+    print_info "Installation de swag (générateur Swagger)..."
+    go install github.com/swaggo/swag/cmd/swag@latest 2&gt;/dev/null
+    if command_exists swag; then
+        print_success "swag installé avec succès"
+    fi
+fi
+
+# ============================================================================
+# STEP 3: Generate JWT Secret
+# ============================================================================
+print_step "Étape 3/6: Génération du JWT secret"
+
+if [ -f .env ]; then
+    JWT_CURRENT=$(grep "^JWT_SECRET=" .env | cut -d '=' -f2)
+    if [ -n "$JWT_CURRENT" ] &amp;&amp; [ "$JWT_CURRENT" != "" ]; then
+        print_info "JWT_SECRET existe déjà dans .env"
+        echo -n "Voulez-vous le régénérer? (y/N): "
+        read -r REGEN_JWT
+        if [[ ! $REGEN_JWT =~ ^[Yy]$ ]]; then
+            print_info "JWT_SECRET conservé"
+            SKIP_JWT=1
+        else
+            SKIP_JWT=0
+        fi
+    else
+        SKIP_JWT=0
+    fi
+else
+    print_error "Fichier .env introuvable. Création depuis .env.example..."
+    if [ -f .env.example ]; then
+        cp .env.example .env
+        print_success "Fichier .env créé"
+    else
+        print_error ".env.example introuvable. Impossible de continuer."
+        exit 1
+    fi
+    SKIP_JWT=0
+fi
+
+if [ $SKIP_JWT -eq 0 ]; then
+    print_info "Génération d'un JWT secret sécurisé..."
+    JWT_SECRET=$(openssl rand -base64 32)
+
+    # Update .env file with JWT secret
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        sed -i '' "s|^JWT_SECRET=.*|JWT_SECRET=$JWT_SECRET|" .env
+    else
+        # Linux
+        sed -i "s|^JWT_SECRET=.*|JWT_SECRET=$JWT_SECRET|" .env
+    fi
+
+    print_success "JWT_SECRET généré et ajouté à .env (chargé automatiquement au démarrage)"
+fi
+
+# ============================================================================
+# STEP 4: Configure PostgreSQL
+# ============================================================================
+print_step "Étape 4/6: Configuration de PostgreSQL"
+
+if [ $DOCKER_AVAILABLE -eq 1 ]; then
+    echo -n "Voulez-vous démarrer PostgreSQL avec Docker? (Y/n): "
+    read -r USE_DOCKER
+    if [[ ! $USE_DOCKER =~ ^[Nn]$ ]]; then
+        # Check if postgres container already exists
+        if docker ps -a --format '{{.Names}}' | grep -q "^postgres$"; then
+            print_info "Conteneur PostgreSQL 'postgres' existe déjà"
+
+            # Check if it's running
+            if docker ps --format '{{.Names}}' | grep -q "^postgres$"; then
+                print_success "PostgreSQL est déjà en cours d'exécution"
+            else
+                print_info "Démarrage du conteneur existant..."
+                docker start postgres
+                sleep 2
+                print_success "PostgreSQL démarré"
+            fi
+        else
+            print_info "Création et démarrage d'un nouveau conteneur PostgreSQL..."
+            docker run -d \
+                --name postgres \
+                -e POSTGRES_DB=` + t.projectName + ` \
+                -e POSTGRES_PASSWORD=postgres \
+                -p 5432:5432 \
+                postgres:16-alpine
+
+            # Wait for PostgreSQL to be ready
+            print_info "Attente du démarrage de PostgreSQL (10 secondes)..."
+            sleep 10
+            print_success "PostgreSQL démarré avec Docker"
+        fi
+
+        POSTGRES_STARTED=1
+    else
+        print_info "Configuration Docker PostgreSQL ignorée"
+        POSTGRES_STARTED=0
+    fi
+else
+    print_info "Docker non disponible. Vérification de PostgreSQL local..."
+    POSTGRES_STARTED=0
+fi
+
+# Try to connect to PostgreSQL to verify it's running
+print_info "Vérification de la connexion PostgreSQL..."
+if [ $PSQL_AVAILABLE -eq 1 ]; then
+    if PGPASSWORD=postgres psql -h localhost -U postgres -d ` + t.projectName + ` -c '\q' 2&gt;/dev/null; then
+        print_success "Connexion PostgreSQL réussie"
+        POSTGRES_STARTED=1
+    else
+        if [ $POSTGRES_STARTED -eq 0 ]; then
+            print_error "Impossible de se connecter à PostgreSQL"
+            print_info "Assurez-vous que PostgreSQL est installé et démarré:"
+            print_info "  macOS: brew install postgresql &amp;&amp; brew services start postgresql"
+            print_info "  Linux: sudo apt install postgresql &amp;&amp; sudo systemctl start postgresql"
+            print_info "\nPuis créez la base de données:"
+            print_info "  createdb ` + t.projectName + `"
+            exit 1
+        fi
+    fi
+else
+    print_info "Client psql non disponible, impossible de vérifier la connexion"
+    if [ $POSTGRES_STARTED -eq 0 ]; then
+        print_info "Assurez-vous que PostgreSQL est installé et démarré manuellement"
+    fi
+fi
+
+# ============================================================================
+# STEP 5: Generate Swagger &amp; Run Tests
+# ============================================================================
+print_step "Étape 5/6: Génération Swagger &amp; Tests"
+
+# Generate Swagger documentation
+if command_exists swag; then
+    print_info "Génération de la documentation Swagger..."
+    if swag init -g cmd/main.go --output docs 2&gt;/dev/null; then
+        print_success "Documentation Swagger générée"
+    else
+        print_info "Génération Swagger ignorée (exécutez 'make swagger' manuellement)"
+    fi
+else
+    print_info "swag non installé, génération Swagger ignorée"
+fi
+
+print_info "Lancement des tests unitaires..."
+if go test ./... 2&gt;/dev/null; then
+    print_success "Tous les tests passent"
+else
+    print_info "Certains tests ont échoué (normal si la base n'est pas encore configurée)"
+fi
+
+# ============================================================================
+# STEP 6: Verify Installation
+# ============================================================================
+print_step "Étape 6/6: Vérification de l'installation"
+
+print_info "Vérification de la configuration..."
+
+# Check .env file
+if [ -f .env ]; then
+    if grep -q "^JWT_SECRET=..*" .env; then
+        print_success ".env configuré avec JWT_SECRET"
+    else
+        print_error ".env manque JWT_SECRET"
+    fi
+else
+    print_error "Fichier .env manquant"
+fi
+
+# Check go.mod
+if [ -f go.mod ]; then
+    print_success "go.mod présent"
+else
+    print_error "go.mod manquant"
+fi
+
+# ============================================================================
+# Summary and Next Steps
+# ============================================================================
+echo -e "\n${GREEN}╔════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${GREEN}║  ✅ Configuration terminée avec succès!${NC}"
+echo -e "${GREEN}╚════════════════════════════════════════════════════════════════╝${NC}\n"
+
+print_info "Prochaines étapes:"
+echo "  1. Lancer l'application:    make run"
+echo "  2. Vérifier la santé:       curl http://localhost:8080/health"
+echo "  3. Documentation Swagger:   http://localhost:8080/swagger/index.html"
+echo ""
+print_info "Documentation:"
+echo "  - Guide rapide: docs/quick-start.md"
+echo "  - README:       README.md"
+echo ""
+print_success "Bon développement! 🚀"
+`
+}</span>
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package main
+
+// ModelsUserTemplate returns the internal/models/user.go file content with domain entities
+func (t *ProjectTemplates) ModelsUserTemplate() string <span class="cov8" title="1">{
+        return `package models
+
+import (
+        "time"
+
+        "gorm.io/gorm"
+)
+
+// User represents the domain entity for a user.
+type User struct {
+        ID           uint           ` + "`gorm:\"primaryKey\" json:\"id\"`" + `
+        Email        string         ` + "`gorm:\"uniqueIndex;not null\" json:\"email\"`" + `
+        PasswordHash string         ` + "`gorm:\"not null\" json:\"-\"`" + `
+        CreatedAt    time.Time      ` + "`gorm:\"autoCreateTime\" json:\"created_at\"`" + `
+        UpdatedAt    time.Time      ` + "`gorm:\"autoUpdateTime\" json:\"updated_at\"`" + `
+        DeletedAt    gorm.DeletedAt ` + "`gorm:\"index\" json:\"deleted_at,omitempty\"`" + `
+}
+
+// RefreshToken represents a refresh token for session management
+type RefreshToken struct {
+        ID        uint      ` + "`gorm:\"primaryKey\" json:\"id\"`" + `
+        UserID    uint      ` + "`gorm:\"not null;index\" json:\"user_id\"`" + `
+        Token     string    ` + "`gorm:\"uniqueIndex;not null\" json:\"token\"`" + `
+        ExpiresAt time.Time ` + "`gorm:\"not null\" json:\"expires_at\"`" + `
+        Revoked   bool      ` + "`gorm:\"not null;default:false\" json:\"revoked\"`" + `
+        CreatedAt time.Time ` + "`gorm:\"autoCreateTime\" json:\"created_at\"`" + `
+        UpdatedAt time.Time ` + "`gorm:\"autoUpdateTime\" json:\"updated_at\"`" + `
+}
+
+// IsExpired returns true if the token has expired
+func (rt *RefreshToken) IsExpired() bool {
+        return time.Now().After(rt.ExpiresAt)
+}
+
+// IsRevoked returns true if the token has been revoked
+func (rt *RefreshToken) IsRevoked() bool {
+        return rt.Revoked
+}
+
+// AuthResponse represents the authentication response with tokens
+type AuthResponse struct {
+        AccessToken  string ` + "`json:\"access_token\"`" + `
+        RefreshToken string ` + "`json:\"refresh_token\"`" + `
+        ExpiresIn    int64  ` + "`json:\"expires_in\"`" + `
+}
+`
+}</span>
+
+// UserEntityTemplate is deprecated - models are now in the models package
+func (t *ProjectTemplates) UserEntityTemplate() string <span class="cov0" title="0">{
+        return ``
+}</span>
+
+// UserRefreshTokenTemplate is deprecated - models are now in the models package
+func (t *ProjectTemplates) UserRefreshTokenTemplate() string <span class="cov0" title="0">{
+        return ``
+}</span>
+
+// UserInterfacesTemplate returns the internal/interfaces/services.go file content
+func (t *ProjectTemplates) UserInterfacesTemplate() string <span class="cov8" title="1">{
+        return `package interfaces
+
+// TokenService defines the interface for token generation.
+// Implemented by pkg/auth/JWTService.
+type TokenService interface {
+        GenerateTokens(userID uint) (accessToken string, refreshToken string, expiresIn int64, err error)
+}
+`
+}</span>
+
+// UserRepositoryInterfaceTemplate returns the internal/interfaces/user_repository.go file content
+func (t *ProjectTemplates) UserRepositoryInterfaceTemplate() string <span class="cov8" title="1">{
+        return `package interfaces
+
+import (
+        "context"
+        "time"
+
+        "` + t.projectName + `/internal/models"
+)
+
+// UserRepository defines the interface for user data persistence.
+type UserRepository interface {
+        CreateUser(ctx context.Context, user *models.User) error
+        GetUserByEmail(ctx context.Context, email string) (*models.User, error)
+        FindByID(ctx context.Context, id uint) (*models.User, error)
+        FindAll(ctx context.Context, page, limit int) ([]*models.User, int64, error)
+        Update(ctx context.Context, user *models.User) error
+        Delete(ctx context.Context, id uint) error
+        SaveRefreshToken(ctx context.Context, UserID uint, token string, expiresAt time.Time) error
+        GetRefreshToken(ctx context.Context, token string) (*models.RefreshToken, error)
+        RevokeRefreshToken(ctx context.Context, tokenID uint) error
+        RotateRefreshToken(ctx context.Context, oldTokenID uint, newToken *models.RefreshToken) error
+}
+`
+}</span>
+
+// UserRepositoryTemplate returns the internal/adapters/repository/user_repository.go file content
+func (t *ProjectTemplates) UserRepositoryTemplate() string <span class="cov8" title="1">{
+        return `package repository
+
+import (
+        "context"
+        "errors"
+        "time"
+
+        "gorm.io/gorm"
+        "` + t.projectName + `/internal/domain"
+        "` + t.projectName + `/internal/models"
+)
+
+// UserRepository implements user data persistence using GORM
+type UserRepository struct {
+        db *gorm.DB
+}
+
+// NewUserRepository creates a new UserRepository instance
+func NewUserRepository(db *gorm.DB) *UserRepository {
+        return &amp;UserRepository{db: db}
+}
+
+// CreateUser creates a new user in the database
+func (r *UserRepository) CreateUser(ctx context.Context, u *models.User) error {
+        return r.db.WithContext(ctx).Create(u).Error
+}
+
+// GetUserByEmail retrieves a user by email, returns nil if not found
+func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+        var u models.User
+        err := r.db.WithContext(ctx).Where("email = ?", email).First(&amp;u).Error
+        if err != nil {
+                if errors.Is(err, gorm.ErrRecordNotFound) {
+                        return nil, nil
+                }
+                return nil, err
+        }
+        return &amp;u, nil
+}
+
+// FindByID retrieves a user by ID, returns nil if not found
+func (r *UserRepository) FindByID(ctx context.Context, id uint) (*models.User, error) {
+        var u models.User
+        err := r.db.WithContext(ctx).Where("id = ?", id).First(&amp;u).Error
+        if err != nil {
+                if errors.Is(err, gorm.ErrRecordNotFound) {
+                        return nil, nil
+                }
+                return nil, err
+        }
+        return &amp;u, nil
+}
+
+// FindAll retrieves all users from the database (excluding soft-deleted)
+func (r *UserRepository) FindAll(ctx context.Context, page, limit int) ([]*models.User, int64, error) {
+        var users []*models.User
+        var total int64
+
+        // Use the same query base for both Count and Find to ensure consistency
+        query := r.db.WithContext(ctx).Model(&amp;models.User{})
+
+        if err := query.Count(&amp;total).Error; err != nil {
+                return nil, 0, err
+        }
+
+        offset := (page - 1) * limit
+        err := query.Limit(limit).Offset(offset).Find(&amp;users).Error
+        if err != nil {
+                return nil, 0, err
+        }
+        return users, total, nil
+}
+
+// Update updates an existing user in the database
+func (r *UserRepository) Update(ctx context.Context, u *models.User) error {
+        return r.db.WithContext(ctx).Updates(u).Error
+}
+
+// Delete performs a soft delete on the user (sets deleted_at)
+func (r *UserRepository) Delete(ctx context.Context, id uint) error {
+        return r.db.WithContext(ctx).Delete(&amp;models.User{}, id).Error
+}
+
+// SaveRefreshToken saves a refresh token for the given user
+func (r *UserRepository) SaveRefreshToken(ctx context.Context, userID uint, token string, expiresAt time.Time) error {
+        refreshToken := &amp;models.RefreshToken{
+                UserID:    userID,
+                Token:     token,
+                ExpiresAt: expiresAt,
+                Revoked:   false,
+        }
+        return r.db.WithContext(ctx).Create(refreshToken).Error
+}
+
+// GetRefreshToken retrieves a refresh token by token string
+func (r *UserRepository) GetRefreshToken(ctx context.Context, token string) (*models.RefreshToken, error) {
+        var rt models.RefreshToken
+        err := r.db.WithContext(ctx).Where("token = ?", token).First(&amp;rt).Error
+        if err != nil {
+                if errors.Is(err, gorm.ErrRecordNotFound) {
+                        return nil, nil
+                }
+                return nil, err
+        }
+        return &amp;rt, nil
+}
+
+// RevokeRefreshToken marks a refresh token as revoked
+func (r *UserRepository) RevokeRefreshToken(ctx context.Context, tokenID uint) error {
+        return r.db.WithContext(ctx).Model(&amp;models.RefreshToken{}).
+                Where("id = ?", tokenID).
+                Update("revoked", true).Error
+}
+
+// RotateRefreshToken performs atomic token rotation: revocation of old and creation of new
+func (r *UserRepository) RotateRefreshToken(ctx context.Context, oldTokenID uint, newToken *models.RefreshToken) error {
+        return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+                // 1. Revoke old token with optimistic locking check
+                result := tx.Model(&amp;models.RefreshToken{}).
+                        Where("id = ? AND revoked = ?", oldTokenID, false).
+                        Update("revoked", true)
+
+                if result.Error != nil {
+                        return result.Error
+                }
+
+                if result.RowsAffected == 0 {
+                        return domain.ErrRefreshTokenRevoked
+                }
+
+                // 2. Create new token
+                if err := tx.Create(newToken).Error; err != nil {
+                        return err
+                }
+
+                return nil
+        })
+}
+`
+}</span>
+
+// DomainErrorsTemplate returns the internal/domain/errors.go file content
+func (t *ProjectTemplates) DomainErrorsTemplate() string <span class="cov8" title="1">{
+        return `package domain
+
+import (
+        "errors"
+
+        "github.com/gofiber/fiber/v2"
+)
+
+// AppError represents a structured application error with HTTP status and details.
+type AppError struct {
+        Code    string ` + "`json:\"code\"`" + `
+        Message string ` + "`json:\"message\"`" + `
+        Status  int    ` + "`json:\"-\"`" + ` // HTTP Status, not serialized in JSON
+        Details any    ` + "`json:\"details,omitempty\"`" + `
+}
+
+// Error implements the error interface.
+func (e *AppError) Error() string {
+        return e.Message
+}
+
+// NewNotFoundError creates a 404 error.
+func NewNotFoundError(msg string, code string) *AppError {
+        return &amp;AppError{
+                Code:    code,
+                Message: msg,
+                Status:  fiber.StatusNotFound,
+                Details: nil,
+        }
+}
+
+// NewBadRequestError creates a 400 error with optional validation details.
+func NewBadRequestError(msg string, code string, details any) *AppError {
+        return &amp;AppError{
+                Code:    code,
+                Message: msg,
+                Status:  fiber.StatusBadRequest,
+                Details: details,
+        }
+}
+
+// NewInternalError creates a 500 error.
+func NewInternalError(msg string, code string) *AppError {
+        return &amp;AppError{
+                Code:    code,
+                Message: msg,
+                Status:  fiber.StatusInternalServerError,
+                Details: nil,
+        }
+}
+
+// NewUnauthorizedError creates a 401 error.
+func NewUnauthorizedError(msg string, code string) *AppError {
+        return &amp;AppError{
+                Code:    code,
+                Message: msg,
+                Status:  fiber.StatusUnauthorized,
+                Details: nil,
+        }
+}
+
+// NewForbiddenError creates a 403 error.
+func NewForbiddenError(msg string, code string) *AppError {
+        return &amp;AppError{
+                Code:    code,
+                Message: msg,
+                Status:  fiber.StatusForbidden,
+                Details: nil,
+        }
+}
+
+// NewConflictError creates a 409 error.
+func NewConflictError(msg string, code string) *AppError {
+        return &amp;AppError{
+                Code:    code,
+                Message: msg,
+                Status:  fiber.StatusConflict,
+                Details: nil,
+        }
+}
+
+// Domain-wide errors
+var (
+        ErrEmailAlreadyRegistered = errors.New("email already registered")
+        ErrInvalidCredentials     = errors.New("invalid credentials")
+        ErrUserNotFound           = errors.New("user not found")
+        ErrInvalidRefreshToken    = errors.New("invalid refresh token")
+        ErrRefreshTokenExpired    = errors.New("refresh token expired")
+        ErrRefreshTokenRevoked    = errors.New("refresh token has been revoked")
+)
+`
+}</span>
+
+// ErrorHandlerMiddlewareTemplate returns the internal/adapters/middleware/error_handler.go file content
+func (t *ProjectTemplates) ErrorHandlerMiddlewareTemplate() string <span class="cov8" title="1">{
+        return `package middleware
+
+import (
+        "errors"
+        "os"
+
+        "` + t.projectName + `/internal/domain"
+
+        "github.com/gofiber/fiber/v2"
+        "github.com/rs/zerolog/log"
+)
+
+// ErrorHandler is a centralized error handler for Fiber that formats all errors
+// into a consistent JSON structure following the API standardization requirements.
+func ErrorHandler(c *fiber.Ctx, err error) error {
+        // Default to 500 Internal Server Error
+        code := fiber.StatusInternalServerError
+        resp := fiber.Map{
+                "status":  "error",
+                "code":    "INTERNAL_SERVER_ERROR",
+                "message": "Internal server error",
+                "details": nil,
+        }
+
+        // Flag to check if we should mask the error message (Production)
+        isProd := os.Getenv("APP_ENV") == "production"
+
+        // 1. Handle Domain standard errors (map standard errors to AppErrors)
+        if errors.Is(err, domain.ErrEmailAlreadyRegistered) {
+                err = domain.NewConflictError("Email already registered", "EMAIL_ALREADY_REGISTERED")
+        } else if errors.Is(err, domain.ErrInvalidCredentials) {
+                err = domain.NewUnauthorizedError("Invalid email or password", "INVALID_CREDENTIALS")
+        } else if errors.Is(err, domain.ErrUserNotFound) {
+                err = domain.NewNotFoundError("User not found", "USER_NOT_FOUND")
+        } else if errors.Is(err, domain.ErrInvalidRefreshToken) || errors.Is(err, domain.ErrRefreshTokenExpired) || errors.Is(err, domain.ErrRefreshTokenRevoked) {
+                err = domain.NewUnauthorizedError(err.Error(), "AUTH_TOKEN_ERROR")
+        }
+
+        // 2. Handle Fiber Errors (including 404, 405, etc.)
+        var fiberErr *fiber.Error
+        if errors.As(err, &amp;fiberErr) {
+                code = fiberErr.Code
+                resp["message"] = fiberErr.Message
+                resp["code"] = mapHTTPStatusToCode(code)
+        }
+
+        // 3. Handle Domain AppErrors (business logic errors)
+        var appErr *domain.AppError
+        if errors.As(err, &amp;appErr) {
+                code = appErr.Status
+                resp["message"] = appErr.Message
+                resp["code"] = appErr.Code
+                resp["details"] = appErr.Details
+        }
+
+        // AC3: Mask internal error messages in production
+        if code == fiber.StatusInternalServerError &amp;&amp; isProd {
+                resp["message"] = "Internal server error"
+        }
+
+        // Logging with context
+        log.Error().
+                Err(err).
+                Int("status", code).
+                Str("method", c.Method()).
+                Str("path", c.Path()).
+                Msg("API Error")
+
+        return c.Status(code).JSON(resp)
+}
+
+// mapHTTPStatusToCode maps HTTP status codes to readable error codes.
+func mapHTTPStatusToCode(status int) string {
+        switch status {
+        case fiber.StatusBadRequest:
+                return "BAD_REQUEST"
+        case fiber.StatusUnauthorized:
+                return "UNAUTHORIZED"
+        case fiber.StatusForbidden:
+                return "FORBIDDEN"
+        case fiber.StatusNotFound:
+                return "NOT_FOUND"
+        case fiber.StatusMethodNotAllowed:
+                return "METHOD_NOT_ALLOWED"
+        case fiber.StatusConflict:
+                return "CONFLICT"
+        case fiber.StatusUnprocessableEntity:
+                return "UNPROCESSABLE_ENTITY"
+        case fiber.StatusInternalServerError:
+                return "INTERNAL_SERVER_ERROR"
+        default:
+                return "HTTP_ERROR"
+        }
+}
+`
+}</span>
+
+// UserServiceTemplate returns the internal/domain/user/service.go file content
+func (t *ProjectTemplates) UserServiceTemplate() string <span class="cov8" title="1">{
+        return `package user
+
+import (
+        "context"
+        "fmt"
+        "time"
+
+        "golang.org/x/crypto/bcrypt"
+        "` + t.projectName + `/internal/domain"
+        "` + t.projectName + `/internal/interfaces"
+        "` + t.projectName + `/internal/models"
+)
+
+// Service handles user business logic
+type Service struct {
+        repo         interfaces.UserRepository
+        tokenService interfaces.TokenService
+}
+
+// NewService creates a new user service
+func NewService(repo interfaces.UserRepository) *Service {
+        return &amp;Service{repo: repo}
+}
+
+// NewServiceWithJWT creates a new user service with JWT support
+func NewServiceWithJWT(repo interfaces.UserRepository, tokenService interfaces.TokenService) *Service {
+        return &amp;Service{
+                repo:         repo,
+                tokenService: tokenService,
+        }
+}
+
+// Register creates a new user account with the given email and password
+func (s *Service) Register(ctx context.Context, email, password string) (*models.User, error) {
+        existing, err := s.repo.GetUserByEmail(ctx, email)
+        if err != nil {
+                return nil, fmt.Errorf("failed to check existing user: %w", err)
+        }
+        if existing != nil {
+                return nil, domain.ErrEmailAlreadyRegistered
+        }
+
+        hashedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+        if err != nil {
+                return nil, fmt.Errorf("failed to hash password: %w", err)
+        }
+
+        if len(hashedBytes) == 0 {
+                return nil, fmt.Errorf("password hash generation produced empty result")
+        }
+
+        newUser := &amp;models.User{
+                Email:        email,
+                PasswordHash: string(hashedBytes),
+        }
+
+        err = s.repo.CreateUser(ctx, newUser)
+        if err != nil {
+                return nil, fmt.Errorf("failed to create user: %w", err)
+        }
+
+        return newUser, nil
+}
+
+// Authenticate validates user credentials and returns JWT tokens
+func (s *Service) Authenticate(ctx context.Context, email, password string) (*models.AuthResponse, error) {
+        u, err := s.repo.GetUserByEmail(ctx, email)
+        if err != nil {
+                return nil, fmt.Errorf("failed to get user: %w", err)
+        }
+
+        if u == nil {
+                return nil, domain.ErrInvalidCredentials
+        }
+
+        err = bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password))
+        if err != nil {
+                return nil, domain.ErrInvalidCredentials
+        }
+
+        accessToken, refreshToken, expiresIn, err := s.tokenService.GenerateTokens(u.ID)
+        if err != nil {
+                return nil, fmt.Errorf("failed to generate tokens: %w", err)
+        }
+
+        refreshExpiresAt := time.Now().Add(7 * 24 * time.Hour)
+
+        err = s.repo.SaveRefreshToken(ctx, u.ID, refreshToken, refreshExpiresAt)
+        if err != nil {
+                return nil, fmt.Errorf("failed to save refresh token: %w", err)
+        }
+
+        return &amp;models.AuthResponse{
+                AccessToken:  accessToken,
+                RefreshToken: refreshToken,
+                ExpiresIn:    expiresIn,
+        }, nil
+}
+
+// RefreshToken validates an existing refresh token and generates new tokens
+func (s *Service) RefreshToken(ctx context.Context, oldToken string) (*models.AuthResponse, error) {
+        rt, err := s.repo.GetRefreshToken(ctx, oldToken)
+        if err != nil {
+                return nil, fmt.Errorf("failed to get refresh token: %w", err)
+        }
+
+        if rt == nil {
+                return nil, domain.ErrInvalidRefreshToken
+        }
+
+        if rt.IsExpired() {
+                return nil, domain.ErrRefreshTokenExpired
+        }
+
+        if rt.IsRevoked() {
+                fmt.Printf("SECURITY ALERT: Attempt to use revoked refresh token ID: %d UserID: %d\n", rt.ID, rt.UserID)
+                return nil, domain.ErrRefreshTokenRevoked
+        }
+
+        accessToken, refreshToken, expiresIn, err := s.tokenService.GenerateTokens(rt.UserID)
+        if err != nil {
+                return nil, fmt.Errorf("failed to generate new tokens: %w", err)
+        }
+
+        refreshExpiresAt := time.Now().Add(7 * 24 * time.Hour)
+        newRefreshToken := &amp;models.RefreshToken{
+                UserID:    rt.UserID,
+                Token:     refreshToken,
+                ExpiresAt: refreshExpiresAt,
+                Revoked:   false,
+        }
+
+        err = s.repo.RotateRefreshToken(ctx, rt.ID, newRefreshToken)
+        if err != nil {
+                if err == domain.ErrRefreshTokenRevoked {
+                        fmt.Printf("SECURITY ALERT: Race condition on refresh token rotation ID: %d\n", rt.ID)
+                        return nil, domain.ErrRefreshTokenRevoked
+                }
+                return nil, fmt.Errorf("failed to rotate refresh token: %w", err)
+        }
+
+        return &amp;models.AuthResponse{
+                AccessToken:  accessToken,
+                RefreshToken: refreshToken,
+                ExpiresIn:    expiresIn,
+        }, nil
+}
+
+// GetProfile retrieves a user's profile by their ID
+func (s *Service) GetProfile(ctx context.Context, userID uint) (*models.User, error) {
+        u, err := s.repo.FindByID(ctx, userID)
+        if err != nil {
+                return nil, fmt.Errorf("failed to get user: %w", err)
+        }
+
+        if u == nil {
+                return nil, domain.ErrUserNotFound
+        }
+
+        return u, nil
+}
+
+// GetAll retrieves all users from the database
+func (s *Service) GetAll(ctx context.Context, page, limit int) ([]*models.User, int64, error) {
+        if page &lt; 1 {
+                page = 1
+        }
+        if limit &lt; 1 {
+                limit = 10
+        }
+        if limit &gt; 100 {
+                limit = 100
+        }
+
+        users, total, err := s.repo.FindAll(ctx, page, limit)
+        if err != nil {
+                return nil, 0, fmt.Errorf("failed to get all users: %w", err)
+        }
+        return users, total, nil
+}
+
+// UpdateUser updates a user's email address
+func (s *Service) UpdateUser(ctx context.Context, userID uint, email string) (*models.User, error) {
+        u, err := s.repo.FindByID(ctx, userID)
+        if err != nil {
+                return nil, fmt.Errorf("failed to get user: %w", err)
+        }
+
+        if u == nil {
+                return nil, domain.ErrUserNotFound
+        }
+
+        if email != u.Email {
+                existing, err := s.repo.GetUserByEmail(ctx, email)
+                if err != nil {
+                        return nil, fmt.Errorf("failed to check existing email: %w", err)
+                }
+                if existing != nil {
+                        return nil, domain.ErrEmailAlreadyRegistered
+                }
+        }
+
+        u.Email = email
+
+        err = s.repo.Update(ctx, u)
+        if err != nil {
+                return nil, fmt.Errorf("failed to update user: %w", err)
+        }
+
+        return u, nil
+}
+
+// DeleteUser performs a soft delete on a user
+func (s *Service) DeleteUser(ctx context.Context, userID uint) error {
+        u, err := s.repo.FindByID(ctx, userID)
+        if err != nil {
+                return fmt.Errorf("failed to get user: %w", err)
+        }
+
+        if u == nil {
+                return domain.ErrUserNotFound
+        }
+
+        err = s.repo.Delete(ctx, userID)
+        if err != nil {
+                return fmt.Errorf("failed to delete user: %w", err)
+        }
+
+        return nil
+}
+`
+}</span>
+
+// UserHandlerTemplate returns the internal/adapters/handlers/user_handler.go file content
+func (t *ProjectTemplates) UserHandlerTemplate() string <span class="cov8" title="1">{
+        return `package handlers
+
+import (
+        "time"
+
+        "github.com/go-playground/validator/v10"
+        "github.com/gofiber/fiber/v2"
+        "` + t.projectName + `/internal/domain"
+        "` + t.projectName + `/internal/domain/user"
+        "` + t.projectName + `/pkg/auth"
+)
+
+// UserHandler handles user-related HTTP requests
+type UserHandler struct {
+        service  *user.Service
+        validate *validator.Validate
+}
+
+// NewUserHandler creates a new UserHandler instance
+func NewUserHandler(service *user.Service) *UserHandler {
+        return &amp;UserHandler{
+                service:  service,
+                validate: validator.New(),
+        }
+}
+
+// ProfileResponse represents the user profile response
+type ProfileResponse struct {
+        ID        uint   ` + "`json:\"id\"`" + `
+        Email     string ` + "`json:\"email\"`" + `
+        CreatedAt string ` + "`json:\"created_at\"`" + `
+}
+
+// GetMe godoc
+// @Summary Get current user profile
+// @Description Get the authenticated user's profile information
+// @Tags users
+// @Produce json
+// @Success 200 {object} map[string]interface{} "Standard JSON Envelope with data"
+// @Failure 401 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /users/me [get]
+// @Security BearerAuth
+func (h *UserHandler) GetMe(c *fiber.Ctx) error {
+        userID, err := auth.GetUserID(c)
+        if err != nil {
+                return domain.NewUnauthorizedError("Unable to extract user information", "UNAUTHORIZED")
+        }
+
+        u, err := h.service.GetProfile(c.Context(), userID)
+        if err != nil {
+                return err // Handled by middleware
+        }
+
+        return c.Status(fiber.StatusOK).JSON(fiber.Map{
+                "status": "success",
+                "data": ProfileResponse{
+                        ID:        u.ID,
+                        Email:     u.Email,
+                        CreatedAt: u.CreatedAt.Format(time.RFC3339),
+                },
+                "meta": fiber.Map{},
+        })
+}
+
+// GetAllUsers godoc
+// @Summary Get all users
+// @Description Get a list of all users with pagination. Maximum limit is 100 users per page.
+// @Tags users
+// @Produce json
+// @Param page query int false "Page number (default: 1)"
+// @Param limit query int false "Users per page (default: 10, max: 100)"
+// @Success 200 {object} map[string]interface{} "Standard JSON Envelope with data"
+// @Failure 500 {object} map[string]string
+// @Router /users [get]
+// @Security BearerAuth
+func (h *UserHandler) GetAllUsers(c *fiber.Ctx) error {
+        page := c.QueryInt("page", 1)
+        limit := c.QueryInt("limit", 10)
+
+        users, total, err := h.service.GetAll(c.Context(), page, limit)
+        if err != nil {
+                return err // Handled by middleware
+        }
+
+        userResponses := make([]ProfileResponse, len(users))
+        for i, u := range users {
+                userResponses[i] = ProfileResponse{
+                        ID:        u.ID,
+                        Email:     u.Email,
+                        CreatedAt: u.CreatedAt.Format(time.RFC3339),
+                }
+        }
+
+        return c.Status(fiber.StatusOK).JSON(fiber.Map{
+                "status": "success",
+                "data":   userResponses,
+                "meta":   fiber.Map{
+                        "page":  page,
+                        "limit": limit,
+                        "total": total,
+                },
+        })
+}
+
+// UpdateUserRequest represents the request body for updating a user
+type UpdateUserRequest struct {
+        Email string ` + "`json:\"email\" validate:\"required,email\"`" + `
+}
+
+// UpdateUser godoc
+// @Summary Update user
+// @Description Update a user's information
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Param request body UpdateUserRequest true "Update user request"
+// @Success 200 {object} map[string]interface{} "Standard JSON Envelope with data"
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /users/{id} [put]
+// @Security BearerAuth
+func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
+        userID, err := c.ParamsInt("id")
+        if err != nil || userID &lt;= 0 {
+                return domain.NewBadRequestError("Invalid user ID", "INVALID_ID", nil)
+        }
+
+        var req UpdateUserRequest
+        if err := c.BodyParser(&amp;req); err != nil {
+                return domain.NewBadRequestError("Invalid request body", "INVALID_JSON", nil)
+        }
+
+        if err := h.validate.Struct(&amp;req); err != nil {
+                return domain.NewBadRequestError("Validation failed: "+err.Error(), "VALIDATION_FAILED", nil)
+        }
+
+        u, err := h.service.UpdateUser(c.Context(), uint(userID), req.Email)
+        if err != nil {
+                return err // Handled by middleware
+        }
+
+        return c.Status(fiber.StatusOK).JSON(fiber.Map{
+                "status": "success",
+                "data": ProfileResponse{
+                        ID:        u.ID,
+                        Email:     u.Email,
+                        CreatedAt: u.CreatedAt.Format(time.RFC3339),
+                },
+                "meta": fiber.Map{},
+        })
+}
+
+// DeleteUser godoc
+// @Summary Delete user
+// @Description Soft delete a user
+// @Tags users
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {object} map[string]interface{} "Standard JSON Envelope"
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /users/{id} [delete]
+// @Security BearerAuth
+func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
+        userID, err := c.ParamsInt("id")
+        if err != nil || userID &lt;= 0 {
+                return domain.NewBadRequestError("Invalid user ID", "INVALID_ID", nil)
+        }
+
+        err = h.service.DeleteUser(c.Context(), uint(userID))
+        if err != nil {
+                return err // Handled by middleware
+        }
+
+        return c.Status(fiber.StatusOK).JSON(fiber.Map{
+                "status":  "success",
+                "message": "User deleted successfully",
+                "meta":    fiber.Map{},
+        })
+}
+`
+}</span>
+
+// HandlerModuleTemplate returns the internal/adapters/handlers/module.go file content
+func (t *ProjectTemplates) HandlerModuleTemplate() string <span class="cov8" title="1">{
+        return `package handlers
+
+import (
+        "go.uber.org/fx"
+
+        "` + t.projectName + `/internal/domain/user"
+)
+
+var Module = fx.Module("handlers",
+        fx.Provide(func(s *user.Service) *AuthHandler {
+                return NewAuthHandler(s)
+        }),
+        fx.Provide(func(s *user.Service) *UserHandler {
+                return NewUserHandler(s)
+        }),
+)
+`
+}</span>
+
+// AuthHandlerTemplate returns the internal/adapters/handlers/auth_handler.go file content
+func (t *ProjectTemplates) AuthHandlerTemplate() string <span class="cov8" title="1">{
+        return `package handlers
+
+import (
+        "errors"
+        "time"
+
+        "github.com/go-playground/validator/v10"
+        "github.com/gofiber/fiber/v2"
+        "` + t.projectName + `/internal/domain"
+        "` + t.projectName + `/internal/domain/user"
+)
+
+// AuthHandler handles authentication-related HTTP requests
+type AuthHandler struct {
+        service  *user.Service
+        validate *validator.Validate
+}
+
+// NewAuthHandler creates a new AuthHandler instance
+func NewAuthHandler(service *user.Service) *AuthHandler {
+        return &amp;AuthHandler{
+                service:  service,
+                validate: validator.New(),
+        }
+}
+
+// RegisterRequest represents the user registration request
+type RegisterRequest struct {
+        Email    string ` + "`json:\"email\" validate:\"required,email,max=255\"`" + `
+        Password string ` + "`json:\"password\" validate:\"required,min=8,max=72\"`" + `
+}
+
+// RegisterResponse represents the user registration response
+type RegisterResponse struct {
+        ID        uint   ` + "`json:\"id\"`" + `
+        Email     string ` + "`json:\"email\"`" + `
+        CreatedAt string ` + "`json:\"created_at\"`" + `
+}
+
+// Register godoc
+// @Summary Register a new user
+// @Description Create a new user account with email and password
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body RegisterRequest true "Registration request"
+// @Success 201 {object} map[string]interface{} "Standard JSON Envelope with user data"
+// @Failure 400 {object} map[string]string "Validation error"
+// @Failure 409 {object} map[string]string "Email already registered"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /auth/register [post]
+func (h *AuthHandler) Register(c *fiber.Ctx) error {
+        var req RegisterRequest
+        if err := c.BodyParser(&amp;req); err != nil {
+                return domain.NewBadRequestError("Invalid request body", "INVALID_JSON", nil)
+        }
+
+        if err := h.validate.Struct(&amp;req); err != nil {
+                validationErrors := make(map[string]string)
+                for _, err := range err.(validator.ValidationErrors) {
+                        field := err.Field()
+                        switch field {
+                        case "Email":
+                                validationErrors["email"] = "Email must be valid and max 255 characters"
+                        case "Password":
+                                validationErrors["password"] = "Password must be between 8 and 72 characters"
+                        default:
+                                validationErrors[field] = err.Error()
+                        }
+                }
+                return domain.NewBadRequestError("Validation failed", "VALIDATION_FAILED", validationErrors)
+        }
+
+        user, err := h.service.Register(c.Context(), req.Email, req.Password)
+        if err != nil {
+                if errors.Is(err, domain.ErrEmailAlreadyRegistered) {
+                        return domain.NewConflictError("Email already registered", "EMAIL_ALREADY_REGISTERED")
+                }
+                return err // Handled by middleware
+        }
+
+        return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+                "status": "success",
+                "data": RegisterResponse{
+                        ID:        user.ID,
+                        Email:     user.Email,
+                        CreatedAt: user.CreatedAt.Format(time.RFC3339),
+                },
+                "meta": fiber.Map{},
+        })
+}
+
+// LoginRequest represents the authentication request
+type LoginRequest struct {
+        Email    string ` + "`json:\"email\" validate:\"required,email\"`" + `
+        Password string ` + "`json:\"password\" validate:\"required\"`" + `
+}
+
+// Login godoc
+// @Summary Authenticate user
+// @Description Login with email and password to receive JWT tokens
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body LoginRequest true "Login credentials"
+// @Success 200 {object} map[string]interface{} "Standard JSON Envelope with tokens"
+// @Failure 400 {object} map[string]string "Validation error"
+// @Failure 401 {object} map[string]string "Invalid credentials"
+// @Router /auth/login [post]
+func (h *AuthHandler) Login(c *fiber.Ctx) error {
+        var req LoginRequest
+        if err := c.BodyParser(&amp;req); err != nil {
+                return domain.NewBadRequestError("Invalid request body", "INVALID_JSON", nil)
+        }
+
+        if err := h.validate.Struct(&amp;req); err != nil {
+                return domain.NewBadRequestError("Validation failed: email and password required", "VALIDATION_FAILED", nil)
+        }
+
+        authResp, err := h.service.Authenticate(c.Context(), req.Email, req.Password)
+        if err != nil {
+                return err // Handled by middleware
+        }
+
+        return c.Status(fiber.StatusOK).JSON(fiber.Map{
+                "status": "success",
+                "data":   authResp,
+                "meta":   fiber.Map{},
+        })
+}
+
+// RefreshRequest represents the token refresh request
+type RefreshRequest struct {
+        RefreshToken string ` + "`json:\"refresh_token\" validate:\"required\"`" + `
+}
+
+// Refresh godoc
+// @Summary Refresh access token
+// @Description Use refresh token to obtain new access and refresh tokens
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body RefreshRequest true "Refresh token"
+// @Success 200 {object} map[string]interface{} "Standard JSON Envelope with new tokens"
+// @Failure 400 {object} map[string]string "Validation error"
+// @Failure 401 {object} map[string]string "Invalid or expired refresh token"
+// @Router /auth/refresh [post]
+func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
+        var req RefreshRequest
+        if err := c.BodyParser(&amp;req); err != nil {
+                return domain.NewBadRequestError("Invalid request body", "INVALID_JSON", nil)
+        }
+
+        if err := h.validate.Struct(&amp;req); err != nil {
+                return domain.NewBadRequestError("Refresh token is required", "VALIDATION_FAILED", nil)
+        }
+
+        authResp, err := h.service.RefreshToken(c.Context(), req.RefreshToken)
+        if err != nil {
+                return err // Handled by middleware
+        }
+
+        return c.Status(fiber.StatusOK).JSON(fiber.Map{
+                "status": "success",
+                "data":   authResp,
+                "meta":   fiber.Map{},
+        })
+}
+`
+}</span>
+
+// JWTAuthTemplate returns the pkg/auth/jwt.go file content
+func (t *ProjectTemplates) JWTAuthTemplate() string <span class="cov8" title="1">{
+        return `package auth
+
+import (
+        "errors"
+        "fmt"
+        "time"
+
+        "github.com/gofiber/fiber/v2"
+        "github.com/golang-jwt/jwt/v5"
+        "` + t.projectName + `/pkg/config"
+)
+
+var (
+        // ErrInvalidToken is returned when the JWT token is invalid
+        ErrInvalidToken = errors.New("invalid token")
+        // ErrMissingUserID is returned when user ID is missing from token claims
+        ErrMissingUserID = errors.New("missing user ID in token")
+)
+
+// JWTService handles JWT token generation and validation
+type JWTService struct {
+        secretKey string
+        expiresIn time.Duration
+}
+
+// NewJWTService creates a new JWT service instance
+func NewJWTService() *JWTService {
+        secret := config.GetEnv("JWT_SECRET", "")
+        if secret == "" {
+                panic("JWT_SECRET environment variable is required")
+        }
+
+        expiryStr := config.GetEnv("JWT_EXPIRY", "24h")
+        expiry, err := time.ParseDuration(expiryStr)
+        if err != nil {
+                panic(fmt.Sprintf("Invalid JWT_EXPIRY format: %v", err))
+        }
+
+        return &amp;JWTService{
+                secretKey: secret,
+                expiresIn: expiry,
+        }
+}
+
+// GenerateTokens creates a new JWT access token and refresh token for the given user ID
+func (s *JWTService) GenerateTokens(userID uint) (accessToken string, refreshToken string, expiresIn int64, err error) {
+        // Create access token claims
+        now := time.Now()
+        expiresAt := now.Add(s.expiresIn)
+
+        claims := jwt.MapClaims{
+                "user_id": userID,
+                "exp":     expiresAt.Unix(),
+                "iat":     now.Unix(),
+        }
+
+        // Generate access token
+        token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+        accessToken, err = token.SignedString([]byte(s.secretKey))
+        if err != nil {
+                return "", "", 0, fmt.Errorf("failed to sign access token: %w", err)
+        }
+
+        // Generate refresh token (longer expiry, same structure)
+        refreshExpiresAt := now.Add(7 * 24 * time.Hour) // 7 days
+        refreshClaims := jwt.MapClaims{
+                "user_id": userID,
+                "exp":     refreshExpiresAt.Unix(),
+                "iat":     now.Unix(),
+                "type":    "refresh",
+        }
+
+        refreshTokenObj := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
+        refreshToken, err = refreshTokenObj.SignedString([]byte(s.secretKey))
+        if err != nil {
+                return "", "", 0, fmt.Errorf("failed to sign refresh token: %w", err)
+        }
+
+        return accessToken, refreshToken, int64(s.expiresIn.Seconds()), nil
+}
+
+// GetUserID extracts the user ID from the JWT token stored in the Fiber context
+func GetUserID(c *fiber.Ctx) (uint, error) {
+        // Get user from JWT middleware (stored by gofiber/contrib/jwt)
+        user := c.Locals("user")
+        if user == nil {
+                return 0, ErrInvalidToken
+        }
+
+        token, ok := user.(*jwt.Token)
+        if !ok {
+                return 0, ErrInvalidToken
+        }
+
+        claims, ok := token.Claims.(jwt.MapClaims)
+        if !ok {
+                return 0, ErrInvalidToken
+        }
+
+        userIDFloat, ok := claims["user_id"].(float64)
+        if !ok {
+                return 0, ErrMissingUserID
+        }
+
+        return uint(userIDFloat), nil
+}
+
+// ValidateToken validates a JWT token and returns the claims
+func (s *JWTService) ValidateToken(tokenString string) (jwt.MapClaims, error) {
+        token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+                if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+                        return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+                }
+                return []byte(s.secretKey), nil
+        })
+
+        if err != nil {
+                return nil, err
+        }
+
+        if claims, ok := token.Claims.(jwt.MapClaims); ok &amp;&amp; token.Valid {
+                return claims, nil
+        }
+
+        return nil, ErrInvalidToken
+}
+`
+}</span>
+
+// JWTMiddlewareTemplate returns the pkg/auth/middleware.go file content
+func (t *ProjectTemplates) JWTMiddlewareTemplate() string <span class="cov8" title="1">{
+        return `package auth
+
+import (
+        "strings"
+
+        jwtware "github.com/gofiber/contrib/jwt"
+        "github.com/gofiber/fiber/v2"
+        "` + t.projectName + `/pkg/config"
+)
+
+// NewJWTMiddleware creates a new JWT authentication middleware
+// It supports both "Bearer &lt;token&gt;" and raw "&lt;token&gt;" formats for Swagger UI compatibility
+func NewJWTMiddleware() fiber.Handler {
+        secret := config.GetEnv("JWT_SECRET", "")
+        if secret == "" {
+                panic("JWT_SECRET environment variable is required for middleware")
+        }
+
+        // Create the JWT middleware
+        jwtMiddleware := jwtware.New(jwtware.Config{
+                SigningKey: jwtware.SigningKey{
+                        JWTAlg: jwtware.HS256,
+                        Key:    []byte(secret),
+                },
+                ErrorHandler: func(c *fiber.Ctx, err error) error {
+                        return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+                                "status":  "error",
+                                "code":    "UNAUTHORIZED",
+                                "message": "Missing or invalid authentication token",
+                        })
+                },
+        })
+
+        // Return a wrapper that normalizes the Authorization header
+        return func(c *fiber.Ctx) error {
+                auth := c.Get("Authorization")
+                
+                // If token is provided without "Bearer " prefix, add it
+                // This makes Swagger UI work without typing "Bearer "
+                if auth != "" &amp;&amp; !strings.HasPrefix(auth, "Bearer ") {
+                        c.Request().Header.Set("Authorization", "Bearer "+auth)
+                }
+                
+                return jwtMiddleware(c)
+        }
+}
+`
+}</span>
+
+// UserModuleTemplate returns the internal/domain/user/module.go file content
+func (t *ProjectTemplates) UserModuleTemplate() string <span class="cov8" title="1">{
+        return `package user
+
+import (
+        "go.uber.org/fx"
+)
+
+// Module provides user domain services via fx
+var Module = fx.Module("user",
+        // Provide service with JWT support - TokenService is injected by fx from auth.Module
+        fx.Provide(NewServiceWithJWT),
+)
+`
+}</span>
+
+// RepositoryModuleTemplate returns the internal/adapters/repository/module.go file content
+func (t *ProjectTemplates) RepositoryModuleTemplate() string <span class="cov8" title="1">{
+        return `package repository
+
+import (
+        "go.uber.org/fx"
+        "gorm.io/gorm"
+        "` + t.projectName + `/internal/interfaces"
+)
+
+// Module provides repository implementations via fx
+var Module = fx.Module("repository",
+        fx.Provide(func(db *gorm.DB) interfaces.UserRepository {
+                return NewUserRepository(db)
+        }),
+)
+`
+}</span>
+
+// AuthModuleTemplate returns the pkg/auth/module.go file content
+func (t *ProjectTemplates) AuthModuleTemplate() string <span class="cov8" title="1">{
+        return `package auth
+
+import (
+        "go.uber.org/fx"
+        "` + t.projectName + `/internal/interfaces"
+)
+
+// Module provides auth services via fx
+var Module = fx.Module("auth",
+        fx.Provide(func() interfaces.TokenService {
+                return NewJWTService()
+        }),
+        fx.Provide(NewJWTMiddleware),
+)
+`
+}</span>
+
+// RoutesTemplate returns the internal/adapters/http/routes.go file content
+func (t *ProjectTemplates) RoutesTemplate() string <span class="cov8" title="1">{
+        return `package http
+
+import (
+        "github.com/gofiber/fiber/v2"
+        swagger "github.com/swaggo/fiber-swagger"
+
+        "` + t.projectName + `/internal/adapters/handlers"
+)
+
+// RegisterRoutes configures all application routes
+func RegisterRoutes(
+        app *fiber.App,
+        authHandler *handlers.AuthHandler,
+        userHandler *handlers.UserHandler,
+        authMiddleware fiber.Handler,
+) {
+        // Health &amp; Swagger
+        RegisterHealthRoutes(app)
+        app.Get("/swagger/*", swagger.WrapHandler)
+
+        // API v1
+        api := app.Group("/api")
+        v1 := api.Group("/v1")
+
+        // Auth routes (public)
+        auth := v1.Group("/auth")
+        auth.Post("/register", authHandler.Register)
+        auth.Post("/login", authHandler.Login)
+        auth.Post("/refresh", authHandler.Refresh)
+
+        // User routes (protected)
+        users := v1.Group("/users", authMiddleware)
+        users.Get("/me", userHandler.GetMe)
+        users.Get("", userHandler.GetAllUsers)
+        users.Put("/:id", userHandler.UpdateUser)
+        users.Delete("/:id", userHandler.DeleteUser)
+}
+`
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
