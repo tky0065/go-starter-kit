@@ -24,14 +24,14 @@ theme:
         name: Passer au mode clair
   features:
     - navigation.sections
-    - navigation.expand
     - navigation.top
     - navigation.indexes
     - toc.follow
-    - toc.integrate
     - search.suggest
     - search.highlight
     - content.code.copy
+    - content.action.edit
+    - content.action.view
   icon:
     repo: fontawesome/brands/github
 
