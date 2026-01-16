@@ -10,11 +10,11 @@ Un outil CLI puissant pour générer des projets Go prêts pour la production en
 
 **v1.0.0** - Stable et prêt pour la production
 
-- :material-check: **Production ready** - Utilisé dans des projets réels
-- :material-check: **3 templates** - Minimal, Full (JWT), GraphQL
-- :material-check: **Bien testé** - Tests unitaires et E2E
-- :material-check: **Documentation complète** - Guides et exemples
-- :material-check: **Open source** - MIT License
+ **Production ready** - Utilisé dans des projets réels
+ **3 templates** - Minimal, Full (JWT), GraphQL
+ **Bien testé** - Tests unitaires et E2E
+ **Documentation complète** - Guides et exemples
+ **Open source** - MIT License
 
 ## Aperçu
 
