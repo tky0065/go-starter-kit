@@ -6,7 +6,7 @@
 
 Un outil CLI puissant pour générer des projets Go prêts pour la production en quelques secondes.
 
-## :material-rocket-launch: Version actuelle
+## Version actuelle
 
 **v1.0.0** - Stable et prêt pour la production
 
