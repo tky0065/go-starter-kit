@@ -187,7 +187,7 @@ func TestRunFunction(t *testing.T) {
 	}
 
 	// Run the main logic
-	err = run(projectName, DefaultTemplate)
+	err = run(projectName, DefaultTemplate, DefaultDatabase)
 	if err != nil {
 		t.Errorf("run() returned error: %v", err)
 	}
@@ -217,7 +217,7 @@ func TestRunFunction(t *testing.T) {
 
 // TestRunFunctionWithInvalidName tests that run() fails with invalid project name
 func TestRunFunctionWithInvalidName(t *testing.T) {
-	err := run("../invalid-path", DefaultTemplate)
+	err := run("../invalid-path", DefaultTemplate, DefaultDatabase)
 	if err == nil {
 		t.Error("Expected error for invalid project name, got nil")
 	}
@@ -228,7 +228,7 @@ func TestRunFunctionWithInvalidName(t *testing.T) {
 
 // TestRunFunctionWithEmptyName tests that run() fails with empty project name
 func TestRunFunctionWithEmptyName(t *testing.T) {
-	err := run("", DefaultTemplate)
+	err := run("", DefaultTemplate, DefaultDatabase)
 	if err == nil {
 		t.Error("Expected error for empty project name, got nil")
 	}
@@ -257,7 +257,7 @@ func TestRunFunctionWithExistingDirectory(t *testing.T) {
 	}
 
 	// Run should fail because directory exists
-	err = run(projectName, DefaultTemplate)
+	err = run(projectName, DefaultTemplate, DefaultDatabase)
 	if err == nil {
 		t.Error("Expected error for existing directory, got nil")
 	}
@@ -479,5 +479,89 @@ func TestHelpShowsTemplateFlag(t *testing.T) {
 	}
 	if !strings.Contains(outputStr, "  graphql   GraphQL API with gqlgen and GraphQL Playground") {
 		t.Errorf("Expected 'graphql' template description in help, got: %s", outputStr)
+	}
+}
+
+// TestTemplateFlagBothSyntaxes tests that both --template=minimal and --template minimal work
+// This is a regression test for the bug where --template minimal (with space) didn't work
+func TestTemplateFlagBothSyntaxes(t *testing.T) {
+	tests := []struct {
+		name           string
+		args           []string
+		wantTemplate   string
+		cleanupProject string
+	}{
+		{
+			name:           "template flag with equals",
+			args:           []string{"--template=minimal", "test-equals-syntax"},
+			wantTemplate:   "minimal",
+			cleanupProject: "test-equals-syntax",
+		},
+		{
+			name:           "template flag with space",
+			args:           []string{"--template", "minimal", "test-space-syntax"},
+			wantTemplate:   "minimal",
+			cleanupProject: "test-space-syntax",
+		},
+		{
+			name:           "full template with space",
+			args:           []string{"--template", "full", "test-full-space"},
+			wantTemplate:   "full",
+			cleanupProject: "test-full-space",
+		},
+		{
+			name:           "graphql template with space",
+			args:           []string{"--template", "graphql", "test-graphql-space"},
+			wantTemplate:   "graphql",
+			cleanupProject: "test-graphql-space",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer os.RemoveAll(tt.cleanupProject)
+
+			cmd := exec.Command(binaryPath, tt.args...)
+			output, err := cmd.CombinedOutput()
+
+			if err != nil {
+				t.Errorf("Expected no error, got: %v\nOutput: %s", err, string(output))
+				return
+			}
+
+			outputStr := string(output)
+			expectedMsg := fmt.Sprintf("template: %s", tt.wantTemplate)
+			if !strings.Contains(outputStr, expectedMsg) {
+				t.Errorf("Expected output to contain %q, got: %s", expectedMsg, outputStr)
+			}
+
+			// Verify that the correct template was actually generated
+			// For minimal template, pkg/auth should NOT exist
+			if tt.wantTemplate == "minimal" {
+				authPath := filepath.Join(tt.cleanupProject, "pkg", "auth")
+				if _, err := os.Stat(authPath); !os.IsNotExist(err) {
+					t.Errorf("Minimal template should not have pkg/auth directory, but it exists")
+				}
+
+				// Verify that pkg/config and pkg/logger DO exist
+				configPath := filepath.Join(tt.cleanupProject, "pkg", "config")
+				if _, err := os.Stat(configPath); os.IsNotExist(err) {
+					t.Errorf("Minimal template should have pkg/config directory, but it doesn't exist")
+				}
+
+				loggerPath := filepath.Join(tt.cleanupProject, "pkg", "logger")
+				if _, err := os.Stat(loggerPath); os.IsNotExist(err) {
+					t.Errorf("Minimal template should have pkg/logger directory, but it doesn't exist")
+				}
+			}
+
+			// For full template, pkg/auth SHOULD exist
+			if tt.wantTemplate == "full" {
+				authPath := filepath.Join(tt.cleanupProject, "pkg", "auth")
+				if _, err := os.Stat(authPath); os.IsNotExist(err) {
+					t.Errorf("Full template should have pkg/auth directory, but it doesn't exist")
+				}
+			}
+		})
 	}
 }
