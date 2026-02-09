@@ -1,59 +1,59 @@
-# Database Selection Guide
+# Guide de sélection de base de données
 
 **Navigation:**
 
-- <i class="material-icons">menu_book</i> [Database Selection Guide](./databases.md) ← You are here
-- <i class="material-icons">sync</i> [Database Migration Guide](./database-migration.md) - How to switch databases
-- <i class="material-icons">arrow_back</i> [Back to README](../README.md)
+- <i class="material-icons">menu_book</i> [Guide de sélection de base de données](./databases.md) ← Vous êtes ici
+- <i class="material-icons">sync</i> [Guide de migration de base de données](./database-migration.md) - Comment changer de base de données
+- <i class="material-icons">arrow_back</i> [Retour au README](../README.md)
 
 ---
 
-go-starter-kit supports **3 database options** to fit your project needs.
+go-starter-kit supporte **3 options de base de données** pour s'adapter aux besoins de votre projet.
 
-## Quick Comparison
+## Comparaison rapide
 
-| Database | Best For | Complexity | Production Ready | Setup Time |
-|----------|----------|------------|------------------|------------|
-| **PostgreSQL** | Production apps, complex queries | Medium | <i class="material-icons success">check_circle</i> Yes | 2 min (Docker) |
-| **MySQL** | Wide compatibility, shared hosting | Medium | <i class="material-icons success">check_circle</i> Yes | 2 min (Docker) |
-| **SQLite** | Prototyping, small apps, embedded | Low | <i class="material-icons warning">error</i> Limited | 0 min |
+| Base de données | Idéal pour | Complexité | Prêt production | Temps installation |
+|-----------------|------------|------------|-----------------|-------------------|
+| **PostgreSQL** | Apps production, requêtes complexes | Moyen | <i class="material-icons success">check_circle</i> Oui | 2 min (Docker) |
+| **MySQL** | Compatibilité large, hébergement partagé | Moyen | <i class="material-icons success">check_circle</i> Oui | 2 min (Docker) |
+| **SQLite** | Prototypage, petites apps, embarqué | Faible | <i class="material-icons warning">error</i> Limité | 0 min |
 
-## Detailed Comparison
+## Comparaison détaillée
 
-### PostgreSQL (Default)
+### PostgreSQL (Par défaut)
 
-**Command:**
+**Commande:**
 ```bash
-create-go-starter my-app
-# OR explicitly:
-create-go-starter my-app --database=postgres
+create-go-starter mon-app
+# OU explicitement:
+create-go-starter mon-app --database=postgres
 ```
 
-**Strengths:**
+**Points forts:**
 
-- <i class="material-icons success">check</i> Advanced SQL features (JSON, arrays, full-text search)
-- <i class="material-icons success">check</i> Excellent performance and reliability
-- <i class="material-icons success">check</i> ACID compliant, strong data integrity
-- <i class="material-icons success">check</i> Great for complex queries and analytics
-- <i class="material-icons success">check</i> Active community and ecosystem
+- <i class="material-icons success">check</i> Fonctionnalités SQL avancées (JSON, arrays, recherche full-text)
+- <i class="material-icons success">check</i> Excellentes performances et fiabilité
+- <i class="material-icons success">check</i> Conforme ACID, forte intégrité des données
+- <i class="material-icons success">check</i> Idéal pour les requêtes complexes et l'analytique
+- <i class="material-icons success">check</i> Communauté active et écosystème riche
 
 **Limitations:**
 
-- <i class="material-icons warning">warning</i> Requires Docker for local development
-- <i class="material-icons warning">warning</i> Slightly more resource-intensive than MySQL
+- <i class="material-icons warning">warning</i> Nécessite Docker pour le développement local
+- <i class="material-icons warning">warning</i> Légèrement plus gourmand en ressources que MySQL
 
-**When to use:**
-- Production applications with complex data
-- Apps requiring advanced SQL features
-- Projects needing strong data integrity
+**Quand l'utiliser:**
+- Applications de production avec données complexes
+- Applications nécessitant des fonctionnalités SQL avancées
+- Projets nécessitant une forte intégrité des données
 
-**Docker Setup:**
+**Configuration Docker:**
 ```yaml
-# Automatically included in docker-compose.yml
+# Automatiquement inclus dans docker-compose.yml
 docker-compose up -d
 ```
 
-**DSN Format:**
+**Format DSN:**
 ```
 user:password@tcp(host:5432)/dbname?sslmode=disable
 ```
@@ -62,36 +62,36 @@ user:password@tcp(host:5432)/dbname?sslmode=disable
 
 ### MySQL/MariaDB
 
-**Command:**
+**Commande:**
 ```bash
-create-go-starter my-app --database=mysql
+create-go-starter mon-app --database=mysql
 ```
 
-**Strengths:**
+**Points forts:**
 
-- <i class="material-icons success">check</i> Wide compatibility and hosting support
-- <i class="material-icons success">check</i> Excellent for read-heavy workloads
-- <i class="material-icons success">check</i> Mature ecosystem and tooling
-- <i class="material-icons success">check</i> Easy to find hosting providers
+- <i class="material-icons success">check</i> Large compatibilité et support d'hébergement
+- <i class="material-icons success">check</i> Excellent pour les charges de lecture intensives
+- <i class="material-icons success">check</i> Écosystème et outils matures
+- <i class="material-icons success">check</i> Facile de trouver des fournisseurs d'hébergement
 
 **Limitations:**
 
-- <i class="material-icons warning">warning</i> Fewer advanced features than PostgreSQL
-- <i class="material-icons warning">warning</i> Some variations between MySQL and MariaDB
+- <i class="material-icons warning">warning</i> Moins de fonctionnalités avancées que PostgreSQL
+- <i class="material-icons warning">warning</i> Quelques variations entre MySQL et MariaDB
 
-**When to use:**
-- Shared hosting environments
-- Read-heavy applications
-- Teams familiar with MySQL
-- Need for wide hosting compatibility
+**Quand l'utiliser:**
+- Environnements d'hébergement partagé
+- Applications à forte charge de lecture
+- Équipes familières avec MySQL
+- Besoin de large compatibilité d'hébergement
 
-**Docker Setup:**
+**Configuration Docker:**
 ```yaml
-# Automatically included in docker-compose.yml
+# Automatiquement inclus dans docker-compose.yml
 docker-compose up -d
 ```
 
-**DSN Format:**
+**Format DSN:**
 ```
 user:password@tcp(host:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local
 ```
@@ -100,81 +100,81 @@ user:password@tcp(host:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local
 
 ### SQLite
 
-**Command:**
+**Commande:**
 ```bash
-create-go-starter my-app --database=sqlite
+create-go-starter mon-app --database=sqlite
 ```
 
-**Strengths:**
+**Points forts:**
 
-- <i class="material-icons success">check</i> Zero configuration (no server needed)
-- <i class="material-icons success">check</i> Perfect for rapid prototyping
-- <i class="material-icons success">check</i> Single file database (easy backup/share)
-- <i class="material-icons success">check</i> Great for testing and development
-- <i class="material-icons success">check</i> Very fast for small datasets
+- <i class="material-icons success">check</i> Zéro configuration (pas de serveur nécessaire)
+- <i class="material-icons success">check</i> Parfait pour le prototypage rapide
+- <i class="material-icons success">check</i> Base de données en fichier unique (sauvegarde/partage facile)
+- <i class="material-icons success">check</i> Idéal pour les tests et le développement
+- <i class="material-icons success">check</i> Très rapide pour les petits jeux de données
 
 **Limitations:**
 
-- <i class="material-icons warning">warning</i> Limited concurrent writes (locks entire DB)
-- <i class="material-icons warning">warning</i> No user/permission management
-- <i class="material-icons warning">warning</i> Not suitable for high-traffic production
-- <i class="material-icons warning">warning</i> Limited scalability
+- <i class="material-icons warning">warning</i> Écritures concurrentes limitées (verrouille toute la DB)
+- <i class="material-icons warning">warning</i> Pas de gestion utilisateurs/permissions
+- <i class="material-icons warning">warning</i> Non adapté pour la production à fort trafic
+- <i class="material-icons warning">warning</i> Scalabilité limitée
 
-**When to use:**
-- Rapid prototyping and MVPs
-- Desktop applications
-- Embedded systems
-- Development and testing
-- Small-scale production (<100 concurrent users)
+**Quand l'utiliser:**
+- Prototypage rapide et MVPs
+- Applications desktop
+- Systèmes embarqués
+- Développement et tests
+- Production à petite échelle (<100 utilisateurs concurrents)
 
-**No Docker Needed:**
+**Pas besoin de Docker:**
 ```bash
-# Just run your app, SQLite file auto-created
+# Lancez simplement votre app, le fichier SQLite est créé automatiquement
 go run ./cmd/main.go
-# Creates: ./my_database.db
+# Crée: ./my_database.db
 ```
 
-**DSN Format:**
+**Format DSN:**
 ```
 ./database.db
 ```
 
 ---
 
-## Decision Matrix
+## Matrice de décision
 
-**Choose PostgreSQL if:**
+**Choisir PostgreSQL si:**
 
-- <i class="material-icons">center_focus_strong</i> You're unsure (it's the default for a reason)
-- <i class="material-icons">center_focus_strong</i> You need production-grade reliability
-- <i class="material-icons">center_focus_strong</i> You have complex relational data
+- <i class="material-icons">center_focus_strong</i> Vous hésitez (c'est le choix par défaut pour une bonne raison)
+- <i class="material-icons">center_focus_strong</i> Vous avez besoin de fiabilité niveau production
+- <i class="material-icons">center_focus_strong</i> Vous avez des données relationnelles complexes
 
-**Choose MySQL if:**
+**Choisir MySQL si:**
 
-- <i class="material-icons">center_focus_strong</i> You're using shared hosting
-- <i class="material-icons">center_focus_strong</i> Your team knows MySQL well
-- <i class="material-icons">center_focus_strong</i> You have read-heavy workloads
+- <i class="material-icons">center_focus_strong</i> Vous utilisez un hébergement partagé
+- <i class="material-icons">center_focus_strong</i> Votre équipe connaît bien MySQL
+- <i class="material-icons">center_focus_strong</i> Vous avez des charges de lecture intensives
 
-**Choose SQLite if:**
+**Choisir SQLite si:**
 
-- <i class="material-icons">center_focus_strong</i> You're prototyping or building an MVP
-- <i class="material-icons">center_focus_strong</i> You want zero infrastructure setup
-- <i class="material-icons">center_focus_strong</i> You have a small user base (<100 concurrent)
+- <i class="material-icons">center_focus_strong</i> Vous prototypez ou construisez un MVP
+- <i class="material-icons">center_focus_strong</i> Vous voulez zéro infrastructure
+- <i class="material-icons">center_focus_strong</i> Vous avez une petite base d'utilisateurs (<100 concurrents)
 
 ---
 
-## Configuration Examples
+## Exemples de configuration
 
 ### PostgreSQL
 
 **.env.example:**
 ```bash
-# Database Configuration (PostgreSQL)
+# Configuration base de données (PostgreSQL)
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=postgres
-DB_NAME=myapp
+DB_NAME=monapp
 DB_SSLMODE=disable
 ```
 
@@ -182,82 +182,82 @@ DB_SSLMODE=disable
 
 **.env.example:**
 ```bash
-# Database Configuration (MySQL)
+# Configuration base de données (MySQL)
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=root
-DB_NAME=myapp
+DB_NAME=monapp
 ```
 
 ### SQLite
 
 **.env.example:**
 ```bash
-# Database Configuration (SQLite - embedded)
-DB_NAME=myapp.db
+# Configuration base de données (SQLite - embarqué)
+DB_NAME=monapp.db
 ```
 
 ---
 
-## Migration Guide
+## Guide de migration
 
-See [database-migration.md](./database-migration.md) for detailed migration instructions between databases.
+Voir [database-migration.md](./database-migration.md) pour les instructions détaillées de migration entre bases de données.
 
 ---
 
-## Performance Considerations
+## Considérations de performance
 
 ### PostgreSQL
-- Best for: Complex queries, ACID transactions, concurrent writes
-- Write performance: Excellent (MVCC architecture)
-- Read performance: Excellent with proper indexing
-- Connection pooling: Recommended for production
+- Idéal pour: Requêtes complexes, transactions ACID, écritures concurrentes
+- Performance écriture: Excellente (architecture MVCC)
+- Performance lecture: Excellente avec indexation appropriée
+- Connection pooling: Recommandé pour la production
 
 ### MySQL
-- Best for: Read-heavy workloads, simple queries
-- Write performance: Good (row-level locking)
-- Read performance: Excellent (query cache)
-- Connection pooling: Recommended for production
+- Idéal pour: Charges de lecture intensives, requêtes simples
+- Performance écriture: Bonne (verrouillage au niveau ligne)
+- Performance lecture: Excellente (cache de requêtes)
+- Connection pooling: Recommandé pour la production
 
 ### SQLite
-- Best for: Single-user, low-concurrency scenarios
-- Write performance: Limited (database-level locking)
-- Read performance: Excellent for small datasets
-- Connection pooling: Not applicable (file-based)
+- Idéal pour: Scénarios mono-utilisateur, faible concurrence
+- Performance écriture: Limitée (verrouillage au niveau base de données)
+- Performance lecture: Excellente pour petits jeux de données
+- Connection pooling: Non applicable (fichier)
 
 ---
 
-## Frequently Asked Questions
+## Questions fréquentes
 
-### Can I switch databases later?
-Yes, but it requires regenerating the project with the new database flag and migrating data. See [database-migration.md](./database-migration.md) for details.
+### Puis-je changer de base de données plus tard?
+Oui, mais cela nécessite de régénérer le projet avec le nouveau flag de base de données et de migrer les données. Voir [database-migration.md](./database-migration.md) pour les détails.
 
-### Which database should I use for my SaaS?
-For a production SaaS application, we recommend **PostgreSQL** for its reliability, ACID compliance, and advanced features. MySQL is also a solid choice if you're more familiar with it.
+### Quelle base de données dois-je utiliser pour mon SaaS?
+Pour une application SaaS de production, nous recommandons **PostgreSQL** pour sa fiabilité, conformité ACID et fonctionnalités avancées. MySQL est aussi un bon choix si vous le connaissez mieux.
 
-### Can I use SQLite in production?
-SQLite can be used for small-scale production (<100 concurrent users), but we recommend PostgreSQL or MySQL for applications expecting growth.
+### Puis-je utiliser SQLite en production?
+SQLite peut être utilisé pour de la production à petite échelle (<100 utilisateurs concurrents), mais nous recommandons PostgreSQL ou MySQL pour les applications qui prévoient de croître.
 
-### Do I need Docker?
-- **PostgreSQL**: Yes (for local development)
-- **MySQL**: Yes (for local development)
-- **SQLite**: No (embedded database)
+### Ai-je besoin de Docker?
+- **PostgreSQL**: Oui (pour le développement local)
+- **MySQL**: Oui (pour le développement local)
+- **SQLite**: Non (base de données embarquée)
 
-### What about MongoDB or NoSQL?
-NoSQL support (MongoDB) was considered but deferred to future releases. Current focus is on SQL databases with GORM support.
-
----
-
-## Additional Resources
-
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
-- [MySQL Documentation](https://dev.mysql.com/doc/)
-- [SQLite Documentation](https://www.sqlite.org/docs.html)
-- [GORM Documentation](https://gorm.io/docs/)
-- [Database Migration Guide](./database-migration.md)
+### Qu'en est-il de MongoDB ou NoSQL?
+Le support NoSQL (MongoDB) a été considéré mais reporté aux versions futures. L'accent actuel est mis sur les bases de données SQL avec support GORM.
 
 ---
 
-**Last Updated:** 2026-02-09
-**Related Stories:** Epic 7 - Multi-Database Support (Stories 7.1-7.5)
+## Ressources additionnelles
+
+- [Documentation PostgreSQL](https://www.postgresql.org/docs/)
+- [Documentation MySQL](https://dev.mysql.com/doc/)
+- [Documentation SQLite](https://www.sqlite.org/docs.html)
+- [Documentation GORM](https://gorm.io/docs/)
+- [Guide de migration de base de données](./database-migration.md)
+
+---
+
+**Dernière mise à jour:** 2026-02-09
+**Stories liées:** Epic 7 - Support multi-bases de données (Stories 7.1-7.5)
