@@ -21,7 +21,7 @@ func TestGenerateProjectFiles(t *testing.T) {
 	}
 
 	// Generate project files
-	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, DefaultDatabase); err != nil {
 		t.Fatalf("generateProjectFiles() error = %v", err)
 	}
 
@@ -86,7 +86,7 @@ func TestGenerateProjectFiles(t *testing.T) {
 
 func TestGenerateProjectFilesWithInvalidPath(t *testing.T) {
 	// Test with non-existent directory
-	err := generateProjectFiles("/non/existent/path", "test-project", DefaultTemplate)
+	err := generateProjectFiles("/non/existent/path", "test-project", DefaultTemplate, DefaultDatabase)
 	if err == nil {
 		t.Error("generateProjectFiles() should return error for non-existent path")
 	}
@@ -167,7 +167,7 @@ func TestGenerateProjectFilesWithInvalidModuleName(t *testing.T) {
 
 	// Test with empty module name
 	var err error // Declared err here
-	err = generateProjectFiles(projectPath, "", DefaultTemplate)
+	err = generateProjectFiles(projectPath, "", DefaultTemplate, DefaultDatabase)
 	if err == nil {
 		t.Error("generateProjectFiles() should return error for empty module name")
 	}
@@ -176,7 +176,7 @@ func TestGenerateProjectFilesWithInvalidModuleName(t *testing.T) {
 	}
 
 	// Test with invalid module name
-	err = generateProjectFiles(projectPath, "-invalid", DefaultTemplate)
+	err = generateProjectFiles(projectPath, "-invalid", DefaultTemplate, DefaultDatabase)
 	if err == nil {
 		t.Error("generateProjectFiles() should return error for invalid module name")
 	}
@@ -197,7 +197,7 @@ func TestGenerateProjectFilesCreatesAllRequiredFiles(t *testing.T) {
 	}
 
 	// Generate project files
-	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, DefaultDatabase); err != nil {
 		t.Fatalf("generateProjectFiles() error = %v", err)
 	}
 
@@ -276,7 +276,7 @@ func TestE2EGeneratedProjectBuilds(t *testing.T) {
 	}
 
 	// Generate all project files
-	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, DefaultDatabase); err != nil {
 		t.Fatalf("Failed to generate project files: %v", err)
 	}
 
@@ -348,7 +348,7 @@ func TestGoModTidyWorkflow(t *testing.T) {
 		t.Fatalf("Failed to create project structure: %v", err)
 	}
 
-	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, DefaultDatabase); err != nil {
 		t.Fatalf("Failed to generate project files: %v", err)
 	}
 
@@ -406,7 +406,7 @@ func TestGenerateGraphQLTemplateFiles(t *testing.T) {
 	}
 
 	// Generate GraphQL project files
-	if err := generateProjectFiles(projectPath, projectName, TemplateGraphQL); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, TemplateGraphQL, DefaultDatabase); err != nil {
 		t.Fatalf("generateProjectFiles(graphql) error = %v", err)
 	}
 
@@ -554,7 +554,7 @@ func TestE2EGraphQLProjectBuilds(t *testing.T) {
 	}
 
 	// Generate all project files
-	if err := generateProjectFiles(projectPath, projectName, TemplateGraphQL); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, TemplateGraphQL, DefaultDatabase); err != nil {
 		t.Fatalf("Failed to generate project files: %v", err)
 	}
 

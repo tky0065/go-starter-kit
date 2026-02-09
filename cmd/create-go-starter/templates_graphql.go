@@ -944,13 +944,7 @@ APP_PORT=8080
 # CORS Configuration (comma-separated list of allowed origins)
 CORS_ORIGINS=http://localhost:3000,http://localhost:5173
 
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=postgres
-DB_NAME=` + t.projectName + `
-DB_SSLMODE=disable
+` + DatabaseEnvVars(t.database, t.projectName) + `
 `
 }
 

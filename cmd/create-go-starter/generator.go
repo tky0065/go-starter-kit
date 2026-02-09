@@ -76,9 +76,13 @@ type FileGenerator struct {
 
 // generateProjectFiles creates all the initial project files with templates.
 // The template parameter specifies the type of project to generate (minimal, full, graphql).
-// For this story (6.1), only the "full" template is implemented. Other templates will be implemented in future stories.
+// The database parameter specifies the database type (postgres, mysql, sqlite, mongodb).
+// generateProjectFiles creates all the initial project files with templates.
+// The template parameter specifies the type of project to generate (minimal, full, graphql).
+// The database parameter specifies the database type (postgres, mysql, sqlite, mongodb).
+// Database-specific templates are used to generate the correct driver, DSN, and configurations.
 // This switch statement clarifies intent and returns an explicit error for unimplemented templates.
-func generateProjectFiles(projectPath, projectName, template string) error {
+func generateProjectFiles(projectPath, projectName, template, database string) error {
 	// Validate that the project directory exists
 	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
 		return fmt.Errorf("project directory does not exist: %s", projectPath)
@@ -91,11 +95,11 @@ func generateProjectFiles(projectPath, projectName, template string) error {
 
 	switch template {
 	case "full":
-		return generateFullTemplateFiles(projectPath, projectName)
+		return generateFullTemplateFiles(projectPath, projectName, database)
 	case "minimal":
-		return generateMinimalTemplateFiles(projectPath, projectName)
+		return generateMinimalTemplateFiles(projectPath, projectName, database)
 	case "graphql":
-		return generateGraphQLTemplateFiles(projectPath, projectName)
+		return generateGraphQLTemplateFiles(projectPath, projectName, database)
 	default:
 		// This case should ideally not be reached if validateTemplate is called beforehand.
 		return fmt.Errorf("unsupported template '%s'", template)
@@ -104,9 +108,9 @@ func generateProjectFiles(projectPath, projectName, template string) error {
 
 // generateFullTemplateFiles generates all files for the "full" template.
 // This function was extracted from the original generateProjectFiles to improve modularity.
-func generateFullTemplateFiles(projectPath, projectName string) error {
-	// Create templates instance
-	templates := NewProjectTemplates(projectName)
+func generateFullTemplateFiles(projectPath, projectName, database string) error {
+	// Create templates instance with database support
+	templates := NewProjectTemplatesWithDatabase(projectName, database)
 
 	// Define all files to generate
 	files := []FileGenerator{
@@ -275,9 +279,9 @@ func generateFullTemplateFiles(projectPath, projectName string) error {
 
 // generateMinimalTemplateFiles generates all files for the "minimal" template.
 // This template includes basic infrastructure without authentication.
-func generateMinimalTemplateFiles(projectPath, projectName string) error {
-	// Create templates instance
-	templates := NewProjectTemplates(projectName)
+func generateMinimalTemplateFiles(projectPath, projectName, database string) error {
+	// Create templates instance with database support
+	templates := NewProjectTemplatesWithDatabase(projectName, database)
 
 	// Define all files to generate for minimal template
 	// Note: No auth-related files (pkg/auth, internal/domain/user, handlers, repository)
@@ -387,9 +391,9 @@ func generateMinimalTemplateFiles(projectPath, projectName string) error {
 
 // generateGraphQLTemplateFiles generates all files for the "graphql" template.
 // This template includes GraphQL support with gqlgen, gofiber/adaptor, and GORM.
-func generateGraphQLTemplateFiles(projectPath, projectName string) error {
-	// Create templates instance
-	templates := NewProjectTemplates(projectName)
+func generateGraphQLTemplateFiles(projectPath, projectName, database string) error {
+	// Create templates instance with database support
+	templates := NewProjectTemplatesWithDatabase(projectName, database)
 
 	// Define all files to generate for GraphQL template
 	files := []FileGenerator{

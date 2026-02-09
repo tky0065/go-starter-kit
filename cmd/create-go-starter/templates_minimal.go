@@ -197,13 +197,7 @@ APP_NAME=` + t.projectName + `
 APP_ENV=development
 APP_PORT=8080
 
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=postgres
-DB_NAME=` + t.projectName + `
-DB_SSLMODE=disable
+` + DatabaseEnvVars(t.database, t.projectName) + `
 `
 }
 

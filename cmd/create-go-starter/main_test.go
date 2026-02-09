@@ -275,7 +275,7 @@ func TestPrintSuccessMessage(t *testing.T) {
 		}
 	}()
 
-	printSuccessMessage("test-project")
+	printSuccessMessage("test-project", "postgres")
 }
 
 // TestValidateTemplateValid tests validateTemplate with valid templates (AC: 1, 2)
