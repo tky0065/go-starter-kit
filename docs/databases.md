@@ -260,4 +260,3 @@ Le support NoSQL (MongoDB) a été considéré mais reporté aux versions future
 ---
 
 **Dernière mise à jour:** 2026-02-09
-**Stories liées:** Epic 7 - Support multi-bases de données (Stories 7.1-7.5)

@@ -405,4 +405,3 @@ Cas d'usage: Développement local plus rapide sans Docker.
 ---
 
 **Dernière mise à jour:** 2026-02-09
-**Stories liées:** Epic 7 - Support multi-bases de données (Story 7.5)
