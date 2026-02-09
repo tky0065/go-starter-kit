@@ -148,47 +148,84 @@ func copyEnvFile(projectPath string) error {
 }
 
 func main() {
-	// Parse flags
-	help := flag.Bool("help", false, "Show help message")
-	flag.BoolVar(help, "h", false, "Show help message (shorthand)")
+	// Parse flags manually to allow flags in any position
+	// This is necessary because we want to support both:
+	// - create-go-starter -database sqlite my-project
+	// - create-go-starter my-project -database sqlite
+	help := false
+	var template string = DefaultTemplate
+	var database string = DefaultDatabase
+	var projectName string
 
-	var template string
-	flag.StringVar(&template, "template", DefaultTemplate, "Template type to generate")
+	// Manually parse arguments to allow flags in any position
+	args := os.Args[1:]
+	for i := 0; i < len(args); i++ {
+		arg := args[i]
 
-	var database string
-	flag.StringVar(&database, "database", DefaultDatabase, "Database type to use")
+		if arg == "-help" || arg == "--help" || arg == "-h" {
+			help = true
+		} else if strings.HasPrefix(arg, "-template=") || strings.HasPrefix(arg, "--template=") {
+			// Handle -template=value syntax
+			parts := strings.SplitN(arg, "=", 2)
+			if len(parts) == 2 {
+				template = parts[1]
+			}
+		} else if strings.HasPrefix(arg, "-database=") || strings.HasPrefix(arg, "--database=") {
+			// Handle -database=value syntax
+			parts := strings.SplitN(arg, "=", 2)
+			if len(parts) == 2 {
+				database = parts[1]
+			}
+		} else if (arg == "-template" || arg == "--template") && i+1 < len(args) {
+			template = args[i+1]
+			i++ // Skip next arg since we consumed it
+		} else if (arg == "-database" || arg == "--database") && i+1 < len(args) {
+			database = args[i+1]
+			i++ // Skip next arg since we consumed it
+		} else if !strings.HasPrefix(arg, "-") && projectName == "" {
+			// First non-flag argument is the project name
+			projectName = arg
+		}
+	}
 
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: create-go-starter [options] <project-name>\n\n")
+	// Define usage function
+	usage := func() {
+		fmt.Fprintf(os.Stderr, "Usage: create-go-starter [options] <project-name>\n")
+		fmt.Fprintf(os.Stderr, "       Flags can be placed before or after the project name\n\n")
 		fmt.Fprintf(os.Stderr, "Options:\n")
-		flag.PrintDefaults()
+		fmt.Fprintf(os.Stderr, "  -database string\n")
+		fmt.Fprintf(os.Stderr, "        Database type to use (default \"postgres\")\n")
+		fmt.Fprintf(os.Stderr, "  -template string\n")
+		fmt.Fprintf(os.Stderr, "        Template type to generate (default \"full\")\n")
+		fmt.Fprintf(os.Stderr, "  -h, -help\n")
+		fmt.Fprintf(os.Stderr, "        Show help message\n")
 		fmt.Fprintf(os.Stderr, "\nTemplates:\n")
-		fmt.Fprintf(os.Stderr, "  %-9s %s\n", TemplateMinimal, TemplateMinimalDesc) // Adjusted formatting
-		fmt.Fprintf(os.Stderr, "  %-9s %s\n", TemplateFull, TemplateFullDesc)       // Adjusted formatting
-		fmt.Fprintf(os.Stderr, "  %-9s %s\n", TemplateGraphQL, TemplateGraphQLDesc) // Adjusted formatting
+		fmt.Fprintf(os.Stderr, "  %-9s %s\n", TemplateMinimal, TemplateMinimalDesc)
+		fmt.Fprintf(os.Stderr, "  %-9s %s\n", TemplateFull, TemplateFullDesc)
+		fmt.Fprintf(os.Stderr, "  %-9s %s\n", TemplateGraphQL, TemplateGraphQLDesc)
 		fmt.Fprintf(os.Stderr, "\nDatabases:\n")
 		fmt.Fprintf(os.Stderr, "  %-9s PostgreSQL (default) - Production-ready, advanced features\n", DatabasePostgres)
 		fmt.Fprintf(os.Stderr, "  %-9s MySQL/MariaDB - Wide compatibility, shared hosting\n", DatabaseMySQL)
 		fmt.Fprintf(os.Stderr, "  %-9s SQLite - Quick prototyping, embedded apps\n", DatabaseSQLite)
 		fmt.Fprintf(os.Stderr, "  %-9s MongoDB - NoSQL, document-oriented\n", DatabaseMongoDB)
+		fmt.Fprintf(os.Stderr, "\nExamples:\n")
+		fmt.Fprintf(os.Stderr, "  create-go-starter my-project\n")
+		fmt.Fprintf(os.Stderr, "  create-go-starter -database sqlite my-project\n")
+		fmt.Fprintf(os.Stderr, "  create-go-starter my-project -template minimal\n")
+		fmt.Fprintf(os.Stderr, "  create-go-starter -database mysql -template minimal my-project\n")
 	}
 
-	flag.Parse()
-
-	if *help {
-		flag.Usage()
+	if help {
+		usage()
 		os.Exit(0)
 	}
 
-	args := flag.Args()
-	if len(args) < 1 {
+	if projectName == "" {
 		// Changed to not include "Error: " here, as Red() function will add color to the message itself.
 		fmt.Fprintln(os.Stderr, Red("Project name is required"))
-		flag.Usage()
+		usage()
 		os.Exit(1)
 	}
-
-	projectName := args[0]
 
 	// Validate project name using the shared utility
 	if err := utils.ValidateGoModuleName(projectName); err != nil {

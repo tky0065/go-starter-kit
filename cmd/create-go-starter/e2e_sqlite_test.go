@@ -269,3 +269,52 @@ func TestE2ESQLiteVsPostgresComparison(t *testing.T) {
 
 	t.Log("🎉 SQLite vs PostgreSQL comparison tests passed!")
 }
+
+// TestE2ESQLiteReadmeContent validates that SQLite projects have correct README documentation
+func TestE2ESQLiteReadmeContent(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping E2E README test in short mode")
+	}
+
+	tmpDir := t.TempDir()
+	projectName := "test-sqlite-readme"
+	projectPath := filepath.Join(tmpDir, projectName)
+
+	if err := createProjectStructure(projectPath, TemplateFull); err != nil {
+		t.Fatalf("Failed to create project structure: %v", err)
+	}
+
+	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, "sqlite"); err != nil {
+		t.Fatalf("Failed to generate project files: %v", err)
+	}
+
+	readmePath := filepath.Join(projectPath, "README.md")
+	content, err := os.ReadFile(readmePath)
+	if err != nil {
+		t.Fatalf("Failed to read README.md: %v", err)
+	}
+
+	readmeContent := string(content)
+
+	// README should mention SQLite as the database
+	if !strings.Contains(readmeContent, "SQLite") {
+		t.Error("README.md should mention SQLite database")
+	}
+
+	// README should NOT mention PostgreSQL for SQLite projects
+	if strings.Contains(readmeContent, "PostgreSQL 14") {
+		t.Error("SQLite project README should NOT mention PostgreSQL 14+ requirement")
+	}
+
+	// README should note SQLite is embedded (no external DB needed)
+	if !strings.Contains(readmeContent, "Inclus dans Go") {
+		t.Error("README should mention that SQLite is included in Go (no external installation)")
+	}
+
+	// README should NOT mention Docker database setup for SQLite
+	if strings.Contains(readmeContent, "postgres:") || strings.Contains(readmeContent, "POSTGRES_") {
+		t.Error("SQLite README should NOT contain PostgreSQL Docker setup")
+	}
+
+	t.Log("✅ SQLite README documentation is correct and database-aware")
+}

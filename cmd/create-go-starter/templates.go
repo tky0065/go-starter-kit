@@ -488,16 +488,18 @@ networks:
 
 // ReadmeTemplate returns the README.md file content
 func (t *ProjectTemplates) ReadmeTemplate() string {
+	dbDesc := t.readmeDatabaseDescription()
+	dbPrereqs := t.readmeDatabasePrerequisites()
 	return `# ` + t.projectName + `
 
-Application backend Go générée avec create-go-starter. Architecture hexagonale complète avec authentification JWT, API REST, et intégration PostgreSQL.
+Application backend Go générée avec create-go-starter. Architecture hexagonale complète avec authentification JWT, API REST, et intégration ` + dbDesc + `.
 
 ## Fonctionnalités
 
 - **Architecture hexagonale** (Ports & Adapters) - Séparation claire des responsabilités
 - **Authentification JWT** - Access tokens + Refresh tokens avec rotation sécurisée
 - **API REST** avec Fiber v2 - Framework web haute performance
-- **Base de données** - GORM avec PostgreSQL et migrations automatiques
+- **Base de données** - GORM avec ` + dbDesc + ` et migrations automatiques
 - **Injection de dépendances** - uber-go/fx pour architecture modulaire
 - **Tests complets** - Tests unitaires et d'intégration
 - **Documentation Swagger** - API documentée automatiquement avec OpenAPI
@@ -507,11 +509,7 @@ Application backend Go générée avec create-go-starter. Architecture hexagonal
 
 ## Prérequis
 
-- **Go 1.25+** - [Télécharger](https://golang.org/dl/)
-- **PostgreSQL** - Base de données (peut être lancée via Docker)
-- **Docker** (optionnel) - Pour containerisation
-- **Make** - Pour les commandes de build
-- **swag** (optionnel) - Pour régénérer la documentation Swagger
+- ` + dbPrereqs + `
   ` + "```bash" + `
   go install github.com/swaggo/swag/cmd/swag@latest
   ` + "```" + `
@@ -541,38 +539,7 @@ Ajoutez dans ` + "`.env`" + `:
 JWT_SECRET=<votre_secret_généré>
 ` + "```" + `
 
-### 3. Lancer PostgreSQL
-
-**Option A: Docker (recommandé)**
-
-` + "```bash" + `
-docker run -d \
-  --name postgres \
-  -e POSTGRES_DB=` + t.projectName + ` \
-  -e POSTGRES_PASSWORD=postgres \
-  -p 5432:5432 \
-  postgres:16-alpine
-` + "```" + `
-
-**Option B: PostgreSQL local**
-
-` + "```bash" + `
-# macOS
-brew install postgresql
-brew services start postgresql
-createdb ` + t.projectName + `
-
-# Linux
-sudo apt install postgresql
-sudo systemctl start postgresql
-sudo -u postgres createdb ` + t.projectName + `
-` + "```" + `
-
-### 4. Lancer l'application
-
-` + "```bash" + `
-make run
-` + "```" + `
+` + t.readmeDatabaseSetup() + `
 
 L'API sera disponible sur ` + "`http://localhost:8080`" + `
 
@@ -695,7 +662,7 @@ make lint
 | Composant | Bibliothèque | Description |
 |-----------|-------------|-------------|
 | Web Framework | [Fiber](https://gofiber.io/) v2 | Framework HTTP rapide |
-| ORM | [GORM](https://gorm.io/) | ORM avec PostgreSQL |
+| ORM | [GORM](https://gorm.io/) | ` + t.readmeDatabaseStackDescription() + ` |
 | DI | [fx](https://uber-go.github.io/fx/) | Dependency injection |
 | Logging | [zerolog](https://github.com/rs/zerolog) | Logger structuré |
 | JWT | [golang-jwt](https://github.com/golang-jwt/jwt) v5 | Authentification |
@@ -707,23 +674,7 @@ make lint
 Fichier ` + "`.env`" + `:
 
 ` + "```bash" + `
-# Application
-APP_NAME=` + t.projectName + `
-APP_ENV=development
-APP_PORT=8080
-
-# Database
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=postgres
-DB_NAME=` + t.projectName + `
-DB_SSLMODE=disable
-
-# JWT
-JWT_SECRET=                  # À REMPLIR!
-JWT_EXPIRY=15m               # 15 minutes
-REFRESH_TOKEN_EXPIRY=168h    # 7 jours
+` + t.readmeDatabaseConfig() + `
 ` + "```" + `
 
 ## Déploiement
@@ -731,14 +682,7 @@ REFRESH_TOKEN_EXPIRY=168h    # 7 jours
 ### Docker
 
 ` + "```bash" + `
-# Build
-make docker-build
-
-# Run
-docker run -p 8080:8080 \
-  -e DB_HOST=host.docker.internal \
-  -e JWT_SECRET=<secret> \
-  ` + t.projectName + `:latest
+` + t.readmeDatabaseDockerRun() + `
 ` + "```" + `
 
 ### Docker Compose
@@ -1511,6 +1455,281 @@ APP_PORT=3000
 - Déployez avec Docker: ` + "`make docker-build && make docker-run`" + `
 
 Bon développement! 🚀
+`
+}
+
+// readmeDatabaseDescription returns a database-specific description for the README
+// This ensures generated projects have accurate documentation for their chosen database
+func (t *ProjectTemplates) readmeDatabaseDescription() string {
+	switch t.database {
+	case "sqlite":
+		return `**SQLite** - Base de données locale (fichier .db), parfait pour prototypage et tests`
+	case "mysql":
+		return `**MySQL/MariaDB** - Base de données relationnelle, compatible partout, facile à déployer`
+	case "mongodb":
+		return `**MongoDB** - Base de données NoSQL orientée documents, flexible et scalable`
+	case "postgres":
+		fallthrough
+	default:
+		return `**PostgreSQL** - Base de données relationnelle avancée, robuste et performante`
+	}
+}
+
+// readmeDatabasePrerequisites returns database-specific prerequisites section for README
+func (t *ProjectTemplates) readmeDatabasePrerequisites() string {
+	switch t.database {
+	case "sqlite":
+		return `**Go 1.25+** - [Télécharger](https://golang.org/dl/)
+- **SQLite** - Inclus dans Go (aucune installation externe requise)
+- **Docker** (optionnel) - Pour containerisation
+- **Make** - Pour les commandes de build
+- **swag** (optionnel) - Pour régénérer la documentation Swagger`
+	case "mysql":
+		return `**Go 1.25+** - [Télécharger](https://golang.org/dl/)
+- **MySQL 8.0+** ou **MariaDB 10.5+** - Base de données (peut être lancée via Docker)
+- **Docker** (optionnel) - Pour containerisation
+- **Make** - Pour les commandes de build
+- **swag** (optionnel) - Pour régénérer la documentation Swagger`
+	case "mongodb":
+		return `**Go 1.25+** - [Télécharger](https://golang.org/dl/)
+- **MongoDB 5.0+** - Base de données (peut être lancée via Docker)
+- **Docker** (optionnel) - Pour containerisation
+- **Make** - Pour les commandes de build
+- **swag** (optionnel) - Pour régénérer la documentation Swagger`
+	case "postgres":
+		fallthrough
+	default:
+		return `**Go 1.25+** - [Télécharger](https://golang.org/dl/)
+- **PostgreSQL 14+** - Base de données (peut être lancée via Docker)
+- **Docker** (optionnel) - Pour containerisation
+- **Make** - Pour les commandes de build
+- **swag** (optionnel) - Pour régénérer la documentation Swagger`
+	}
+}
+
+// readmeDatabaseConfig returns database-specific configuration example for README
+func (t *ProjectTemplates) readmeDatabaseConfig() string {
+	switch t.database {
+	case "sqlite":
+		return `# Application
+APP_NAME=` + t.projectName + `
+APP_ENV=development
+APP_PORT=8080
+
+# Database (SQLite - fichier local)
+DB_NAME=` + t.projectName + `.db
+
+# JWT
+JWT_SECRET=                  # À REMPLIR!
+JWT_EXPIRY=15m               # 15 minutes
+REFRESH_TOKEN_EXPIRY=168h    # 7 jours
+`
+	case "mysql":
+		return `# Application
+APP_NAME=` + t.projectName + `
+APP_ENV=development
+APP_PORT=8080
+
+# Database (MySQL)
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=secret
+DB_NAME=` + t.projectName + `
+
+# JWT
+JWT_SECRET=                  # À REMPLIR!
+JWT_EXPIRY=15m               # 15 minutes
+REFRESH_TOKEN_EXPIRY=168h    # 7 jours
+`
+	case "mongodb":
+		return `# Application
+APP_NAME=` + t.projectName + `
+APP_ENV=development
+APP_PORT=8080
+
+# Database (MongoDB)
+DB_HOST=localhost
+DB_PORT=27017
+DB_NAME=` + t.projectName + `
+
+# JWT
+JWT_SECRET=                  # À REMPLIR!
+JWT_EXPIRY=15m               # 15 minutes
+REFRESH_TOKEN_EXPIRY=168h    # 7 jours
+`
+	case "postgres":
+		fallthrough
+	default:
+		return `# Application
+APP_NAME=` + t.projectName + `
+APP_ENV=development
+APP_PORT=8080
+
+# Database (PostgreSQL)
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=` + t.projectName + `
+DB_SSLMODE=disable
+
+# JWT
+JWT_SECRET=                  # À REMPLIR!
+JWT_EXPIRY=15m               # 15 minutes
+REFRESH_TOKEN_EXPIRY=168h    # 7 jours
+`
+	}
+}
+
+// readmeDatabaseSetup returns database-specific setup instructions for README
+// For SQLite, this returns an empty string (no setup needed)
+// For other databases, returns the setup instructions
+func (t *ProjectTemplates) readmeDatabaseSetup() string {
+	switch t.database {
+	case "sqlite":
+		// SQLite needs no external setup
+		return ``
+	case "mysql":
+		return `### 3. Lancer MySQL
+
+**Option A: Docker (recommandé)**
+
+` + "```bash" + `
+docker run -d \
+  --name mysql \
+  -e MYSQL_ROOT_PASSWORD=secret \
+  -e MYSQL_DATABASE=` + t.projectName + ` \
+  -p 3306:3306 \
+  mysql:8.0
+` + "```" + `
+
+**Option B: MySQL local**
+
+` + "```bash" + `
+# macOS
+brew install mysql
+brew services start mysql
+mysql -u root -p"secret" -e "CREATE DATABASE ` + t.projectName + `;"
+
+# Linux
+sudo apt install mysql-server
+sudo systemctl start mysql
+mysql -u root -e "CREATE DATABASE ` + t.projectName + `;"
+` + "```" + `
+
+### 4. Lancer l'application
+
+` + "```bash" + `
+make run
+` + "```" + ``
+	case "mongodb":
+		return `### 3. Lancer MongoDB
+
+**Option A: Docker (recommandé)**
+
+` + "```bash" + `
+docker run -d \
+  --name mongodb \
+  -e MONGO_INITDB_DATABASE=` + t.projectName + ` \
+  -p 27017:27017 \
+  mongo:latest
+` + "```" + `
+
+**Option B: MongoDB local**
+
+` + "```bash" + `
+# macOS
+brew install mongodb-community
+brew services start mongodb-community
+
+# Linux
+sudo apt install -y mongodb
+sudo systemctl start mongodb
+` + "```" + `
+
+### 4. Lancer l'application
+
+` + "```bash" + `
+make run
+` + "```" + ``
+	case "postgres":
+		fallthrough
+	default:
+		return `### 3. Lancer PostgreSQL
+
+**Option A: Docker (recommandé)**
+
+` + "```bash" + `
+docker run -d \
+  --name postgres \
+  -e POSTGRES_DB=` + t.projectName + ` \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:16-alpine
+` + "```" + `
+
+**Option B: PostgreSQL local**
+
+` + "```bash" + `
+# macOS
+brew install postgresql
+brew services start postgresql
+createdb ` + t.projectName + `
+
+# Linux
+sudo apt install postgresql
+sudo systemctl start postgresql
+sudo -u postgres createdb ` + t.projectName + `
+` + "```" + `
+
+### 4. Lancer l'application
+
+` + "```bash" + `
+make run
+` + "```" + ``
+	}
+}
+
+// readmeDatabaseStackDescription returns database-specific description for tech stack table
+func (t *ProjectTemplates) readmeDatabaseStackDescription() string {
+	switch t.database {
+	case "sqlite":
+		return `ORM avec SQLite (fichier local)`
+	case "mysql":
+		return `ORM avec MySQL/MariaDB`
+	case "mongodb":
+		return `ODM avec MongoDB`
+	case "postgres":
+		fallthrough
+	default:
+		return `ORM avec PostgreSQL`
+	}
+}
+
+// readmeDatabaseDockerRun returns database-specific Docker run command
+func (t *ProjectTemplates) readmeDatabaseDockerRun() string {
+	if t.database == "sqlite" {
+		// For SQLite, just need the JWT_SECRET and basic config
+		return `# Build
+make docker-build
+
+# Run with SQLite (database file mounted as volume)
+docker run -p 8080:8080 \
+  -v $(pwd)/data:/app/data \
+  -e JWT_SECRET=<secret> \
+  ` + t.projectName + `:latest
+`
+	}
+	// For other databases, include DB_HOST
+	return `# Build
+make docker-build
+
+# Run
+docker run -p 8080:8080 \
+  -e DB_HOST=host.docker.internal \
+  -e JWT_SECRET=<secret> \
+  ` + t.projectName + `:latest
 `
 }
 
