@@ -1,9 +1,10 @@
 # Database Selection Guide
 
 **Navigation:**
-- 📖 [Database Selection Guide](./databases.md) ← You are here
-- 🔄 [Database Migration Guide](./database-migration.md) - How to switch databases
-- 📚 [Back to README](../README.md)
+
+- :material-book-open: [Database Selection Guide](./databases.md) ← You are here
+- :material-sync: [Database Migration Guide](./database-migration.md) - How to switch databases
+- :material-arrow-left: [Back to README](../README.md)
 
 ---
 
@@ -13,9 +14,9 @@ go-starter-kit supports **3 database options** to fit your project needs.
 
 | Database | Best For | Complexity | Production Ready | Setup Time |
 |----------|----------|------------|------------------|------------|
-| **PostgreSQL** | Production apps, complex queries | Medium | ✅ Yes | 2 min (Docker) |
-| **MySQL** | Wide compatibility, shared hosting | Medium | ✅ Yes | 2 min (Docker) |
-| **SQLite** | Prototyping, small apps, embedded | Low | ⚠️ Limited | 0 min |
+| **PostgreSQL** | Production apps, complex queries | Medium | :material-check-circle:{ .success } Yes | 2 min (Docker) |
+| **MySQL** | Wide compatibility, shared hosting | Medium | :material-check-circle:{ .success } Yes | 2 min (Docker) |
+| **SQLite** | Prototyping, small apps, embedded | Low | :material-alert-circle:{ .warning } Limited | 0 min |
 
 ## Detailed Comparison
 
@@ -29,15 +30,17 @@ create-go-starter my-app --database=postgres
 ```
 
 **Strengths:**
-- ✅ Advanced SQL features (JSON, arrays, full-text search)
-- ✅ Excellent performance and reliability
-- ✅ ACID compliant, strong data integrity
-- ✅ Great for complex queries and analytics
-- ✅ Active community and ecosystem
+
+- :material-check: Advanced SQL features (JSON, arrays, full-text search)
+- :material-check: Excellent performance and reliability
+- :material-check: ACID compliant, strong data integrity
+- :material-check: Great for complex queries and analytics
+- :material-check: Active community and ecosystem
 
 **Limitations:**
-- ⚠️ Requires Docker for local development
-- ⚠️ Slightly more resource-intensive than MySQL
+
+- :material-alert: Requires Docker for local development
+- :material-alert: Slightly more resource-intensive than MySQL
 
 **When to use:**
 - Production applications with complex data
@@ -65,14 +68,16 @@ create-go-starter my-app --database=mysql
 ```
 
 **Strengths:**
-- ✅ Wide compatibility and hosting support
-- ✅ Excellent for read-heavy workloads
-- ✅ Mature ecosystem and tooling
-- ✅ Easy to find hosting providers
+
+- :material-check: Wide compatibility and hosting support
+- :material-check: Excellent for read-heavy workloads
+- :material-check: Mature ecosystem and tooling
+- :material-check: Easy to find hosting providers
 
 **Limitations:**
-- ⚠️ Fewer advanced features than PostgreSQL
-- ⚠️ Some variations between MySQL and MariaDB
+
+- :material-alert: Fewer advanced features than PostgreSQL
+- :material-alert: Some variations between MySQL and MariaDB
 
 **When to use:**
 - Shared hosting environments
@@ -101,17 +106,19 @@ create-go-starter my-app --database=sqlite
 ```
 
 **Strengths:**
-- ✅ Zero configuration (no server needed)
-- ✅ Perfect for rapid prototyping
-- ✅ Single file database (easy backup/share)
-- ✅ Great for testing and development
-- ✅ Very fast for small datasets
+
+- :material-check: Zero configuration (no server needed)
+- :material-check: Perfect for rapid prototyping
+- :material-check: Single file database (easy backup/share)
+- :material-check: Great for testing and development
+- :material-check: Very fast for small datasets
 
 **Limitations:**
-- ⚠️ Limited concurrent writes (locks entire DB)
-- ⚠️ No user/permission management
-- ⚠️ Not suitable for high-traffic production
-- ⚠️ Limited scalability
+
+- :material-alert: Limited concurrent writes (locks entire DB)
+- :material-alert: No user/permission management
+- :material-alert: Not suitable for high-traffic production
+- :material-alert: Limited scalability
 
 **When to use:**
 - Rapid prototyping and MVPs
@@ -137,19 +144,22 @@ go run ./cmd/main.go
 ## Decision Matrix
 
 **Choose PostgreSQL if:**
-- 🎯 You're unsure (it's the default for a reason)
-- 🎯 You need production-grade reliability
-- 🎯 You have complex relational data
+
+- :material-target: You're unsure (it's the default for a reason)
+- :material-target: You need production-grade reliability
+- :material-target: You have complex relational data
 
 **Choose MySQL if:**
-- 🎯 You're using shared hosting
-- 🎯 Your team knows MySQL well
-- 🎯 You have read-heavy workloads
+
+- :material-target: You're using shared hosting
+- :material-target: Your team knows MySQL well
+- :material-target: You have read-heavy workloads
 
 **Choose SQLite if:**
-- 🎯 You're prototyping or building an MVP
-- 🎯 You want zero infrastructure setup
-- 🎯 You have a small user base (<100 concurrent)
+
+- :material-target: You're prototyping or building an MVP
+- :material-target: You want zero infrastructure setup
+- :material-target: You have a small user base (<100 concurrent)
 
 ---
 

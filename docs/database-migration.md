@@ -1,9 +1,10 @@
 # Database Migration Guide
 
 **Navigation:**
-- 📖 [Database Selection Guide](./databases.md) - Which database to choose
-- 🔄 [Database Migration Guide](./database-migration.md) ← You are here
-- 📚 [Back to README](../README.md)
+
+- :material-book-open: [Database Selection Guide](./databases.md) - Which database to choose
+- :material-sync: [Database Migration Guide](./database-migration.md) ← You are here
+- :material-arrow-left: [Back to README](../README.md)
 
 ---
 
@@ -11,7 +12,8 @@ This guide helps you migrate between different database systems in go-starter-ki
 
 ## Prerequisites
 
-⚠️ **Important:** Database migration is not automated. You'll need to:
+!!! warning "Important"
+    Database migration is not automated. You'll need to:
 1. Export data from source database
 2. Regenerate project with target database
 3. Import data to target database
@@ -23,7 +25,7 @@ This guide helps you migrate between different database systems in go-starter-ki
 
 ### PostgreSQL ↔ MySQL
 
-**Difficulty:** 🟢 Easy (both SQL, GORM compatible)
+**Difficulty:** :material-circle:{ .success } Easy (both SQL, GORM compatible)
 
 **Steps:**
 
@@ -73,7 +75,7 @@ This guide helps you migrate between different database systems in go-starter-ki
 
 ### SQL → SQLite (Downgrade)
 
-**Difficulty:** 🟡 Medium (feature reduction)
+**Difficulty:** :material-circle:{ .warning } Medium (feature reduction)
 
 **When to do this:**
 - Moving from production to local development
@@ -110,11 +112,12 @@ This guide helps you migrate between different database systems in go-starter-ki
    - No concurrent writes
 
 **Limitations:**
-- ⚠️ No concurrent writes (database-level locking)
-- ⚠️ Limited data types
-- ⚠️ No stored procedures
-- ⚠️ No user/permission management
-- ⚠️ Not suitable for production at scale
+
+- :material-alert: No concurrent writes (database-level locking)
+- :material-alert: Limited data types
+- :material-alert: No stored procedures
+- :material-alert: No user/permission management
+- :material-alert: Not suitable for production at scale
 
 **Recommended Use Cases:**
 - Local development environments
@@ -126,7 +129,7 @@ This guide helps you migrate between different database systems in go-starter-ki
 
 ### SQLite → SQL (Upgrade)
 
-**Difficulty:** 🟢 Easy (adding features)
+**Difficulty:** :material-circle:{ .success } Easy (adding features)
 
 **When to do this:**
 - Scaling from prototype to production
