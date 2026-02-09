@@ -374,6 +374,11 @@ Thumbs.db
 # Temporary files
 tmp/
 temp/
+
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
 `
 }
 

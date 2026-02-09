@@ -1,4 +1,4 @@
-# generated: 2026-01-14
+# generated: 2026-02-05
 # project: go-starter-kit
 # project_key: go-starter-kit
 # tracking_system: file-system
@@ -33,55 +33,21 @@
 # - SM typically creates next story after previous one is 'done' to incorporate learnings
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
-generated: 2026-01-14
+generated: 2026-02-05
 project: go-starter-kit
 project_key: go-starter-kit
 tracking_system: file-system
 story_location: _bmad-output/implementation-artifacts
 
 development_status:
-  # Epic 1
+  # Epic 1-6 (v1.0.0 - COMPLÉTÉS)
   epic-1: done
-  1-1-installation-de-l-outil-cli: done
-  1-2-generation-de-la-structure-de-base: done
-  1-3-injection-dynamique-du-contexte-projet: done
-  1-4-initialisation-du-serveur-fiber-di-fx-et-db: done
-  1-5-environnement-de-developpement-dotenv-makefile-docker: done
-  epic-1-retrospective: optional
-
-  # Epic 2
   epic-2: done
-  2-1-inscription-des-utilisateurs: done
-  2-2-authentification: done
-  2-3-renouvellement-de-session: done
-  2-4-securisation-des-routes: done
-  epic-2-retrospective: optional
-
-  # Epic 3
   epic-3: done
-  3-1-gestion-du-profil-utilisateur: done
-  3-2-operations-crud-utilisateur: done
-  epic-3-retrospective: optional
-
-  # Epic 4
   epic-4: done
-  4-1-standardisation-des-api: done
-  4-2-gestion-centralisee-des-erreurs: done
-  4-3-documentation-interactive: done
-  4-4-automatisation-de-la-qualite: done
-  4-5-integration-continue: done
-  epic-4-retrospective: optional
-  # Epic 5
   epic-5: done
-  5-1-initialisation-git-automatique: done
-  5-2-installation-automatique-des-dependances-go: done
-  5-3-amelioration-de-la-couverture-de-tests-du-cli: done
-  5-4-optimisation-de-l-image-docker-generee: done
-  5-5-documentation-des-fonctions-publiques-du-code-genere: done
-  5-6-validation-finale-et-smoke-tests: done
-  epic-5-retrospective: optional
-
-  # Epic 6 - Templates Multiples
+  
+  # Epic 6 - Templates Multiples (v1.0.0 - COMPLÉTÉ)
   epic-6: done
   6-1-flag-cli-pour-selection-de-template: done
   6-2-template-minimal: done
@@ -89,3 +55,53 @@ development_status:
   6-4-template-graphql: done
   6-5-documentation-et-aide-cli: done
   epic-6-retrospective: optional
+
+  # Epic 7 - Multi-Database Support (v1.1.0 - ROADMAP)
+  epic-7: in-progress
+  7-1-database-selection-flag: done
+  7-2-mysql-mariadb-support: review
+  7-3-sqlite-support: review
+  7-4-mongodb-support-optional: ready-for-dev (LAISSE D'ABORDE)
+  7-5-database-tests-documentation: ready-for-dev
+  epic-7-retrospective: optional
+
+  # Epic 8 - CRUD Scaffolding Generator (v1.2.0 - ROADMAP)
+  epic-8: backlog
+  8-1-add-model-cli-command: backlog
+  8-2-model-repository-generation: backlog
+  8-3-service-handler-generation: backlog
+  8-4-tests-swagger-auto-update: backlog
+  8-5-relations-support: backlog
+  epic-8-retrospective: optional
+
+  # Epic 9 - Advanced Observability (v1.3.0 - ROADMAP)
+  epic-9: backlog
+  9-1-prometheus-metrics-endpoint: backlog
+  9-2-distributed-tracing: backlog
+  9-3-advanced-health-checks: backlog
+  9-4-grafana-dashboard-template: backlog
+  epic-9-retrospective: optional
+
+  # Epic 10 - CLI Enhancements & Developer Experience (ROADMAP)
+  epic-10: backlog
+  10-1-interactive-mode: backlog
+  10-2-dry-run-preview: backlog
+  10-3-doctor-command: backlog
+  10-4-visual-feedback-progress: backlog
+  epic-10-retrospective: optional
+
+  # Epic 11 - Multi-Framework Support (v2.0.0 - ROADMAP)
+  epic-11: backlog
+  11-1-framework-selection-flag: backlog
+  11-2-gin-framework-templates: backlog
+  11-3-echo-framework-templates: backlog
+  11-4-framework-agnostic-abstraction: backlog
+  epic-11-retrospective: optional
+
+  # Epic 12 - Plugin System & Extensibility (v2.x - ROADMAP)
+  epic-12: backlog
+  12-1-plugin-architecture: backlog
+  12-2-plugin-install-command: backlog
+  12-3-community-plugin-registry: backlog
+  12-4-core-plugins-oauth-payment-cloud: backlog
+  epic-12-retrospective: optional
