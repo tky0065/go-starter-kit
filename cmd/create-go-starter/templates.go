@@ -3,17 +3,119 @@ package main
 // ProjectTemplates holds all the templates for project file generation
 type ProjectTemplates struct {
 	projectName string
+	database    string // Database type: mysql, postgres (default), sqlite, mongodb
 }
 
 // NewProjectTemplates creates a new templates instance with the given project name
+// Defaults to postgres for backward compatibility
 func NewProjectTemplates(projectName string) *ProjectTemplates {
 	return &ProjectTemplates{
 		projectName: projectName,
+		database:    "postgres", // Default to postgres for backward compatibility
 	}
 }
 
-// GoModTemplate returns the go.mod file content
+// NewProjectTemplatesWithDatabase creates a new templates instance with project name and database type
+func NewProjectTemplatesWithDatabase(projectName, database string) *ProjectTemplates {
+	if database == "" {
+		database = "postgres" // Default to postgres if empty
+	}
+	return &ProjectTemplates{
+		projectName: projectName,
+		database:    database,
+	}
+}
+
+// Helper methods for database-specific configuration
+
+// getDatabaseDescription returns a description for the database type
+func (t *ProjectTemplates) getDatabaseDescription() string {
+	switch t.database {
+	case "mysql":
+		return "MySQL"
+	case "sqlite":
+		return "SQLite"
+	case "postgres", "":
+		return "PostgreSQL"
+	default:
+		return "PostgreSQL"
+	}
+}
+
+// getDefaultPort returns the default port for the database type
+func (t *ProjectTemplates) getDefaultPort() string {
+	switch t.database {
+	case "mysql":
+		return "3306"
+	case "sqlite":
+		return ""
+	case "postgres", "":
+		return "5432"
+	default:
+		return "5432"
+	}
+}
+
+// getDefaultUser returns the default user for the database type
+func (t *ProjectTemplates) getDefaultUser() string {
+	switch t.database {
+	case "mysql":
+		return "root"
+	case "sqlite":
+		return ""
+	case "postgres", "":
+		return "postgres"
+	default:
+		return "postgres"
+	}
+}
+
+// getDefaultPassword returns the default password for the database type
+func (t *ProjectTemplates) getDefaultPassword() string {
+	switch t.database {
+	case "mysql":
+		return "secret"
+	case "sqlite":
+		return ""
+	case "postgres", "":
+		return "postgres"
+	default:
+		return "postgres"
+	}
+}
+
+// getDatabaseConnectionCode returns the GORM connection code for the database type
+func (t *ProjectTemplates) getDatabaseConnectionCode() string {
+	switch t.database {
+	case "mysql":
+		return "mysql.Open(dsn)"
+	case "sqlite":
+		return "sqlite.Open(dsn)"
+	case "postgres", "":
+		return "postgres.Open(dsn)"
+	default:
+		return "postgres.Open(dsn)"
+	}
+}
+
+// getDatabaseDSN returns the DSN format string for the database type
+func (t *ProjectTemplates) getDatabaseDSN() string {
+	switch t.database {
+	case "mysql":
+		return `"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local"`
+	case "sqlite":
+		return `"./%s.db"`
+	case "postgres", "":
+		return `"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s"`
+	default:
+		return `"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s"`
+	}
+}
+
 func (t *ProjectTemplates) GoModTemplate() string {
+	// Get the appropriate database driver dependency
+	databaseDriver := GoModDependencies(t.database)
+
 	return `module ` + t.projectName + `
 
 go 1.25.5
@@ -29,7 +131,7 @@ require (
 	github.com/swaggo/swag v1.16.4
 	go.uber.org/fx v1.24.0
 	golang.org/x/crypto v0.32.0
-	gorm.io/driver/postgres v1.5.11
+	` + databaseDriver + `
 	gorm.io/gorm v1.31.1
 )
 `
@@ -283,26 +385,70 @@ temp/
 
 // DockerComposeTemplate returns the docker-compose.yml file content
 func (t *ProjectTemplates) DockerComposeTemplate() string {
+	// Get database-specific environment variables for API service
+	dbHost := "db"
+	dbPort := "5432"
+	dbUser := "postgres"
+	dbPassword := "postgres"
+	dbName := t.projectName
+
+	// Adjust for MySQL
+	if t.database == "mysql" {
+		dbPort = "3306"
+		dbUser = "root"
+		dbPassword = "secret"
+	}
+
+	// For SQLite, no db service needed
+	if t.database == "sqlite" {
+		return `version: '3.8'
+
+services:
+  # Application API (SQLite - no separate DB service needed)
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ` + t.projectName + `_api
+    environment:
+      APP_NAME: ` + t.projectName + `
+      APP_ENV: development
+      APP_PORT: 8080
+      DB_NAME: ` + dbName + `.db
+      JWT_SECRET: dev-secret-change-in-production
+      JWT_EXPIRY: 24h
+    ports:
+      - "8080:8080"
+    networks:
+      - ` + t.projectName + `_network
+    volumes:
+      - .:/app
+      - sqlite_data:/app/data
+    command: /app/` + t.projectName + `
+
+volumes:
+  sqlite_data:
+
+networks:
+  ` + t.projectName + `_network:
+    driver: bridge
+`
+	}
+
+	// For MySQL and PostgreSQL, include database service
+	dbServiceComment := "# PostgreSQL Database"
+	if t.database == "mysql" {
+		dbServiceComment = "# MySQL Database"
+	}
+
+	// Get database service configuration from helper function
+	dbServiceConfig := DatabaseDockerService(t.database, t.projectName)
+
 	return `version: '3.8'
 
 services:
-  # PostgreSQL Database
-  db:
-    image: postgres:16-alpine
-    container_name: ` + t.projectName + `_db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ` + t.projectName + `
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  ` + dbServiceComment + `
+` + dbServiceConfig + `
     networks:
       - ` + t.projectName + `_network
 
@@ -316,11 +462,11 @@ services:
       APP_NAME: ` + t.projectName + `
       APP_ENV: development
       APP_PORT: 8080
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: ` + t.projectName + `
+      DB_HOST: ` + dbHost + `
+      DB_PORT: ` + dbPort + `
+      DB_USER: ` + dbUser + `
+      DB_PASSWORD: ` + dbPassword + `
+      DB_NAME: ` + dbName + `
       DB_SSLMODE: disable
       JWT_SECRET: dev-secret-change-in-production
       JWT_EXPIRY: 24h
@@ -334,9 +480,6 @@ services:
     volumes:
       - .:/app
     command: /app/` + t.projectName + `
-
-volumes:
-  postgres_data:
 
 networks:
   ` + t.projectName + `_network:
@@ -683,7 +826,41 @@ func NewLogger() zerolog.Logger {
 
 // DatabaseTemplate returns the internal/infrastructure/database/database.go file content
 func (t *ProjectTemplates) DatabaseTemplate() string {
-	return `// Package database provides PostgreSQL database connectivity and management.
+	// Get database-specific import path and description
+	databaseImport := DatabaseImportPath(t.database)
+	databaseDesc := t.getDatabaseDescription()
+	connectionCode := DatabaseConnectionCode(t.database)
+
+	// Generate database-specific DSN code
+	var dsnCode string
+	switch t.database {
+	case "mysql":
+		dsnCode = `dsn := fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		config.GetEnv("DB_USER", "root"),
+		config.GetEnv("DB_PASSWORD", "secret"),
+		config.GetEnv("DB_HOST", "localhost"),
+		config.GetEnv("DB_PORT", "3306"),
+		config.GetEnv("DB_NAME", "` + t.projectName + `"),
+	)`
+	case "sqlite":
+		dsnCode = `dsn := fmt.Sprintf(
+		"./%s.db",
+		config.GetEnv("DB_NAME", "` + t.projectName + `"),
+	)`
+	default: // postgres
+		dsnCode = `dsn := fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		config.GetEnv("DB_HOST", "localhost"),
+		config.GetEnv("DB_PORT", "5432"),
+		config.GetEnv("DB_USER", "postgres"),
+		config.GetEnv("DB_PASSWORD", "postgres"),
+		config.GetEnv("DB_NAME", "` + t.projectName + `"),
+		config.GetEnv("DB_SSLMODE", "disable"),
+	)`
+	}
+
+	return `// Package database provides ` + databaseDesc + ` database connectivity and management.
 // It configures GORM for database operations, handles connection pooling,
 // runs automatic migrations, and manages graceful shutdown through fx lifecycle hooks.
 // This package is part of the infrastructure layer in the hexagonal architecture.
@@ -695,7 +872,7 @@ import (
 
 	"github.com/rs/zerolog"
 	"go.uber.org/fx"
-	"gorm.io/driver/postgres"
+	"` + databaseImport + `"
 	"gorm.io/gorm"
 
 	"` + t.projectName + `/internal/models"
@@ -709,21 +886,13 @@ var Module = fx.Module("database",
 )
 
 // NewDatabase creates a new GORM database connection configured from environment variables.
-// It establishes a PostgreSQL connection, configures connection pooling, and runs
+// It establishes a database connection, configures connection pooling, and runs
 // automatic migrations for all domain models. Returns an error if connection fails.
 func NewDatabase(logger zerolog.Logger) (*gorm.DB, error) {
 	// Build DSN from environment variables
-	dsn := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		config.GetEnv("DB_HOST", "localhost"),
-		config.GetEnv("DB_PORT", "5432"),
-		config.GetEnv("DB_USER", "postgres"),
-		config.GetEnv("DB_PASSWORD", "postgres"),
-		config.GetEnv("DB_NAME", "` + t.projectName + `"),
-		config.GetEnv("DB_SSLMODE", "disable"),
-	)
+	` + dsnCode + `
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(` + connectionCode + `, &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}

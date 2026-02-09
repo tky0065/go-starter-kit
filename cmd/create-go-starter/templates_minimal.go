@@ -3,6 +3,9 @@ package main
 // MinimalGoModTemplate returns the go.mod file content for minimal template.
 // This template excludes JWT and authentication-related dependencies.
 func (t *ProjectTemplates) MinimalGoModTemplate() string {
+	// Get the appropriate database driver dependency
+	databaseDriver := GoModDependencies(t.database)
+
 	return `module ` + t.projectName + `
 
 go 1.25.5
@@ -15,7 +18,7 @@ require (
 	github.com/swaggo/fiber-swagger v1.3.0
 	github.com/swaggo/swag v1.16.4
 	go.uber.org/fx v1.24.0
-	gorm.io/driver/postgres v1.5.11
+	` + databaseDriver + `
 	gorm.io/gorm v1.31.1
 )
 `
@@ -394,7 +397,41 @@ MIT
 // MinimalDatabaseTemplate returns the database.go for minimal template.
 // This template has no User model migrations.
 func (t *ProjectTemplates) MinimalDatabaseTemplate() string {
-	return `// Package database provides PostgreSQL database connectivity and management.
+	// Get database-specific import path and description
+	databaseImport := DatabaseImportPath(t.database)
+	databaseDesc := t.getDatabaseDescription()
+	connectionCode := DatabaseConnectionCode(t.database)
+
+	// Generate database-specific DSN code
+	var dsnCode string
+	switch t.database {
+	case "mysql":
+		dsnCode = `dsn := fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		config.GetEnv("DB_USER", "root"),
+		config.GetEnv("DB_PASSWORD", "secret"),
+		config.GetEnv("DB_HOST", "localhost"),
+		config.GetEnv("DB_PORT", "3306"),
+		config.GetEnv("DB_NAME", "` + t.projectName + `"),
+	)`
+	case "sqlite":
+		dsnCode = `dsn := fmt.Sprintf(
+		"./%s.db",
+		config.GetEnv("DB_NAME", "` + t.projectName + `"),
+	)`
+	default: // postgres
+		dsnCode = `dsn := fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		config.GetEnv("DB_HOST", "localhost"),
+		config.GetEnv("DB_PORT", "5432"),
+		config.GetEnv("DB_USER", "postgres"),
+		config.GetEnv("DB_PASSWORD", "postgres"),
+		config.GetEnv("DB_NAME", "` + t.projectName + `"),
+		config.GetEnv("DB_SSLMODE", "disable"),
+	)`
+	}
+
+	return `// Package database provides ` + databaseDesc + ` database connectivity and management.
 // It configures GORM for database operations, handles connection pooling,
 // and manages graceful shutdown through fx lifecycle hooks.
 package database
@@ -406,7 +443,7 @@ import (
 
 	"github.com/rs/zerolog"
 	"go.uber.org/fx"
-	"gorm.io/driver/postgres"
+	"` + databaseImport + `"
 	"gorm.io/gorm"
 
 	"` + t.projectName + `/pkg/config"
@@ -419,20 +456,12 @@ var Module = fx.Module("database",
 )
 
 // NewDatabase creates a new GORM database connection configured from environment variables.
-// It establishes a PostgreSQL connection and configures connection pooling.
+// It establishes a database connection and configures connection pooling.
 func NewDatabase(logger zerolog.Logger) (*gorm.DB, error) {
 	// Build DSN from environment variables
-	dsn := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		config.GetEnv("DB_HOST", "localhost"),
-		config.GetEnv("DB_PORT", "5432"),
-		config.GetEnv("DB_USER", "postgres"),
-		config.GetEnv("DB_PASSWORD", "postgres"),
-		config.GetEnv("DB_NAME", "` + t.projectName + `"),
-		config.GetEnv("DB_SSLMODE", "disable"),
-	)
+	` + dsnCode + `
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(` + connectionCode + `, &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
