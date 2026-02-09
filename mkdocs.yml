@@ -44,6 +44,9 @@ nav:
   - Accueil: index.md
   - Installation: installation.md
   - Utilisation: usage.md
+  - Bases de données:
+      - Guide de sélection: databases.md
+      - Guide de migration: database-migration.md
   - Projet généré: generated-project-guide.md
   - Tutoriel complet: tutorial-exemple-complet.md
   - Architecture CLI: cli-architecture.md

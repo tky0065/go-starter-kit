@@ -202,6 +202,72 @@ GET    /                        # GraphQL Playground UI
 
 
 
+## Bases de données supportées
+
+Go Starter Kit supporte **3 types de bases de données** pour s'adapter à vos besoins:
+
+### Vue d'ensemble
+
+| Base de données | Idéal pour | Configuration | Commande |
+|-----------------|------------|---------------|----------|
+| **PostgreSQL** | Production, queries complexes | Docker | `create-go-starter mon-app` |
+| **MySQL** | Compatibilité large, shared hosting | Docker | `create-go-starter mon-app --database=mysql` |
+| **SQLite** | Prototypage, petites apps | Aucune | `create-go-starter mon-app --database=sqlite` |
+
+### PostgreSQL (défaut)
+
+```bash
+create-go-starter mon-app
+# OU explicitement:
+create-go-starter mon-app --database=postgres
+```
+
+**Avantages**:
+- ✅ Features SQL avancées (JSON, arrays, full-text search)
+- ✅ Excellente performance et fiabilité
+- ✅ ACID compliant, forte intégrité des données
+- ✅ Idéal pour production
+
+**Quand l'utiliser**: Applications production, données complexes, besoin de fiabilité
+
+### MySQL/MariaDB
+
+```bash
+create-go-starter mon-app --database=mysql
+```
+
+**Avantages**:
+- ✅ Compatibilité large avec hébergeurs
+- ✅ Excellent pour workloads read-heavy
+- ✅ Écosystème mature et bien documenté
+
+**Quand l'utiliser**: Shared hosting, équipes MySQL, compatibilité large
+
+### SQLite
+
+```bash
+create-go-starter mon-app --database=sqlite
+```
+
+**Avantages**:
+- ✅ Zéro configuration (pas de serveur)
+- ✅ Parfait pour prototypage rapide
+- ✅ Base de données dans un seul fichier
+- ✅ Très rapide pour petits datasets
+
+**Limitations**:
+- ⚠️ Écritures concurrentes limitées
+- ⚠️ Pas adapté pour production à grande échelle
+
+**Quand l'utiliser**: Prototypage, MVPs, développement, apps embarquées, petite production (<100 utilisateurs)
+
+### Guide complet
+
+Pour une comparaison détaillée, exemples de configuration, et guides de migration, consultez:
+
+- **[Guide de sélection des databases](databases.md)** - Comparaison complète et aide au choix
+- **[Guide de migration](database-migration.md)** - Migration entre databases
+
 ## Options disponibles
 
 ### Flags actuels
@@ -210,23 +276,35 @@ GET    /                        # GraphQL Playground UI
 create-go-starter --help                  # Afficher l'aide
 create-go-starter -h                      # Alias pour --help
 create-go-starter --template <type>       # Choisir le template (minimal, full, graphql)
+create-go-starter --database <type>       # Choisir la base de données (postgres, mysql, sqlite)
 ```
 
 **Exemples**:
 
 ```bash
-# Utiliser le template minimal
+# Template minimal
 create-go-starter mon-projet --template minimal
 
-# Utiliser le template full (défaut - équivalent à ne pas spécifier --template)
+# Template full (défaut)
 create-go-starter mon-projet --template full
 create-go-starter mon-projet  # Même résultat
 
-# Utiliser le template graphql
+# Template GraphQL
 create-go-starter mon-projet --template graphql
+
+# Choisir MySQL comme base de données
+create-go-starter mon-projet --database=mysql
+
+# Choisir SQLite (idéal pour prototypage)
+create-go-starter mon-projet --database=sqlite
+
+# Combiner template et database
+create-go-starter mon-projet --template=minimal --database=sqlite
 ```
 
-> **Note**: Le flag `--template` est optionnel. Si non spécifié, le template **full** est utilisé par défaut.
+> **Notes**:
+> - Le flag `--template` est optionnel. Si non spécifié, le template **full** est utilisé par défaut.
+> - Le flag `--database` est optionnel. Si non spécifié, **PostgreSQL** est utilisé par défaut.
 
 ## Conventions de nommage
 
