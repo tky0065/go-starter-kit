@@ -56,12 +56,12 @@ development_status:
   6-5-documentation-et-aide-cli: done
   epic-6-retrospective: optional
 
-  # Epic 7 - Multi-Database Support (v1.1.0 - ROADMAP)
-  epic-7: in-progress
-  7-1-database-selection-flag: done
-  7-2-mysql-mariadb-support: review
-  7-3-sqlite-support: review
-  7-4-mongodb-support-optional: ready-for-dev (LAISSE D'ABORDE)
+   # Epic 7 - Multi-Database Support (v1.1.0 - ROADMAP)
+   epic-7: in-progress
+   7-1-database-selection-flag: done
+   7-2-mysql-mariadb-support: done
+   7-3-sqlite-support: done
+   7-4-mongodb-support-optional: ready-for-dev (LAISSE D'ABORDE)
   7-5-database-tests-documentation: ready-for-dev
   epic-7-retrospective: optional
 
