@@ -124,6 +124,36 @@ create-go-starter mon-projet --template graphql    # API GraphQL avec gqlgen
 
 Pour plus de détails sur les différences entre templates, consultez le [guide d'utilisation](./docs/usage.md#templates-disponibles).
 
+### Choisir une base de données
+
+`create-go-starter` supporte **PostgreSQL** (défaut), **MySQL**, et **SQLite**. Utilisez le flag `--database` pour sélectionner votre base de données:
+
+```bash
+# PostgreSQL (défaut) - Production, requêtes complexes
+create-go-starter mon-app
+create-go-starter mon-app --database=postgres
+
+# MySQL - Compatibilité large, shared hosting
+create-go-starter mon-app --database=mysql
+
+# SQLite - Prototypage rapide, zéro configuration
+create-go-starter mon-app --database=sqlite
+```
+
+**Comparaison rapide**:
+
+| Database | Setup | Idéal pour |
+|----------|-------|-----------|
+| **PostgreSQL** | Docker | Production, requêtes complexes, fiabilité |
+| **MySQL** | Docker | Shared hosting, compatibilité, read-heavy |
+| **SQLite** | Aucun | Prototypage, petites apps, développement |
+
+**Voir le [guide complet des databases](./docs/databases.md)** pour des détails sur:
+- Comparaison détaillée des features
+- Avantages et limitations
+- Cas d'usage recommandés
+- Guide de migration entre databases
+
 ### Lancer le projet généré
 
 #### Option 1: Configuration automatique (Recommandé) :material-rocket-launch:
@@ -372,19 +402,48 @@ Les contributions sont les bienvenues! Consultez le [guide de contribution](./do
 4. Push vers la branche (`git push origin feature/ma-fonctionnalite`)
 5. Ouvrir une Pull Request
 
+## FAQ
+
+### Puis-je changer de base de données plus tard?
+Oui! Voir le [guide de migration](./docs/database-migration.md) pour les instructions détaillées. Vous devrez régénérer le projet avec le flag `--database` et migrer vos données.
+
+### Quelle base de données choisir pour mon projet?
+- **PostgreSQL**: Pour la production, queries complexes, fiabilité
+- **MySQL**: Pour shared hosting, compatibilité large
+- **SQLite**: Pour prototypage, développement, petites apps
+
+Voir le [guide des databases](./docs/databases.md) pour une comparaison complète.
+
+### SQLite est-il adapté pour la production?
+SQLite peut être utilisé en production pour des petites applications (<100 utilisateurs concurrents), mais PostgreSQL ou MySQL sont recommandés pour une croissance attendue.
+
+### Ai-je besoin de Docker?
+- **PostgreSQL**: Oui (pour développement local)
+- **MySQL**: Oui (pour développement local)
+- **SQLite**: Non (base de données embarquée)
+
+### Puis-je utiliser plusieurs templates et databases?
+Oui! Toutes les combinaisons sont possibles:
+```bash
+create-go-starter app --template=minimal --database=sqlite
+create-go-starter app --template=full --database=mysql
+create-go-starter app --template=graphql --database=postgres
+```
+
 ## Roadmap
 
-**Fonctionnalités complétées**:
+**Fonctionnalités complétées** (v1.0+):
 
-- [x] **Templates multiples** - Trois templates disponibles (minimal, full, graphql) pour différents cas d'usage
+- [x] **Templates multiples** - Trois templates disponibles (minimal, full, graphql)
+- [x] **Multi-database support** - PostgreSQL, MySQL, SQLite avec migration guides
 
-**Fonctionnalités prévues**:
+**Fonctionnalités prévues** (v1.1+):
 
-- [ ] Support pour d'autres bases de données (MySQL, SQLite, MongoDB)
+- [ ] Support NoSQL (MongoDB) - en attente de demande communautaire
 - [ ] Choix du framework web (Gin, Echo, Chi)
 - [ ] CLI interactif avec prompts
 - [ ] Génération de microservices
-- [ ] Templates de tests E2E
+- [ ] Templates de tests E2E avancés
 - [ ] Configuration Kubernetes
 
 ## Licence
