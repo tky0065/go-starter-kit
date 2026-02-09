@@ -2,9 +2,9 @@
 
 **Navigation:**
 
-- :material-book-open: [Database Selection Guide](./databases.md) ← You are here
-- :material-sync: [Database Migration Guide](./database-migration.md) - How to switch databases
-- :material-arrow-left: [Back to README](../README.md)
+- <i class="material-icons">menu_book</i> [Database Selection Guide](./databases.md) ← You are here
+- <i class="material-icons">sync</i> [Database Migration Guide](./database-migration.md) - How to switch databases
+- <i class="material-icons">arrow_back</i> [Back to README](../README.md)
 
 ---
 
@@ -14,9 +14,9 @@ go-starter-kit supports **3 database options** to fit your project needs.
 
 | Database | Best For | Complexity | Production Ready | Setup Time |
 |----------|----------|------------|------------------|------------|
-| **PostgreSQL** | Production apps, complex queries | Medium | :material-check-circle:{ .success } Yes | 2 min (Docker) |
-| **MySQL** | Wide compatibility, shared hosting | Medium | :material-check-circle:{ .success } Yes | 2 min (Docker) |
-| **SQLite** | Prototyping, small apps, embedded | Low | :material-alert-circle:{ .warning } Limited | 0 min |
+| **PostgreSQL** | Production apps, complex queries | Medium | <i class="material-icons success">check_circle</i> Yes | 2 min (Docker) |
+| **MySQL** | Wide compatibility, shared hosting | Medium | <i class="material-icons success">check_circle</i> Yes | 2 min (Docker) |
+| **SQLite** | Prototyping, small apps, embedded | Low | <i class="material-icons warning">error</i> Limited | 0 min |
 
 ## Detailed Comparison
 
@@ -31,16 +31,16 @@ create-go-starter my-app --database=postgres
 
 **Strengths:**
 
-- :material-check: Advanced SQL features (JSON, arrays, full-text search)
-- :material-check: Excellent performance and reliability
-- :material-check: ACID compliant, strong data integrity
-- :material-check: Great for complex queries and analytics
-- :material-check: Active community and ecosystem
+- <i class="material-icons success">check</i> Advanced SQL features (JSON, arrays, full-text search)
+- <i class="material-icons success">check</i> Excellent performance and reliability
+- <i class="material-icons success">check</i> ACID compliant, strong data integrity
+- <i class="material-icons success">check</i> Great for complex queries and analytics
+- <i class="material-icons success">check</i> Active community and ecosystem
 
 **Limitations:**
 
-- :material-alert: Requires Docker for local development
-- :material-alert: Slightly more resource-intensive than MySQL
+- <i class="material-icons warning">warning</i> Requires Docker for local development
+- <i class="material-icons warning">warning</i> Slightly more resource-intensive than MySQL
 
 **When to use:**
 - Production applications with complex data
@@ -69,15 +69,15 @@ create-go-starter my-app --database=mysql
 
 **Strengths:**
 
-- :material-check: Wide compatibility and hosting support
-- :material-check: Excellent for read-heavy workloads
-- :material-check: Mature ecosystem and tooling
-- :material-check: Easy to find hosting providers
+- <i class="material-icons success">check</i> Wide compatibility and hosting support
+- <i class="material-icons success">check</i> Excellent for read-heavy workloads
+- <i class="material-icons success">check</i> Mature ecosystem and tooling
+- <i class="material-icons success">check</i> Easy to find hosting providers
 
 **Limitations:**
 
-- :material-alert: Fewer advanced features than PostgreSQL
-- :material-alert: Some variations between MySQL and MariaDB
+- <i class="material-icons warning">warning</i> Fewer advanced features than PostgreSQL
+- <i class="material-icons warning">warning</i> Some variations between MySQL and MariaDB
 
 **When to use:**
 - Shared hosting environments
@@ -107,18 +107,18 @@ create-go-starter my-app --database=sqlite
 
 **Strengths:**
 
-- :material-check: Zero configuration (no server needed)
-- :material-check: Perfect for rapid prototyping
-- :material-check: Single file database (easy backup/share)
-- :material-check: Great for testing and development
-- :material-check: Very fast for small datasets
+- <i class="material-icons success">check</i> Zero configuration (no server needed)
+- <i class="material-icons success">check</i> Perfect for rapid prototyping
+- <i class="material-icons success">check</i> Single file database (easy backup/share)
+- <i class="material-icons success">check</i> Great for testing and development
+- <i class="material-icons success">check</i> Very fast for small datasets
 
 **Limitations:**
 
-- :material-alert: Limited concurrent writes (locks entire DB)
-- :material-alert: No user/permission management
-- :material-alert: Not suitable for high-traffic production
-- :material-alert: Limited scalability
+- <i class="material-icons warning">warning</i> Limited concurrent writes (locks entire DB)
+- <i class="material-icons warning">warning</i> No user/permission management
+- <i class="material-icons warning">warning</i> Not suitable for high-traffic production
+- <i class="material-icons warning">warning</i> Limited scalability
 
 **When to use:**
 - Rapid prototyping and MVPs
@@ -145,21 +145,21 @@ go run ./cmd/main.go
 
 **Choose PostgreSQL if:**
 
-- :material-target: You're unsure (it's the default for a reason)
-- :material-target: You need production-grade reliability
-- :material-target: You have complex relational data
+- <i class="material-icons">center_focus_strong</i> You're unsure (it's the default for a reason)
+- <i class="material-icons">center_focus_strong</i> You need production-grade reliability
+- <i class="material-icons">center_focus_strong</i> You have complex relational data
 
 **Choose MySQL if:**
 
-- :material-target: You're using shared hosting
-- :material-target: Your team knows MySQL well
-- :material-target: You have read-heavy workloads
+- <i class="material-icons">center_focus_strong</i> You're using shared hosting
+- <i class="material-icons">center_focus_strong</i> Your team knows MySQL well
+- <i class="material-icons">center_focus_strong</i> You have read-heavy workloads
 
 **Choose SQLite if:**
 
-- :material-target: You're prototyping or building an MVP
-- :material-target: You want zero infrastructure setup
-- :material-target: You have a small user base (<100 concurrent)
+- <i class="material-icons">center_focus_strong</i> You're prototyping or building an MVP
+- <i class="material-icons">center_focus_strong</i> You want zero infrastructure setup
+- <i class="material-icons">center_focus_strong</i> You have a small user base (<100 concurrent)
 
 ---
 

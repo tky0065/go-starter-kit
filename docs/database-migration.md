@@ -2,9 +2,9 @@
 
 **Navigation:**
 
-- :material-book-open: [Database Selection Guide](./databases.md) - Which database to choose
-- :material-sync: [Database Migration Guide](./database-migration.md) ← You are here
-- :material-arrow-left: [Back to README](../README.md)
+- <i class="material-icons">menu_book</i> [Database Selection Guide](./databases.md) - Which database to choose
+- <i class="material-icons">sync</i> [Database Migration Guide](./database-migration.md) ← You are here
+- <i class="material-icons">arrow_back</i> [Back to README](../README.md)
 
 ---
 
@@ -25,7 +25,7 @@ This guide helps you migrate between different database systems in go-starter-ki
 
 ### PostgreSQL ↔ MySQL
 
-**Difficulty:** :material-circle:{ .success } Easy (both SQL, GORM compatible)
+**Difficulty:** <i class="material-icons success small">circle</i> Easy (both SQL, GORM compatible)
 
 **Steps:**
 
@@ -75,7 +75,7 @@ This guide helps you migrate between different database systems in go-starter-ki
 
 ### SQL → SQLite (Downgrade)
 
-**Difficulty:** :material-circle:{ .warning } Medium (feature reduction)
+**Difficulty:** <i class="material-icons warning small">circle</i> Medium (feature reduction)
 
 **When to do this:**
 - Moving from production to local development
@@ -113,11 +113,11 @@ This guide helps you migrate between different database systems in go-starter-ki
 
 **Limitations:**
 
-- :material-alert: No concurrent writes (database-level locking)
-- :material-alert: Limited data types
-- :material-alert: No stored procedures
-- :material-alert: No user/permission management
-- :material-alert: Not suitable for production at scale
+- <i class="material-icons warning">warning</i> No concurrent writes (database-level locking)
+- <i class="material-icons warning">warning</i> Limited data types
+- <i class="material-icons warning">warning</i> No stored procedures
+- <i class="material-icons warning">warning</i> No user/permission management
+- <i class="material-icons warning">warning</i> Not suitable for production at scale
 
 **Recommended Use Cases:**
 - Local development environments
@@ -129,7 +129,7 @@ This guide helps you migrate between different database systems in go-starter-ki
 
 ### SQLite → SQL (Upgrade)
 
-**Difficulty:** :material-circle:{ .success } Easy (adding features)
+**Difficulty:** <i class="material-icons success small">circle</i> Easy (adding features)
 
 **When to do this:**
 - Scaling from prototype to production

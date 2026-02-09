@@ -86,4 +86,7 @@ extra:
       link: /go-starter-kit/en/
       lang: en
 
+extra_css:
+  - stylesheets/extra.css
+
 copyright: Copyright &copy; 2026 tky0065

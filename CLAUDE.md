@@ -181,6 +181,7 @@ After ANY code change, review and update these files as needed:
 - `CLAUDE.md` - This file (AI context)
 - `GEMINI.md` - Gemini AI context
 - `AGENTS.md` - Agents AI context
+- `site/**`   - Officiel docs site 
 
 ### Documentation Update Process
 
@@ -225,3 +226,194 @@ git push origin main
 - **Consistency**: Prevents drift between code and documentation
 
 **Remember**: Code without updated documentation is incomplete work. Always update docs as part of your changes.
+
+## MkDocs Documentation Site
+
+### Overview
+
+The project uses **Material for MkDocs** to generate the official documentation site. The documentation is written in Markdown and deployed to GitHub Pages.
+
+### Commands
+
+```bash
+# Activate Python virtual environment
+source venv/bin/activate
+
+# Build the documentation site
+mkdocs build
+
+# Build with clean (removes old files)
+mkdocs build --clean
+
+# Serve documentation locally
+mkdocs serve
+# View at: http://127.0.0.1:8000/go-starter-kit/
+
+# Deploy to GitHub Pages
+mkdocs gh-deploy
+```
+
+### Project Structure
+
+```
+docs/                           # Documentation source files
+├── index.md                    # Home page
+├── installation.md             # Installation guide
+├── usage.md                    # Usage guide
+├── databases.md                # Database selection guide
+├── database-migration.md       # Database migration guide
+├── generated-project-guide.md  # Complete guide for generated projects
+├── tutorial-exemple-complet.md # Complete tutorial
+├── cli-architecture.md         # CLI architecture documentation
+├── contributing.md             # Contributing guidelines
+├── stylesheets/               # Custom CSS
+│   └── extra.css              # Material Icons and custom styles
+└── overrides/                 # Theme overrides (if any)
+
+mkdocs.yml                     # MkDocs configuration
+site/                          # Generated site (git-ignored)
+venv/                          # Python virtual environment
+```
+
+### Material Icons Usage
+
+The documentation uses **Material Icons web font** for consistent iconography.
+
+#### Configuration
+
+Material Icons are enabled via custom CSS (`docs/stylesheets/extra.css`):
+
+```css
+/* Import Material Icons font */
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+/* Base Material Icons styles */
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.2em;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  vertical-align: middle;
+}
+
+/* Color variants */
+.material-icons.success { color: var(--md-success-fg-color, #00c853); }
+.material-icons.warning { color: var(--md-warning-fg-color, #ff6d00); }
+.material-icons.error { color: var(--md-error-fg-color, #ff1744); }
+.material-icons.info { color: var(--md-info-fg-color, #00b0ff); }
+
+/* Size variants */
+.material-icons.small { font-size: 1em; }
+.material-icons.large { font-size: 1.5em; }
+```
+
+The CSS file is loaded in `mkdocs.yml`:
+
+```yaml
+extra_css:
+  - stylesheets/extra.css
+```
+
+#### Using Material Icons in Markdown
+
+**IMPORTANT**: Do NOT use the `:material-icon-name:` syntax as it renders as emoji. Instead, use HTML with the Material Icons web font:
+
+**❌ WRONG (renders as emoji):**
+```markdown
+:material-check: Feature enabled
+:material-alert: Warning message
+```
+
+**✅ CORRECT (renders as Material Icons):**
+```markdown
+<i class="material-icons success">check</i> Feature enabled
+<i class="material-icons warning">warning</i> Warning message
+```
+
+#### Common Icons Reference
+
+| Purpose | Icon Name | HTML Code |
+|---------|-----------|-----------|
+| Success/Check | `check` | `<i class="material-icons success">check</i>` |
+| Success Circle | `check_circle` | `<i class="material-icons success">check_circle</i>` |
+| Warning | `warning` | `<i class="material-icons warning">warning</i>` |
+| Error | `error` | `<i class="material-icons warning">error</i>` |
+| Info | `info` | `<i class="material-icons info">info</i>` |
+| Target/Focus | `center_focus_strong` | `<i class="material-icons">center_focus_strong</i>` |
+| Book | `menu_book` | `<i class="material-icons">menu_book</i>` |
+| Sync | `sync` | `<i class="material-icons">sync</i>` |
+| Back Arrow | `arrow_back` | `<i class="material-icons">arrow_back</i>` |
+| Circle Indicator | `circle` | `<i class="material-icons small">circle</i>` |
+
+**Find more icons:** [Google Material Icons](https://fonts.google.com/icons?icon.set=Material+Icons)
+
+#### Icon Style Classes
+
+**Color Classes:**
+- `.success` - Green (for positive/confirmed items)
+- `.warning` - Orange (for warnings/cautions)
+- `.error` - Red (for errors/critical items)
+- `.info` - Blue (for informational items)
+
+**Size Classes:**
+- `.small` - 1em (inline with text)
+- (default) - 1.2em (slightly larger)
+- `.large` - 1.5em (prominent)
+
+**Examples:**
+```markdown
+<!-- Small success indicator -->
+<i class="material-icons success small">circle</i> Easy
+
+<!-- Default warning icon -->
+<i class="material-icons warning">warning</i> Requires attention
+
+<!-- Large error icon -->
+<i class="material-icons error large">error</i> Critical issue
+```
+
+### Common Issues and Solutions
+
+#### Issue: Icons render as emoji instead of Material Icons
+**Solution:** Replace `:material-icon-name:` syntax with HTML `<i class="material-icons">icon_name</i>` tags.
+
+#### Issue: Icons don't have color
+**Solution:** Add color class: `<i class="material-icons success">check</i>`
+
+#### Issue: Custom CSS not loading
+**Solution:**
+1. Verify `docs/stylesheets/extra.css` exists
+2. Check `mkdocs.yml` has `extra_css: - stylesheets/extra.css`
+3. Run `mkdocs build --clean` to rebuild
+
+#### Issue: Icons not showing after deployment
+**Solution:**
+1. Ensure Google Fonts can be accessed (not blocked by CSP)
+2. Check browser console for font loading errors
+3. Verify `@import url('https://fonts.googleapis.com/icon?family=Material+Icons');` in CSS
+
+### Updating Documentation
+
+When adding or modifying documentation:
+
+1. **Edit markdown files** in `docs/` directory
+2. **Use Material Icons HTML syntax** (not emoji syntax)
+3. **Test locally** with `mkdocs serve`
+4. **Build and verify** with `mkdocs build --clean`
+5. **Deploy** with `mkdocs gh-deploy` (or push to trigger CI/CD)
+
+### Documentation Standards
+
+- Use French for all content (this is a French-language project)
+- Include code examples for all features
+- Add navigation links at the top of each page
+- Use admonitions for important notes (warning, info, danger)
+- Keep line length reasonable (80-120 characters)
+- Use Material Icons consistently throughout docs

@@ -179,6 +179,56 @@ Files to update after code changes:
 - `docs/cli-architecture.md` - CLI architecture
 - `CLAUDE.md` / `AGENTS.md` - AI context files
 
+## MkDocs Documentation Site
+
+### Structure
+```
+docs/                          # Markdown documentation source
+├── stylesheets/extra.css     # Material Icons + custom styles
+mkdocs.yml                    # MkDocs configuration
+venv/                         # Python virtual environment
+```
+
+### Commands
+```bash
+source venv/bin/activate       # Activate Python environment
+mkdocs serve                   # Serve locally at http://127.0.0.1:8000
+mkdocs build --clean          # Build site to site/ directory
+mkdocs gh-deploy              # Deploy to GitHub Pages
+```
+
+### Material Icons in Documentation
+
+**CRITICAL**: Use HTML syntax for icons, NOT emoji syntax.
+
+**❌ WRONG:**
+```markdown
+:material-check: Success
+```
+
+**✅ CORRECT:**
+```markdown
+<i class="material-icons success">check</i> Success
+<i class="material-icons warning">warning</i> Warning
+<i class="material-icons small">circle</i> Indicator
+```
+
+**Common Icons:**
+- `check` / `check_circle` - Success (use `.success` class)
+- `warning` / `error` - Warnings (use `.warning` class)
+- `info` - Information (use `.info` class)
+- `menu_book` / `sync` / `arrow_back` - Navigation
+
+**Classes:**
+- Color: `.success` (green), `.warning` (orange), `.error` (red), `.info` (blue)
+- Size: `.small` (1em), default (1.2em), `.large` (1.5em)
+
+**Icon Reference:** [Google Material Icons](https://fonts.google.com/icons?icon.set=Material+Icons)
+
+### Configuration Files
+- `docs/stylesheets/extra.css` - Material Icons font + custom styles
+- `mkdocs.yml` - Must include `extra_css: - stylesheets/extra.css`
+
 ## Quick Reference
 
 | Task | Command |
@@ -193,3 +243,6 @@ Files to update after code changes:
 | Lint | `make lint` |
 | Run | `go run ./cmd/create-go-starter <name>` |
 | Install | `go install ./cmd/create-go-starter` |
+| **Docs serve** | `source venv/bin/activate && mkdocs serve` |
+| **Docs build** | `mkdocs build --clean` |
+| **Docs deploy** | `mkdocs gh-deploy` |

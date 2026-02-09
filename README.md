@@ -282,6 +282,31 @@ Les projets générés utilisent les meilleures bibliothèques de l'écosystème
 - **[Architecture du CLI](./docs/cli-architecture.md)** - Documentation technique pour contributeurs
 - **[Guide de contribution](./docs/contributing.md)** - Comment contribuer au projet
 
+### Site de documentation
+
+Le projet utilise **Material for MkDocs** pour générer le site de documentation officiel.
+
+**Voir la documentation en ligne:** [https://tky0065.github.io/go-starter-kit/](https://tky0065.github.io/go-starter-kit/)
+
+**Travailler avec la documentation localement:**
+
+```bash
+# Activer l'environnement Python
+source venv/bin/activate
+
+# Serveur de développement avec rechargement automatique
+mkdocs serve
+# Accès: http://127.0.0.1:8000/go-starter-kit/
+
+# Construire le site
+mkdocs build --clean
+
+# Déployer sur GitHub Pages
+mkdocs gh-deploy
+```
+
+**Note pour les contributeurs:** Utilisez la syntaxe HTML pour les icônes Material Design, pas la syntaxe emoji. Voir [CLAUDE.md](./CLAUDE.md) pour les détails.
+
 ## Démarrage rapide en 30 secondes
 
 ```bash

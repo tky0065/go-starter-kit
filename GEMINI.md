@@ -208,3 +208,183 @@ git commit -m "feat: implement feature X
 - When in doubt, over-document rather than under-document
 
 **Remember**: Undocumented code changes are considered incomplete work.
+
+---
+
+## MkDocs Documentation Site
+
+### Overview
+
+The project uses **Material for MkDocs** to generate and publish documentation to GitHub Pages. All documentation is written in Markdown (French language).
+
+### Setup and Commands
+
+```bash
+# Activate Python virtual environment (required)
+source venv/bin/activate
+
+# Local development server (with live reload)
+mkdocs serve
+# Access at: http://127.0.0.1:8000/go-starter-kit/
+
+# Build static site
+mkdocs build --clean
+
+# Deploy to GitHub Pages
+mkdocs gh-deploy
+```
+
+### Directory Structure
+
+```
+docs/                           # Documentation source (Markdown)
+├── index.md                    # Home page
+├── installation.md
+├── usage.md
+├── databases.md                # Database selection guide
+├── database-migration.md       # Migration guide
+├── generated-project-guide.md
+├── tutorial-exemple-complet.md
+├── cli-architecture.md
+├── contributing.md
+├── stylesheets/
+│   └── extra.css              # Material Icons + custom styles
+└── overrides/                 # Theme customizations
+
+mkdocs.yml                     # MkDocs configuration file
+site/                          # Generated static site (git-ignored)
+venv/                          # Python dependencies
+```
+
+### Material Icons in Markdown
+
+**⚠️ CRITICAL RULE**: Use HTML with Material Icons web font, NOT emoji syntax.
+
+#### Why Not Emoji Syntax?
+
+The syntax `:material-icon-name:` is **NOT supported** by Material for MkDocs in markdown content. It renders as TWemoji (Twitter emoji), not Material Design icons.
+
+#### Correct Usage
+
+Material Icons are configured via `docs/stylesheets/extra.css` which imports the Google Fonts Material Icons web font and defines helper classes.
+
+**HTML Syntax (Correct):**
+
+```html
+<!-- Success icon (green) -->
+<i class="material-icons success">check</i>
+
+<!-- Warning icon (orange) -->
+<i class="material-icons warning">warning</i>
+
+<!-- Small indicator -->
+<i class="material-icons small">circle</i>
+
+<!-- Default size, no color -->
+<i class="material-icons">menu_book</i>
+```
+
+**Emoji Syntax (WRONG - renders as emoji):**
+
+```markdown
+:material-check:        ❌ Renders as emoji
+:material-warning:      ❌ Renders as emoji
+:material-book-open:    ❌ Renders as emoji
+```
+
+#### Available Classes
+
+**Color Classes:**
+- `.success` - Green (#00c853) - Use for positive states, checkmarks, completed items
+- `.warning` - Orange (#ff6d00) - Use for warnings, cautions, requires attention
+- `.error` - Red (#ff1744) - Use for errors, critical issues, blocked items
+- `.info` - Blue (#00b0ff) - Use for informational items, tips
+
+**Size Classes:**
+- `.small` - 1em (inline with text, good for indicators)
+- (no class) - 1.2em (default, slightly larger than text)
+- `.large` - 1.5em (prominent icons)
+
+**Combining Classes:**
+
+```html
+<i class="material-icons success small">circle</i>     <!-- Small green dot -->
+<i class="material-icons warning large">error</i>      <!-- Large orange error -->
+```
+
+#### Common Icons Reference
+
+| Use Case | Icon Name | Example Code |
+|----------|-----------|--------------|
+| Success/Checkmark | `check` | `<i class="material-icons success">check</i>` |
+| Success Badge | `check_circle` | `<i class="material-icons success">check_circle</i>` |
+| Warning | `warning` | `<i class="material-icons warning">warning</i>` |
+| Error | `error` | `<i class="material-icons warning">error</i>` |
+| Info | `info` | `<i class="material-icons info">info</i>` |
+| Indicator Dot | `circle` | `<i class="material-icons small">circle</i>` |
+| Target/Focus | `center_focus_strong` | `<i class="material-icons">center_focus_strong</i>` |
+| Book/Documentation | `menu_book` | `<i class="material-icons">menu_book</i>` |
+| Sync/Refresh | `sync` | `<i class="material-icons">sync</i>` |
+| Back Arrow | `arrow_back` | `<i class="material-icons">arrow_back</i>` |
+
+**Full Icon Library:** [Google Material Icons](https://fonts.google.com/icons?icon.set=Material+Icons)
+
+### Configuration
+
+Material Icons are enabled through two files:
+
+#### 1. `docs/stylesheets/extra.css`
+
+```css
+/* Import Material Icons font from Google Fonts */
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+/* Base class */
+.material-icons {
+  font-family: 'Material Icons';
+  font-size: 1.2em;
+  display: inline-block;
+  vertical-align: middle;
+  /* ... additional styles ... */
+}
+
+/* Color and size variants */
+.material-icons.success { color: var(--md-success-fg-color, #00c853); }
+.material-icons.warning { color: var(--md-warning-fg-color, #ff6d00); }
+/* ... etc ... */
+```
+
+#### 2. `mkdocs.yml`
+
+```yaml
+extra_css:
+  - stylesheets/extra.css
+```
+
+### Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| Icons render as emoji | Replace `:material-icon:` with `<i class="material-icons">icon</i>` |
+| Icons have no color | Add color class: `.success`, `.warning`, `.error`, or `.info` |
+| Icons don't appear | Check `extra_css` in `mkdocs.yml` and verify `extra.css` exists |
+| Icons missing after deploy | Ensure Google Fonts CDN is accessible (check browser console) |
+| Wrong icon size | Add `.small` or `.large` class, or remove class for default |
+
+### Documentation Workflow
+
+1. **Edit** - Modify markdown files in `docs/`
+2. **Preview** - Run `mkdocs serve` and check at http://127.0.0.1:8000
+3. **Use icons correctly** - HTML syntax with Material Icons font
+4. **Build** - Run `mkdocs build --clean` to verify
+5. **Deploy** - Run `mkdocs gh-deploy` or push to trigger CI/CD
+
+### Best Practices
+
+- ✅ Use Material Icons HTML syntax consistently throughout documentation
+- ✅ Apply color classes to convey meaning (success=green, warning=orange, etc.)
+- ✅ Test documentation locally before deploying
+- ✅ Keep line length reasonable (80-120 chars) for readability
+- ✅ Use French language for all content
+- ❌ Don't use emoji syntax (`:material-icon:`) - it won't render correctly
+- ❌ Don't forget to activate venv before running mkdocs commands
