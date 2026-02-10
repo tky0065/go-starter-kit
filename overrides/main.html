@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    // Initialize Mermaid
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get current theme
+      var scheme = document.querySelector('[data-md-color-scheme]');
+      var theme = scheme && scheme.getAttribute('data-md-color-scheme') === 'slate' ? 'dark' : 'default';
+      
+      // Initialize mermaid
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: theme
+      });
+      
+      // Watch for theme changes
+      var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.attributeName === 'data-md-color-scheme') {
+            var newTheme = mutation.target.getAttribute('data-md-color-scheme') === 'slate' ? 'dark' : 'default';
+            mermaid.initialize({ 
+              startOnLoad: true, 
+              theme: newTheme 
+            });
+            // Re-render diagrams
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+              el.removeAttribute('data-processed');
+            });
+            mermaid.init(undefined, '.mermaid');
+          }
+        });
+      });
+      
+      if (scheme) {
+        observer.observe(scheme, {
+          attributes: true,
+          attributeFilter: ['data-md-color-scheme']
+        });
+      }
+    });
+  </script>
+{% endblock %}

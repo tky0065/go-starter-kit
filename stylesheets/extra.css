@@ -1,0 +1,44 @@
+/* Import Material Icons font */
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+/* Base Material Icons styles */
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.2em;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  vertical-align: middle;
+}
+
+/* Color variants */
+.material-icons.success {
+  color: var(--md-success-fg-color, #00c853);
+}
+
+.material-icons.warning {
+  color: var(--md-warning-fg-color, #ff6d00);
+}
+
+.material-icons.error {
+  color: var(--md-error-fg-color, #ff1744);
+}
+
+.material-icons.info {
+  color: var(--md-info-fg-color, #00b0ff);
+}
+
+/* Size variants */
+.material-icons.small {
+  font-size: 1em;
+}
+
+.material-icons.large {
+  font-size: 1.5em;
+}

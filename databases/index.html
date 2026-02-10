@@ -1,0 +1,1603 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Un outil CLI puissant pour generer des projets Go prets pour la production">
+      
+      
+        <meta name="author" content="tky0065">
+      
+      
+        <link rel="canonical" href="https://tky0065.github.io/go-starter-kit/databases/">
+      
+      
+        <link rel="prev" href="../usage/">
+      
+      
+        <link rel="next" href="../database-migration/">
+      
+      
+        
+          <link rel="alternate" href="/go-starter-kit/" hreflang="fr">
+        
+          <link rel="alternate" href="/go-starter-kit/en/" hreflang="en">
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Guide de sélection - Go Starter Kit</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#guide-de-selection-de-base-de-donnees" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href=".." title="Go Starter Kit" class="md-header__button md-logo" aria-label="Go Starter Kit" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Go Starter Kit
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Guide de sélection
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Passer au mode sombre"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Passer au mode sombre" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Passer au mode clair"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Passer au mode clair" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Sélectionner la langue">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="/go-starter-kit/" hreflang="fr" class="md-select__link">
+              Français
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="/go-starter-kit/en/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/tky0065/go-starter-kit" title="Aller au dépôt" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    tky0065/go-starter-kit
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Go Starter Kit" class="md-nav__button md-logo" aria-label="Go Starter Kit" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Go Starter Kit
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/tky0065/go-starter-kit" title="Aller au dépôt" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    tky0065/go-starter-kit
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accueil
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utilisation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bases de données
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Bases de données
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide de sélection
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide de sélection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#comparaison-rapide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparaison rapide
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparaison-detaillee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparaison détaillée
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Comparaison détaillée">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#postgresql-par-defaut" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL (Par défaut)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mysqlmariadb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL/MariaDB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sqlite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQLite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matrice-de-decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Matrice de décision
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exemples-de-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemples de configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Exemples de configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mysql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sqlite_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQLite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#guide-de-migration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guide de migration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considerations-de-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considérations de performance
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considérations de performance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#postgresql_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mysql_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sqlite_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQLite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#questions-frequentes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Questions fréquentes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Questions fréquentes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#puis-je-changer-de-base-de-donnees-plus-tard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Puis-je changer de base de données plus tard?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quelle-base-de-donnees-dois-je-utiliser-pour-mon-saas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quelle base de données dois-je utiliser pour mon SaaS?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#puis-je-utiliser-sqlite-en-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Puis-je utiliser SQLite en production?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ai-je-besoin-de-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ai-je besoin de Docker?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quen-est-il-de-mongodb-ou-nosql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Qu'en est-il de MongoDB ou NoSQL?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ressources-additionnelles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ressources additionnelles
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../database-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide de migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generated-project-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Projet généré
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial-exemple-complet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutoriel complet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribuer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#comparaison-rapide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparaison rapide
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparaison-detaillee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparaison détaillée
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Comparaison détaillée">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#postgresql-par-defaut" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL (Par défaut)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mysqlmariadb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL/MariaDB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sqlite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQLite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matrice-de-decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Matrice de décision
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exemples-de-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemples de configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Exemples de configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mysql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sqlite_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQLite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#guide-de-migration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guide de migration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#considerations-de-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Considérations de performance
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Considérations de performance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#postgresql_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mysql_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sqlite_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQLite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#questions-frequentes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Questions fréquentes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Questions fréquentes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#puis-je-changer-de-base-de-donnees-plus-tard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Puis-je changer de base de données plus tard?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quelle-base-de-donnees-dois-je-utiliser-pour-mon-saas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quelle base de données dois-je utiliser pour mon SaaS?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#puis-je-utiliser-sqlite-en-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Puis-je utiliser SQLite en production?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ai-je-besoin-de-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ai-je besoin de Docker?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quen-est-il-de-mongodb-ou-nosql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Qu'en est-il de MongoDB ou NoSQL?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ressources-additionnelles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ressources additionnelles
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/tky0065/go-starter-kit/edit/master/docs/databases.md" title="Editer cette page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/tky0065/go-starter-kit/raw/master/docs/databases.md" title="Consulter la source de cette page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+<h1 id="guide-de-selection-de-base-de-donnees">Guide de sélection de base de données<a class="headerlink" href="#guide-de-selection-de-base-de-donnees" title="Permanent link">&para;</a></h1>
+<p><strong>Navigation:</strong></p>
+<ul>
+<li><i class="material-icons">menu_book</i> <a href="./">Guide de sélection de base de données</a> ← Vous êtes ici</li>
+<li><i class="material-icons">sync</i> <a href="../database-migration/">Guide de migration de base de données</a> - Comment changer de base de données</li>
+<li><i class="material-icons">arrow_back</i> <a href="../README.md">Retour au README</a></li>
+</ul>
+<hr />
+<p>go-starter-kit supporte <strong>3 options de base de données</strong> pour s'adapter aux besoins de votre projet.</p>
+<h2 id="comparaison-rapide">Comparaison rapide<a class="headerlink" href="#comparaison-rapide" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Base de données</th>
+<th>Idéal pour</th>
+<th>Complexité</th>
+<th>Prêt production</th>
+<th>Temps installation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PostgreSQL</strong></td>
+<td>Apps production, requêtes complexes</td>
+<td>Moyen</td>
+<td><i class="material-icons success">check_circle</i> Oui</td>
+<td>2 min (Docker)</td>
+</tr>
+<tr>
+<td><strong>MySQL</strong></td>
+<td>Compatibilité large, hébergement partagé</td>
+<td>Moyen</td>
+<td><i class="material-icons success">check_circle</i> Oui</td>
+<td>2 min (Docker)</td>
+</tr>
+<tr>
+<td><strong>SQLite</strong></td>
+<td>Prototypage, petites apps, embarqué</td>
+<td>Faible</td>
+<td><i class="material-icons warning">error</i> Limité</td>
+<td>0 min</td>
+</tr>
+</tbody>
+</table>
+<h2 id="comparaison-detaillee">Comparaison détaillée<a class="headerlink" href="#comparaison-detaillee" title="Permanent link">&para;</a></h2>
+<h3 id="postgresql-par-defaut">PostgreSQL (Par défaut)<a class="headerlink" href="#postgresql-par-defaut" title="Permanent link">&para;</a></h3>
+<p><strong>Commande:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>create-go-starter<span class="w"> </span>mon-app
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># OU explicitement:</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>create-go-starter<span class="w"> </span>mon-app<span class="w"> </span>--database<span class="o">=</span>postgres
+</code></pre></div></p>
+<p><strong>Points forts:</strong></p>
+<ul>
+<li><i class="material-icons success">check</i> Fonctionnalités SQL avancées (JSON, arrays, recherche full-text)</li>
+<li><i class="material-icons success">check</i> Excellentes performances et fiabilité</li>
+<li><i class="material-icons success">check</i> Conforme ACID, forte intégrité des données</li>
+<li><i class="material-icons success">check</i> Idéal pour les requêtes complexes et l'analytique</li>
+<li><i class="material-icons success">check</i> Communauté active et écosystème riche</li>
+</ul>
+<p><strong>Limitations:</strong></p>
+<ul>
+<li><i class="material-icons warning">warning</i> Nécessite Docker pour le développement local</li>
+<li><i class="material-icons warning">warning</i> Légèrement plus gourmand en ressources que MySQL</li>
+</ul>
+<p><strong>Quand l'utiliser:</strong>
+- Applications de production avec données complexes
+- Applications nécessitant des fonctionnalités SQL avancées
+- Projets nécessitant une forte intégrité des données</p>
+<p><strong>Configuration Docker:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Automatiquement inclus dans docker-compose.yml</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="l l-Scalar l-Scalar-Plain">docker-compose up -d</span>
+</code></pre></div></p>
+<p><strong>Format DSN:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>user:password@tcp(host:5432)/dbname?sslmode=disable
+</code></pre></div></p>
+<hr />
+<h3 id="mysqlmariadb">MySQL/MariaDB<a class="headerlink" href="#mysqlmariadb" title="Permanent link">&para;</a></h3>
+<p><strong>Commande:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>create-go-starter<span class="w"> </span>mon-app<span class="w"> </span>--database<span class="o">=</span>mysql
+</code></pre></div></p>
+<p><strong>Points forts:</strong></p>
+<ul>
+<li><i class="material-icons success">check</i> Large compatibilité et support d'hébergement</li>
+<li><i class="material-icons success">check</i> Excellent pour les charges de lecture intensives</li>
+<li><i class="material-icons success">check</i> Écosystème et outils matures</li>
+<li><i class="material-icons success">check</i> Facile de trouver des fournisseurs d'hébergement</li>
+</ul>
+<p><strong>Limitations:</strong></p>
+<ul>
+<li><i class="material-icons warning">warning</i> Moins de fonctionnalités avancées que PostgreSQL</li>
+<li><i class="material-icons warning">warning</i> Quelques variations entre MySQL et MariaDB</li>
+</ul>
+<p><strong>Quand l'utiliser:</strong>
+- Environnements d'hébergement partagé
+- Applications à forte charge de lecture
+- Équipes familières avec MySQL
+- Besoin de large compatibilité d'hébergement</p>
+<p><strong>Configuration Docker:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Automatiquement inclus dans docker-compose.yml</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="l l-Scalar l-Scalar-Plain">docker-compose up -d</span>
+</code></pre></div></p>
+<p><strong>Format DSN:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>user:password@tcp(host:3306)/dbname?charset=utf8mb4&amp;parseTime=True&amp;loc=Local
+</code></pre></div></p>
+<hr />
+<h3 id="sqlite">SQLite<a class="headerlink" href="#sqlite" title="Permanent link">&para;</a></h3>
+<p><strong>Commande:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>create-go-starter<span class="w"> </span>mon-app<span class="w"> </span>--database<span class="o">=</span>sqlite
+</code></pre></div></p>
+<p><strong>Points forts:</strong></p>
+<ul>
+<li><i class="material-icons success">check</i> Zéro configuration (pas de serveur nécessaire)</li>
+<li><i class="material-icons success">check</i> Parfait pour le prototypage rapide</li>
+<li><i class="material-icons success">check</i> Base de données en fichier unique (sauvegarde/partage facile)</li>
+<li><i class="material-icons success">check</i> Idéal pour les tests et le développement</li>
+<li><i class="material-icons success">check</i> Très rapide pour les petits jeux de données</li>
+</ul>
+<p><strong>Limitations:</strong></p>
+<ul>
+<li><i class="material-icons warning">warning</i> Écritures concurrentes limitées (verrouille toute la DB)</li>
+<li><i class="material-icons warning">warning</i> Pas de gestion utilisateurs/permissions</li>
+<li><i class="material-icons warning">warning</i> Non adapté pour la production à fort trafic</li>
+<li><i class="material-icons warning">warning</i> Scalabilité limitée</li>
+</ul>
+<p><strong>Quand l'utiliser:</strong>
+- Prototypage rapide et MVPs
+- Applications desktop
+- Systèmes embarqués
+- Développement et tests
+- Production à petite échelle (&lt;100 utilisateurs concurrents)</p>
+<p><strong>Pas besoin de Docker:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Lancez simplement votre app, le fichier SQLite est créé automatiquement</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/main.go
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="c1"># Crée: ./my_database.db</span>
+</code></pre></div></p>
+<p><strong>Format DSN:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>./database.db
+</code></pre></div></p>
+<hr />
+<h2 id="matrice-de-decision">Matrice de décision<a class="headerlink" href="#matrice-de-decision" title="Permanent link">&para;</a></h2>
+<p><strong>Choisir PostgreSQL si:</strong></p>
+<ul>
+<li><i class="material-icons">center_focus_strong</i> Vous hésitez (c'est le choix par défaut pour une bonne raison)</li>
+<li><i class="material-icons">center_focus_strong</i> Vous avez besoin de fiabilité niveau production</li>
+<li><i class="material-icons">center_focus_strong</i> Vous avez des données relationnelles complexes</li>
+</ul>
+<p><strong>Choisir MySQL si:</strong></p>
+<ul>
+<li><i class="material-icons">center_focus_strong</i> Vous utilisez un hébergement partagé</li>
+<li><i class="material-icons">center_focus_strong</i> Votre équipe connaît bien MySQL</li>
+<li><i class="material-icons">center_focus_strong</i> Vous avez des charges de lecture intensives</li>
+</ul>
+<p><strong>Choisir SQLite si:</strong></p>
+<ul>
+<li><i class="material-icons">center_focus_strong</i> Vous prototypez ou construisez un MVP</li>
+<li><i class="material-icons">center_focus_strong</i> Vous voulez zéro infrastructure</li>
+<li><i class="material-icons">center_focus_strong</i> Vous avez une petite base d'utilisateurs (&lt;100 concurrents)</li>
+</ul>
+<hr />
+<h2 id="exemples-de-configuration">Exemples de configuration<a class="headerlink" href="#exemples-de-configuration" title="Permanent link">&para;</a></h2>
+<h3 id="postgresql">PostgreSQL<a class="headerlink" href="#postgresql" title="Permanent link">&para;</a></h3>
+<p><strong>.env.example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Configuration base de données (PostgreSQL)</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nv">DB_HOST</span><span class="o">=</span>localhost
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nv">DB_PORT</span><span class="o">=</span><span class="m">5432</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="nv">DB_USER</span><span class="o">=</span>postgres
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="nv">DB_PASSWORD</span><span class="o">=</span>postgres
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="nv">DB_NAME</span><span class="o">=</span>monapp
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="nv">DB_SSLMODE</span><span class="o">=</span>disable
+</code></pre></div></p>
+<h3 id="mysql">MySQL<a class="headerlink" href="#mysql" title="Permanent link">&para;</a></h3>
+<p><strong>.env.example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Configuration base de données (MySQL)</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nv">DB_HOST</span><span class="o">=</span>localhost
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="nv">DB_PORT</span><span class="o">=</span><span class="m">3306</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="nv">DB_USER</span><span class="o">=</span>root
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="nv">DB_PASSWORD</span><span class="o">=</span>root
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="nv">DB_NAME</span><span class="o">=</span>monapp
+</code></pre></div></p>
+<h3 id="sqlite_1">SQLite<a class="headerlink" href="#sqlite_1" title="Permanent link">&para;</a></h3>
+<p><strong>.env.example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Configuration base de données (SQLite - embarqué)</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nv">DB_NAME</span><span class="o">=</span>monapp.db
+</code></pre></div></p>
+<hr />
+<h2 id="guide-de-migration">Guide de migration<a class="headerlink" href="#guide-de-migration" title="Permanent link">&para;</a></h2>
+<p>Voir <a href="../database-migration/">database-migration.md</a> pour les instructions détaillées de migration entre bases de données.</p>
+<hr />
+<h2 id="considerations-de-performance">Considérations de performance<a class="headerlink" href="#considerations-de-performance" title="Permanent link">&para;</a></h2>
+<h3 id="postgresql_1">PostgreSQL<a class="headerlink" href="#postgresql_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Idéal pour: Requêtes complexes, transactions ACID, écritures concurrentes</li>
+<li>Performance écriture: Excellente (architecture MVCC)</li>
+<li>Performance lecture: Excellente avec indexation appropriée</li>
+<li>Connection pooling: Recommandé pour la production</li>
+</ul>
+<h3 id="mysql_1">MySQL<a class="headerlink" href="#mysql_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Idéal pour: Charges de lecture intensives, requêtes simples</li>
+<li>Performance écriture: Bonne (verrouillage au niveau ligne)</li>
+<li>Performance lecture: Excellente (cache de requêtes)</li>
+<li>Connection pooling: Recommandé pour la production</li>
+</ul>
+<h3 id="sqlite_2">SQLite<a class="headerlink" href="#sqlite_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Idéal pour: Scénarios mono-utilisateur, faible concurrence</li>
+<li>Performance écriture: Limitée (verrouillage au niveau base de données)</li>
+<li>Performance lecture: Excellente pour petits jeux de données</li>
+<li>Connection pooling: Non applicable (fichier)</li>
+</ul>
+<hr />
+<h2 id="questions-frequentes">Questions fréquentes<a class="headerlink" href="#questions-frequentes" title="Permanent link">&para;</a></h2>
+<h3 id="puis-je-changer-de-base-de-donnees-plus-tard">Puis-je changer de base de données plus tard?<a class="headerlink" href="#puis-je-changer-de-base-de-donnees-plus-tard" title="Permanent link">&para;</a></h3>
+<p>Oui, mais cela nécessite de régénérer le projet avec le nouveau flag de base de données et de migrer les données. Voir <a href="../database-migration/">database-migration.md</a> pour les détails.</p>
+<h3 id="quelle-base-de-donnees-dois-je-utiliser-pour-mon-saas">Quelle base de données dois-je utiliser pour mon SaaS?<a class="headerlink" href="#quelle-base-de-donnees-dois-je-utiliser-pour-mon-saas" title="Permanent link">&para;</a></h3>
+<p>Pour une application SaaS de production, nous recommandons <strong>PostgreSQL</strong> pour sa fiabilité, conformité ACID et fonctionnalités avancées. MySQL est aussi un bon choix si vous le connaissez mieux.</p>
+<h3 id="puis-je-utiliser-sqlite-en-production">Puis-je utiliser SQLite en production?<a class="headerlink" href="#puis-je-utiliser-sqlite-en-production" title="Permanent link">&para;</a></h3>
+<p>SQLite peut être utilisé pour de la production à petite échelle (&lt;100 utilisateurs concurrents), mais nous recommandons PostgreSQL ou MySQL pour les applications qui prévoient de croître.</p>
+<h3 id="ai-je-besoin-de-docker">Ai-je besoin de Docker?<a class="headerlink" href="#ai-je-besoin-de-docker" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>PostgreSQL</strong>: Oui (pour le développement local)</li>
+<li><strong>MySQL</strong>: Oui (pour le développement local)</li>
+<li><strong>SQLite</strong>: Non (base de données embarquée)</li>
+</ul>
+<h3 id="quen-est-il-de-mongodb-ou-nosql">Qu'en est-il de MongoDB ou NoSQL?<a class="headerlink" href="#quen-est-il-de-mongodb-ou-nosql" title="Permanent link">&para;</a></h3>
+<p>Le support NoSQL (MongoDB) a été considéré mais reporté aux versions futures. L'accent actuel est mis sur les bases de données SQL avec support GORM.</p>
+<hr />
+<h2 id="ressources-additionnelles">Ressources additionnelles<a class="headerlink" href="#ressources-additionnelles" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://www.postgresql.org/docs/">Documentation PostgreSQL</a></li>
+<li><a href="https://dev.mysql.com/doc/">Documentation MySQL</a></li>
+<li><a href="https://www.sqlite.org/docs.html">Documentation SQLite</a></li>
+<li><a href="https://gorm.io/docs/">Documentation GORM</a></li>
+<li><a href="../database-migration/">Guide de migration de base de données</a></li>
+</ul>
+<hr />
+<p><strong>Dernière mise à jour:</strong> 2026-02-09</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Retour en haut de la page
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 tky0065
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/tky0065/go-starter-kit" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.indexes", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit", "content.action.view"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+  
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    // Initialize Mermaid
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get current theme
+      var scheme = document.querySelector('[data-md-color-scheme]');
+      var theme = scheme && scheme.getAttribute('data-md-color-scheme') === 'slate' ? 'dark' : 'default';
+      
+      // Initialize mermaid
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: theme
+      });
+      
+      // Watch for theme changes
+      var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.attributeName === 'data-md-color-scheme') {
+            var newTheme = mutation.target.getAttribute('data-md-color-scheme') === 'slate' ? 'dark' : 'default';
+            mermaid.initialize({ 
+              startOnLoad: true, 
+              theme: newTheme 
+            });
+            // Re-render diagrams
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+              el.removeAttribute('data-processed');
+            });
+            mermaid.init(undefined, '.mermaid');
+          }
+        });
+      });
+      
+      if (scheme) {
+        observer.observe(scheme, {
+          attributes: true,
+          attributeFilter: ['data-md-color-scheme']
+        });
+      }
+    });
+  </script>
+
+  </body>
+</html>

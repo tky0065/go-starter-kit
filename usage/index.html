@@ -1,0 +1,3175 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Un outil CLI puissant pour generer des projets Go prets pour la production">
+      
+      
+        <meta name="author" content="tky0065">
+      
+      
+        <link rel="canonical" href="https://tky0065.github.io/go-starter-kit/usage/">
+      
+      
+        <link rel="prev" href="../installation/">
+      
+      
+        <link rel="next" href="../databases/">
+      
+      
+        
+          <link rel="alternate" href="/go-starter-kit/" hreflang="fr">
+        
+          <link rel="alternate" href="/go-starter-kit/en/" hreflang="en">
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Utilisation - Go Starter Kit</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#guide-dutilisation" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href=".." title="Go Starter Kit" class="md-header__button md-logo" aria-label="Go Starter Kit" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Go Starter Kit
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Utilisation
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Passer au mode sombre"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Passer au mode sombre" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Passer au mode clair"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Passer au mode clair" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Sélectionner la langue">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="/go-starter-kit/" hreflang="fr" class="md-select__link">
+              Français
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="/go-starter-kit/en/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/tky0065/go-starter-kit" title="Aller au dépôt" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    tky0065/go-starter-kit
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Go Starter Kit" class="md-nav__button md-logo" aria-label="Go Starter Kit" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Go Starter Kit
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/tky0065/go-starter-kit" title="Aller au dépôt" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    tky0065/go-starter-kit
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accueil
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utilisation
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utilisation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#commande-de-base" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commande de base
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Commande de base">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exemple" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#templates-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Templates disponibles
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Templates disponibles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vue-densemble-des-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vue d'ensemble des templates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comparaison-detaillee-des-fonctionnalites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparaison détaillée des fonctionnalités
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#differences-structurelles-majeures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Différences structurelles majeures
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Différences structurelles majeures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#template-minimal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template minimal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-full-defaut" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template full (défaut)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-graphql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template graphql
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comment-choisir-le-bon-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comment choisir le bon template?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bases-de-donnees-supportees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bases de données supportées
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Bases de données supportées">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vue-densemble" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vue d'ensemble
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#postgresql-defaut" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL (défaut)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mysqlmariadb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL/MariaDB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sqlite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQLite
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#guide-complet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guide complet
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#options-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options disponibles
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Options disponibles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flags-actuels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flags actuels
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conventions-de-nommage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conventions de nommage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Conventions de nommage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#caracteres-autorises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caractères autorisés
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#restrictions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restrictions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemples-valides" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemples valides
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemples-invalides" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemples invalides
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#structure-generee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structure générée
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explication-detaillee-de-chaque-repertoire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explication détaillée de chaque répertoire
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Explication détaillée de chaque répertoire">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cmd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /cmd
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internalmodels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/models
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internaldomain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/domain
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internaladapters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/adapters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="/internal/adapters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#internaladaptershandlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/adapters/handlers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internaladaptersmiddleware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/adapters/middleware
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internaladaptersrepository" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/adapters/repository
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internaladaptershttp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/adapters/http
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internalinfrastructure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/infrastructure
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="/internal/infrastructure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#internalinfrastructuredatabase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/infrastructure/database
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internalinfrastructureserver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/infrastructure/server
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internalinterfaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/interfaces
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pkg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /pkg
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="/pkg">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pkgauth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /pkg/auth
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pkgconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /pkg/config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pkglogger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /pkg/logger
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubworkflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /.github/workflows
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fichiers-de-configuration-detailles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fichiers de configuration détaillés
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fichiers de configuration détaillés">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#env-et-envexample" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .env et .env.example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gomod" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        go.mod
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#makefile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Makefile
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#golangciyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .golangci.yml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dockerfile
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-apres-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow après génération
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow après génération">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-a-configuration-automatique-avec-setupsh-recommande" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option A: Configuration automatique avec setup.sh (Recommandé)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-b-configuration-manuelle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option B: Configuration manuelle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-1-naviguer-dans-le-projet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 1: Naviguer dans le projet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-2-configurer-les-variables-denvironnement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 2: Configurer les variables d'environnement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-3-installer-les-dependances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 3: Installer les dépendances
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-4-lancer-postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 4: Lancer PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-5-lancer-lapplication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 5: Lancer l'application
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-6-tester-lapi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 6: Tester l'API
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commandes-make-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commandes Make disponibles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prochaines-etapes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prochaines étapes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conseils" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conseils
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bases de données
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Bases de données
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../databases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide de sélection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../database-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide de migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generated-project-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Projet généré
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial-exemple-complet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutoriel complet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribuer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#commande-de-base" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commande de base
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Commande de base">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exemple" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#templates-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Templates disponibles
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Templates disponibles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vue-densemble-des-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vue d'ensemble des templates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comparaison-detaillee-des-fonctionnalites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparaison détaillée des fonctionnalités
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#differences-structurelles-majeures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Différences structurelles majeures
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Différences structurelles majeures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#template-minimal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template minimal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-full-defaut" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template full (défaut)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-graphql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template graphql
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comment-choisir-le-bon-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comment choisir le bon template?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bases-de-donnees-supportees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bases de données supportées
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Bases de données supportées">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vue-densemble" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vue d'ensemble
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#postgresql-defaut" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL (défaut)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mysqlmariadb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL/MariaDB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sqlite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQLite
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#guide-complet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guide complet
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#options-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options disponibles
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Options disponibles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flags-actuels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flags actuels
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conventions-de-nommage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conventions de nommage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Conventions de nommage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#caracteres-autorises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caractères autorisés
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#restrictions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restrictions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemples-valides" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemples valides
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemples-invalides" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemples invalides
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#structure-generee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structure générée
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explication-detaillee-de-chaque-repertoire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explication détaillée de chaque répertoire
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Explication détaillée de chaque répertoire">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cmd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /cmd
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internalmodels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/models
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internaldomain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/domain
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internaladapters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/adapters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="/internal/adapters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#internaladaptershandlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/adapters/handlers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internaladaptersmiddleware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/adapters/middleware
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internaladaptersrepository" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/adapters/repository
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internaladaptershttp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/adapters/http
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internalinfrastructure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/infrastructure
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="/internal/infrastructure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#internalinfrastructuredatabase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/infrastructure/database
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internalinfrastructureserver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/infrastructure/server
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internalinterfaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /internal/interfaces
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pkg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /pkg
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="/pkg">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pkgauth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /pkg/auth
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pkgconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /pkg/config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pkglogger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /pkg/logger
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubworkflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /.github/workflows
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fichiers-de-configuration-detailles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fichiers de configuration détaillés
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fichiers de configuration détaillés">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#env-et-envexample" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .env et .env.example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gomod" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        go.mod
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#makefile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Makefile
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#golangciyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .golangci.yml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dockerfile
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-apres-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow après génération
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow après génération">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-a-configuration-automatique-avec-setupsh-recommande" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option A: Configuration automatique avec setup.sh (Recommandé)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-b-configuration-manuelle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option B: Configuration manuelle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-1-naviguer-dans-le-projet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 1: Naviguer dans le projet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-2-configurer-les-variables-denvironnement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 2: Configurer les variables d'environnement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-3-installer-les-dependances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 3: Installer les dépendances
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-4-lancer-postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 4: Lancer PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-5-lancer-lapplication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 5: Lancer l'application
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#etape-6-tester-lapi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 6: Tester l'API
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commandes-make-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commandes Make disponibles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prochaines-etapes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prochaines étapes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conseils" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conseils
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/tky0065/go-starter-kit/edit/master/docs/usage.md" title="Editer cette page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/tky0065/go-starter-kit/raw/master/docs/usage.md" title="Consulter la source de cette page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+<h1 id="guide-dutilisation">Guide d'utilisation<a class="headerlink" href="#guide-dutilisation" title="Permanent link">&para;</a></h1>
+<p>Ce guide détaille l'utilisation de <code>create-go-starter</code> et explique en profondeur la structure des projets générés.</p>
+<h2 id="commande-de-base">Commande de base<a class="headerlink" href="#commande-de-base" title="Permanent link">&para;</a></h2>
+<p>La syntaxe de base est très simple:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>create-go-starter<span class="w"> </span>&lt;nom-du-projet&gt;
+</code></pre></div>
+<h3 id="exemple">Exemple<a class="headerlink" href="#exemple" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>create-go-starter<span class="w"> </span>mon-api-backend
+</code></pre></div>
+<p>Cette commande va créer un nouveau répertoire <code>mon-api-backend/</code> avec toute la structure du projet en utilisant le template <strong>full</strong> par défaut.</p>
+<h2 id="templates-disponibles">Templates disponibles<a class="headerlink" href="#templates-disponibles" title="Permanent link">&para;</a></h2>
+<p><code>create-go-starter</code> propose <strong>trois templates</strong> pour répondre à différents besoins de projets. Choisissez le template avec le flag <code>--template</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>create-go-starter<span class="w"> </span>mon-projet<span class="w"> </span>--template<span class="w"> </span>minimal<span class="w">    </span><span class="c1"># API REST basique</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>create-go-starter<span class="w"> </span>mon-projet<span class="w"> </span>--template<span class="w"> </span>full<span class="w">       </span><span class="c1"># API complète avec auth (défaut)</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>create-go-starter<span class="w"> </span>mon-projet<span class="w"> </span>--template<span class="w"> </span>graphql<span class="w">    </span><span class="c1"># API GraphQL</span>
+</code></pre></div>
+<h3 id="vue-densemble-des-templates">Vue d'ensemble des templates<a class="headerlink" href="#vue-densemble-des-templates" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Template</th>
+<th>Description</th>
+<th>Cas d'usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>minimal</code></td>
+<td>API REST basique avec Swagger (sans authentification)</td>
+<td>Prototypes rapides, APIs publiques simples, microservices sans auth</td>
+</tr>
+<tr>
+<td><code>full</code></td>
+<td>API complète avec JWT auth, gestion utilisateurs et Swagger (<strong>défaut</strong>)</td>
+<td>Applications backend complètes, APIs nécessitant authentification</td>
+</tr>
+<tr>
+<td><code>graphql</code></td>
+<td>API GraphQL avec gqlgen et GraphQL Playground</td>
+<td>Applications nécessitant GraphQL, clients frontend modernes</td>
+</tr>
+</tbody>
+</table>
+<h3 id="comparaison-detaillee-des-fonctionnalites">Comparaison détaillée des fonctionnalités<a class="headerlink" href="#comparaison-detaillee-des-fonctionnalites" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Fonctionnalité</th>
+<th>minimal</th>
+<th>full</th>
+<th>graphql</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>API REST</strong></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>API GraphQL</strong></td>
+<td>❌</td>
+<td>❌</td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+</tr>
+<tr>
+<td><strong>Authentification JWT</strong></td>
+<td>❌</td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>Gestion utilisateurs</strong></td>
+<td>❌</td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+</tr>
+<tr>
+<td><strong>Documentation Swagger</strong></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>GraphQL Playground</strong></td>
+<td>❌</td>
+<td>❌</td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+</tr>
+<tr>
+<td><strong>Base de données (GORM)</strong></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+</tr>
+<tr>
+<td><strong>PostgreSQL</strong></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+</tr>
+<tr>
+<td><strong>Dependency Injection (fx)</strong></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+</tr>
+<tr>
+<td><strong>Logging structuré (zerolog)</strong></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+</tr>
+<tr>
+<td><strong>Architecture hexagonale</strong></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+</tr>
+<tr>
+<td><strong>Tests unitaires</strong></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+</tr>
+<tr>
+<td><strong>Docker</strong></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+</tr>
+<tr>
+<td><strong>CI/CD (GitHub Actions)</strong></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span></td>
+</tr>
+</tbody>
+</table>
+<h3 id="differences-structurelles-majeures">Différences structurelles majeures<a class="headerlink" href="#differences-structurelles-majeures" title="Permanent link">&para;</a></h3>
+<h4 id="template-minimal">Template <code>minimal</code><a class="headerlink" href="#template-minimal" title="Permanent link">&para;</a></h4>
+<p><strong>Caractéristiques</strong>:
+- API REST simple avec endpoints CRUD de base
+- Pas d'authentification ni d'autorisation
+- Swagger pour documentation API
+- Parfait pour commencer rapidement sans complexité</p>
+<p><strong>Structure spécifique</strong>:
+- <code>internal/adapters/handlers/user_handler.go</code> - Handlers CRUD simples sans auth
+- <code>internal/domain/user/service.go</code> - Logique métier basique
+- Documentation Swagger automatique via annotations</p>
+<p><strong>Endpoints générés</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>GET    /health                  # Health check
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>GET    /api/v1/users            # Liste tous les utilisateurs
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>GET    /api/v1/users/:id        # Récupère un utilisateur
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>POST   /api/v1/users            # Crée un utilisateur
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>PUT    /api/v1/users/:id        # Met à jour un utilisateur
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>DELETE /api/v1/users/:id        # Supprime un utilisateur
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>GET    /swagger/*               # Documentation Swagger UI
+</code></pre></div></p>
+<p><strong>Cas d'usage recommandés</strong>:
+- Prototypes et POCs rapides
+- APIs publiques sans données sensibles
+- Microservices internes sans besoins d'authentification
+- Apprentissage de l'architecture hexagonale</p>
+<hr />
+<h4 id="template-full-defaut">Template <code>full</code> (défaut)<a class="headerlink" href="#template-full-defaut" title="Permanent link">&para;</a></h4>
+<p><strong>Caractéristiques</strong>:
+- API REST complète avec authentification JWT
+- Système d'auth avec access tokens + refresh tokens
+- Gestion complète des utilisateurs (CRUD + auth)
+- Swagger avec authentification Bearer token
+- Production-ready avec sécurité intégrée</p>
+<p><strong>Structure spécifique</strong>:
+- <code>internal/adapters/handlers/auth_handler.go</code> - Endpoints register, login, refresh
+- <code>internal/adapters/handlers/user_handler.go</code> - CRUD protégé par JWT
+- <code>internal/adapters/middleware/auth_middleware.go</code> - Vérification JWT
+- <code>pkg/auth/</code> - Génération et validation des tokens JWT
+- <code>internal/models/user.go</code> - User + RefreshToken avec bcrypt</p>
+<p><strong>Endpoints générés</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>GET    /health                      # Health check
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>POST   /api/v1/auth/register        # Inscription utilisateur
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>POST   /api/v1/auth/login           # Connexion (retourne access + refresh tokens)
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>POST   /api/v1/auth/refresh         # Rafraîchir l&#39;access token
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>GET    /api/v1/users                # Liste utilisateurs (:material-lock: JWT requis)
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>GET    /api/v1/users/:id            # Récupère utilisateur (:material-lock: JWT requis)
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>PUT    /api/v1/users/:id            # Met à jour utilisateur (:material-lock: JWT requis)
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>DELETE /api/v1/users/:id            # Supprime utilisateur (:material-lock: JWT requis)
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>GET    /swagger/*                   # Documentation Swagger UI
+</code></pre></div></p>
+<p><strong>Cas d'usage recommandés</strong>:
+- Applications backend complètes
+- APIs nécessitant authentification et autorisation
+- SaaS et applications multi-utilisateurs
+- APIs exposées publiquement avec données sensibles</p>
+<hr />
+<h4 id="template-graphql">Template <code>graphql</code><a class="headerlink" href="#template-graphql" title="Permanent link">&para;</a></h4>
+<p><strong>Caractéristiques</strong>:
+- API GraphQL complète avec gqlgen
+- GraphQL Playground pour explorer l'API interactivement
+- Schéma GraphQL typé avec resolvers
+- Gestion des utilisateurs avec mutations et queries
+- Architecture hexagonale adaptée à GraphQL</p>
+<p><strong>Structure spécifique</strong>:
+- <code>graph/schema.graphqls</code> - Schéma GraphQL (types, queries, mutations)
+- <code>graph/resolver.go</code> - Resolver principal
+- <code>graph/schema.resolvers.go</code> - Implémentation des resolvers
+- <code>gqlgen.yml</code> - Configuration gqlgen
+- <code>internal/infrastructure/server/server.go</code> - Serveur GraphQL avec Playground</p>
+<p><strong>Schéma GraphQL généré</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">type</span><span class="w"> </span><span class="err">User</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nl">id</span><span class="p">:</span><span class="w"> </span><span class="n">ID</span><span class="err">!</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nl">email</span><span class="p">:</span><span class="w"> </span><span class="n">String</span><span class="err">!</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nl">createdAt</span><span class="p">:</span><span class="w"> </span><span class="n">Time</span><span class="err">!</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nl">updatedAt</span><span class="p">:</span><span class="w"> </span><span class="n">Time</span><span class="err">!</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">}</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="k">type</span><span class="w"> </span><span class="err">Query</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="n">users</span><span class="p">(</span><span class="n">limit</span><span class="p">:</span><span class="w"> </span><span class="no">Int</span><span class="p">,</span><span class="w"> </span><span class="n">offset</span><span class="p">:</span><span class="w"> </span><span class="no">Int</span><span class="p">)</span><span class="err">:</span><span class="w"> </span><span class="err">[</span><span class="n">User</span><span class="err">!]!</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="n">user</span><span class="p">(</span><span class="n">id</span><span class="p">:</span><span class="w"> </span><span class="no">ID</span><span class="err">!</span><span class="p">)</span><span class="err">:</span><span class="w"> </span><span class="n">User</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="p">}</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="k">type</span><span class="w"> </span><span class="err">Mutation</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">  </span><span class="n">createUser</span><span class="p">(</span><span class="n">input</span><span class="p">:</span><span class="w"> </span><span class="no">CreateUserInput</span><span class="err">!</span><span class="p">)</span><span class="err">:</span><span class="w"> </span><span class="n">User</span><span class="err">!</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="w">  </span><span class="n">updateUser</span><span class="p">(</span><span class="n">id</span><span class="p">:</span><span class="w"> </span><span class="no">ID</span><span class="err">!</span><span class="p">,</span><span class="w"> </span><span class="n">input</span><span class="p">:</span><span class="w"> </span><span class="no">UpdateUserInput</span><span class="err">!</span><span class="p">)</span><span class="err">:</span><span class="w"> </span><span class="n">User</span><span class="err">!</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">  </span><span class="n">deleteUser</span><span class="p">(</span><span class="n">id</span><span class="p">:</span><span class="w"> </span><span class="no">ID</span><span class="err">!</span><span class="p">)</span><span class="err">:</span><span class="w"> </span><span class="n">Boolean</span><span class="err">!</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Endpoints générés</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>GET    /health                  # Health check
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>POST   /graphql                 # Endpoint GraphQL
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>GET    /                        # GraphQL Playground UI
+</code></pre></div></p>
+<p><strong>Cas d'usage recommandés</strong>:
+- Applications frontend modernes (React, Vue, Angular)
+- APIs nécessitant des queries flexibles
+- Applications mobile avec besoins de données spécifiques
+- Projets privilégiant GraphQL à REST</p>
+<hr />
+<h3 id="comment-choisir-le-bon-template">Comment choisir le bon template?<a class="headerlink" href="#comment-choisir-le-bon-template" title="Permanent link">&para;</a></h3>
+<p><strong>Choisissez <code>minimal</code> si</strong>:
+- Vous voulez un prototype rapide
+- Votre API est publique sans données sensibles
+- Vous n'avez pas besoin d'authentification
+- Vous voulez apprendre l'architecture hexagonale simplement</p>
+<p><strong>Choisissez <code>full</code> si</strong>:
+- Vous construisez une application backend complète
+- Vous avez besoin d'authentification JWT
+- Vous voulez des utilisateurs avec login/register
+- Vous préférez REST à GraphQL
+- Vous voulez un projet production-ready immédiatement</p>
+<p><strong>Choisissez <code>graphql</code> si</strong>:
+- Vous construisez une API GraphQL
+- Votre frontend utilise Apollo Client, Relay ou urql
+- Vous préférez un schéma typé fort
+- Vous voulez GraphQL Playground pour l'exploration
+- Vos clients ont des besoins de données variables</p>
+<h2 id="bases-de-donnees-supportees">Bases de données supportées<a class="headerlink" href="#bases-de-donnees-supportees" title="Permanent link">&para;</a></h2>
+<p>Go Starter Kit supporte <strong>3 types de bases de données</strong> pour s'adapter à vos besoins:</p>
+<h3 id="vue-densemble">Vue d'ensemble<a class="headerlink" href="#vue-densemble" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Base de données</th>
+<th>Idéal pour</th>
+<th>Configuration</th>
+<th>Commande</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PostgreSQL</strong></td>
+<td>Production, queries complexes</td>
+<td>Docker</td>
+<td><code>create-go-starter mon-app</code></td>
+</tr>
+<tr>
+<td><strong>MySQL</strong></td>
+<td>Compatibilité large, shared hosting</td>
+<td>Docker</td>
+<td><code>create-go-starter mon-app --database=mysql</code></td>
+</tr>
+<tr>
+<td><strong>SQLite</strong></td>
+<td>Prototypage, petites apps</td>
+<td>Aucune</td>
+<td><code>create-go-starter mon-app --database=sqlite</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="postgresql-defaut">PostgreSQL (défaut)<a class="headerlink" href="#postgresql-defaut" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>create-go-starter<span class="w"> </span>mon-app
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1"># OU explicitement:</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>create-go-starter<span class="w"> </span>mon-app<span class="w"> </span>--database<span class="o">=</span>postgres
+</code></pre></div>
+<p><strong>Avantages</strong>:
+- ✅ Features SQL avancées (JSON, arrays, full-text search)
+- ✅ Excellente performance et fiabilité
+- ✅ ACID compliant, forte intégrité des données
+- ✅ Idéal pour production</p>
+<p><strong>Quand l'utiliser</strong>: Applications production, données complexes, besoin de fiabilité</p>
+<h3 id="mysqlmariadb">MySQL/MariaDB<a class="headerlink" href="#mysqlmariadb" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>create-go-starter<span class="w"> </span>mon-app<span class="w"> </span>--database<span class="o">=</span>mysql
+</code></pre></div>
+<p><strong>Avantages</strong>:
+- ✅ Compatibilité large avec hébergeurs
+- ✅ Excellent pour workloads read-heavy
+- ✅ Écosystème mature et bien documenté</p>
+<p><strong>Quand l'utiliser</strong>: Shared hosting, équipes MySQL, compatibilité large</p>
+<h3 id="sqlite">SQLite<a class="headerlink" href="#sqlite" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>create-go-starter<span class="w"> </span>mon-app<span class="w"> </span>--database<span class="o">=</span>sqlite
+</code></pre></div>
+<p><strong>Avantages</strong>:
+- ✅ Zéro configuration (pas de serveur)
+- ✅ Parfait pour prototypage rapide
+- ✅ Base de données dans un seul fichier
+- ✅ Très rapide pour petits datasets</p>
+<p><strong>Limitations</strong>:
+- ⚠️ Écritures concurrentes limitées
+- ⚠️ Pas adapté pour production à grande échelle</p>
+<p><strong>Quand l'utiliser</strong>: Prototypage, MVPs, développement, apps embarquées, petite production (&lt;100 utilisateurs)</p>
+<h3 id="guide-complet">Guide complet<a class="headerlink" href="#guide-complet" title="Permanent link">&para;</a></h3>
+<p>Pour une comparaison détaillée, exemples de configuration, et guides de migration, consultez:</p>
+<ul>
+<li><strong><a href="../databases/">Guide de sélection des databases</a></strong> - Comparaison complète et aide au choix</li>
+<li><strong><a href="../database-migration/">Guide de migration</a></strong> - Migration entre databases</li>
+</ul>
+<h2 id="options-disponibles">Options disponibles<a class="headerlink" href="#options-disponibles" title="Permanent link">&para;</a></h2>
+<h3 id="flags-actuels">Flags actuels<a class="headerlink" href="#flags-actuels" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>create-go-starter<span class="w"> </span>--help<span class="w">                  </span><span class="c1"># Afficher l&#39;aide</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>create-go-starter<span class="w"> </span>-h<span class="w">                      </span><span class="c1"># Alias pour --help</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>create-go-starter<span class="w"> </span>--template<span class="w"> </span>&lt;type&gt;<span class="w">       </span><span class="c1"># Choisir le template (minimal, full, graphql)</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>create-go-starter<span class="w"> </span>--database<span class="w"> </span>&lt;type&gt;<span class="w">       </span><span class="c1"># Choisir la base de données (postgres, mysql, sqlite)</span>
+</code></pre></div>
+<p><strong>Exemples</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Template minimal</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>create-go-starter<span class="w"> </span>mon-projet<span class="w"> </span>--template<span class="w"> </span>minimal
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># Template full (défaut)</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>create-go-starter<span class="w"> </span>mon-projet<span class="w"> </span>--template<span class="w"> </span>full
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>create-go-starter<span class="w"> </span>mon-projet<span class="w">  </span><span class="c1"># Même résultat</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="c1"># Template GraphQL</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>create-go-starter<span class="w"> </span>mon-projet<span class="w"> </span>--template<span class="w"> </span>graphql
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="c1"># Choisir MySQL comme base de données</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>create-go-starter<span class="w"> </span>mon-projet<span class="w"> </span>--database<span class="o">=</span>mysql
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="c1"># Choisir SQLite (idéal pour prototypage)</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>create-go-starter<span class="w"> </span>mon-projet<span class="w"> </span>--database<span class="o">=</span>sqlite
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="c1"># Combiner template et database</span>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>create-go-starter<span class="w"> </span>mon-projet<span class="w"> </span>--template<span class="o">=</span>minimal<span class="w"> </span>--database<span class="o">=</span>sqlite
+</code></pre></div>
+<blockquote>
+<p><strong>Notes</strong>:
+- Le flag <code>--template</code> est optionnel. Si non spécifié, le template <strong>full</strong> est utilisé par défaut.
+- Le flag <code>--database</code> est optionnel. Si non spécifié, <strong>PostgreSQL</strong> est utilisé par défaut.</p>
+</blockquote>
+<h2 id="conventions-de-nommage">Conventions de nommage<a class="headerlink" href="#conventions-de-nommage" title="Permanent link">&para;</a></h2>
+<p>Le nom du projet doit respecter certaines règles:</p>
+<h3 id="caracteres-autorises">Caractères autorisés<a class="headerlink" href="#caracteres-autorises" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Lettres</strong>: a-z, A-Z</li>
+<li><strong>Chiffres</strong>: 0-9</li>
+<li><strong>Tirets</strong>: - (hyphen)</li>
+<li><strong>Underscores</strong>: _ (trait de soulignement)</li>
+</ul>
+<h3 id="restrictions">Restrictions<a class="headerlink" href="#restrictions" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Pas d'espaces</li>
+<li>Pas de caractères spéciaux (/, \, @, #, etc.)</li>
+<li>Pas de points (.)</li>
+<li>Doit commencer par une lettre ou un chiffre (pas de tiret au début)</li>
+</ul>
+<h3 id="exemples-valides">Exemples valides<a class="headerlink" href="#exemples-valides" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>create-go-starter<span class="w"> </span>mon-projet<span class="w">           </span>:material-check-circle:
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>create-go-starter<span class="w"> </span>my-awesome-api<span class="w">       </span>:material-check-circle:
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>create-go-starter<span class="w"> </span>user_service<span class="w">         </span>:material-check-circle:
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>create-go-starter<span class="w"> </span>app2024<span class="w">              </span>:material-check-circle:
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>create-go-starter<span class="w"> </span>MonProjet<span class="w">            </span>:material-check-circle:
+</code></pre></div>
+<h3 id="exemples-invalides">Exemples invalides<a class="headerlink" href="#exemples-invalides" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>create-go-starter<span class="w"> </span>mon<span class="w"> </span>projet<span class="w">           </span>❌<span class="w"> </span><span class="o">(</span>contient<span class="w"> </span>un<span class="w"> </span>espace<span class="o">)</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>create-go-starter<span class="w"> </span>mon-projet!<span class="w">          </span>❌<span class="w"> </span><span class="o">(</span>caractère<span class="w"> </span>spécial<span class="o">)</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>create-go-starter<span class="w"> </span>my.project<span class="w">           </span>❌<span class="w"> </span><span class="o">(</span>contient<span class="w"> </span>un<span class="w"> </span>point<span class="o">)</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>create-go-starter<span class="w"> </span>-mon-projet<span class="w">          </span>❌<span class="w"> </span><span class="o">(</span>commence<span class="w"> </span>par<span class="w"> </span>un<span class="w"> </span>tiret<span class="o">)</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>create-go-starter<span class="w"> </span>mon/projet<span class="w">           </span>❌<span class="w"> </span><span class="o">(</span>contient<span class="w"> </span>un<span class="w"> </span>slash<span class="o">)</span>
+</code></pre></div>
+<h2 id="structure-generee">Structure générée<a class="headerlink" href="#structure-generee" title="Permanent link">&para;</a></h2>
+<p>Voici la structure complète créée par <code>create-go-starter</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>mon-projet/
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>├── cmd/
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>│   └── main.go                              # Point d&#39;entrée de l&#39;application
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>│
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>├── internal/
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>│   ├── models/
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>│   │   └── user.go                          # Entités partagées: User, RefreshToken, AuthResponse
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>│   │
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>│   ├── adapters/
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>│   │   ├── handlers/
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>│   │   │   ├── auth_handler.go              # Endpoints auth (register, login, refresh)
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>│   │   │   ├── auth_handler_test.go         # Tests handlers auth
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>│   │   │   ├── user_handler.go              # Endpoints CRUD users
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>│   │   │   └── user_handler_test.go         # Tests handlers users
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>│   │   ├── middleware/
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>│   │   │   ├── auth_middleware.go           # Middleware JWT authentication
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>│   │   │   ├── auth_middleware_test.go      # Tests middleware auth
+<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a>│   │   │   ├── error_handler.go             # Middleware gestion centralisée erreurs
+<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a>│   │   │   └── error_handler_test.go        # Tests error handler
+<a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a>│   │   ├── repository/
+<a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a>│   │   │   ├── user_repository.go           # Implémentation GORM du repository
+<a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a>│   │   │   └── user_repository_test.go      # Tests repository
+<a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a>│   │   └── http/
+<a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a>│   │       ├── health.go                    # Handler health check
+<a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a>│   │       ├── health_test.go               # Tests health check
+<a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a>│   │       └── routes.go                    # Routes centralisées de l&#39;API
+<a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a>│   │
+<a id="__codelineno-14-28" name="__codelineno-14-28" href="#__codelineno-14-28"></a>│   ├── domain/
+<a id="__codelineno-14-29" name="__codelineno-14-29" href="#__codelineno-14-29"></a>│   │   ├── errors.go                        # Erreurs métier personnalisées
+<a id="__codelineno-14-30" name="__codelineno-14-30" href="#__codelineno-14-30"></a>│   │   ├── errors_test.go                   # Tests erreurs
+<a id="__codelineno-14-31" name="__codelineno-14-31" href="#__codelineno-14-31"></a>│   │   └── user/
+<a id="__codelineno-14-32" name="__codelineno-14-32" href="#__codelineno-14-32"></a>│   │       ├── service.go                   # Logique métier (Register, Login, etc.)
+<a id="__codelineno-14-33" name="__codelineno-14-33" href="#__codelineno-14-33"></a>│   │       ├── service_test.go              # Tests service
+<a id="__codelineno-14-34" name="__codelineno-14-34" href="#__codelineno-14-34"></a>│   │       └── module.go                    # Module fx pour dependency injection
+<a id="__codelineno-14-35" name="__codelineno-14-35" href="#__codelineno-14-35"></a>│   │
+<a id="__codelineno-14-36" name="__codelineno-14-36" href="#__codelineno-14-36"></a>│   ├── infrastructure/
+<a id="__codelineno-14-37" name="__codelineno-14-37" href="#__codelineno-14-37"></a>│   │   ├── database/
+<a id="__codelineno-14-38" name="__codelineno-14-38" href="#__codelineno-14-38"></a>│   │   │   ├── database.go                  # Configuration GORM et connexion DB
+<a id="__codelineno-14-39" name="__codelineno-14-39" href="#__codelineno-14-39"></a>│   │   │   ├── database_test.go             # Tests database
+<a id="__codelineno-14-40" name="__codelineno-14-40" href="#__codelineno-14-40"></a>│   │   │   └── module.go                    # Module fx pour database
+<a id="__codelineno-14-41" name="__codelineno-14-41" href="#__codelineno-14-41"></a>│   │   └── server/
+<a id="__codelineno-14-42" name="__codelineno-14-42" href="#__codelineno-14-42"></a>│   │       ├── server.go                    # Configuration Fiber app
+<a id="__codelineno-14-43" name="__codelineno-14-43" href="#__codelineno-14-43"></a>│   │       ├── server_test.go               # Tests server
+<a id="__codelineno-14-44" name="__codelineno-14-44" href="#__codelineno-14-44"></a>│   │       └── module.go                    # Module fx pour server
+<a id="__codelineno-14-45" name="__codelineno-14-45" href="#__codelineno-14-45"></a>│   │
+<a id="__codelineno-14-46" name="__codelineno-14-46" href="#__codelineno-14-46"></a>│   └── interfaces/
+<a id="__codelineno-14-47" name="__codelineno-14-47" href="#__codelineno-14-47"></a>│       ├── auth_service.go                  # Interface AuthService (port)
+<a id="__codelineno-14-48" name="__codelineno-14-48" href="#__codelineno-14-48"></a>│       ├── user_service.go                  # Interface UserService (port)
+<a id="__codelineno-14-49" name="__codelineno-14-49" href="#__codelineno-14-49"></a>│       └── user_repository.go               # Interface UserRepository (port)
+<a id="__codelineno-14-50" name="__codelineno-14-50" href="#__codelineno-14-50"></a>│
+<a id="__codelineno-14-51" name="__codelineno-14-51" href="#__codelineno-14-51"></a>├── pkg/
+<a id="__codelineno-14-52" name="__codelineno-14-52" href="#__codelineno-14-52"></a>│   ├── auth/
+<a id="__codelineno-14-53" name="__codelineno-14-53" href="#__codelineno-14-53"></a>│   │   ├── jwt.go                           # Génération et parsing JWT tokens
+<a id="__codelineno-14-54" name="__codelineno-14-54" href="#__codelineno-14-54"></a>│   │   ├── jwt_test.go                      # Tests JWT
+<a id="__codelineno-14-55" name="__codelineno-14-55" href="#__codelineno-14-55"></a>│   │   ├── middleware.go                    # Middleware JWT pour Fiber
+<a id="__codelineno-14-56" name="__codelineno-14-56" href="#__codelineno-14-56"></a>│   │   ├── middleware_test.go               # Tests middleware
+<a id="__codelineno-14-57" name="__codelineno-14-57" href="#__codelineno-14-57"></a>│   │   └── module.go                        # Module fx pour auth
+<a id="__codelineno-14-58" name="__codelineno-14-58" href="#__codelineno-14-58"></a>│   ├── config/
+<a id="__codelineno-14-59" name="__codelineno-14-59" href="#__codelineno-14-59"></a>│   │   ├── env.go                           # Chargement variables d&#39;environnement
+<a id="__codelineno-14-60" name="__codelineno-14-60" href="#__codelineno-14-60"></a>│   │   ├── env_test.go                      # Tests config
+<a id="__codelineno-14-61" name="__codelineno-14-61" href="#__codelineno-14-61"></a>│   │   └── module.go                        # Module fx pour config
+<a id="__codelineno-14-62" name="__codelineno-14-62" href="#__codelineno-14-62"></a>│   └── logger/
+<a id="__codelineno-14-63" name="__codelineno-14-63" href="#__codelineno-14-63"></a>│       ├── logger.go                        # Configuration zerolog
+<a id="__codelineno-14-64" name="__codelineno-14-64" href="#__codelineno-14-64"></a>│       ├── logger_test.go                   # Tests logger
+<a id="__codelineno-14-65" name="__codelineno-14-65" href="#__codelineno-14-65"></a>│       └── module.go                        # Module fx pour logger
+<a id="__codelineno-14-66" name="__codelineno-14-66" href="#__codelineno-14-66"></a>│
+<a id="__codelineno-14-67" name="__codelineno-14-67" href="#__codelineno-14-67"></a>├── .github/
+<a id="__codelineno-14-68" name="__codelineno-14-68" href="#__codelineno-14-68"></a>│   └── workflows/
+<a id="__codelineno-14-69" name="__codelineno-14-69" href="#__codelineno-14-69"></a>│       └── ci.yml                           # Pipeline CI/CD GitHub Actions
+<a id="__codelineno-14-70" name="__codelineno-14-70" href="#__codelineno-14-70"></a>│
+<a id="__codelineno-14-71" name="__codelineno-14-71" href="#__codelineno-14-71"></a>├── .env                                     # Variables d&#39;environnement (créé automatiquement)
+<a id="__codelineno-14-72" name="__codelineno-14-72" href="#__codelineno-14-72"></a>├── .env.example                             # Template de configuration
+<a id="__codelineno-14-73" name="__codelineno-14-73" href="#__codelineno-14-73"></a>├── .gitignore                               # Exclusions Git
+<a id="__codelineno-14-74" name="__codelineno-14-74" href="#__codelineno-14-74"></a>├── .golangci.yml                            # Configuration golangci-lint
+<a id="__codelineno-14-75" name="__codelineno-14-75" href="#__codelineno-14-75"></a>├── Dockerfile                               # Build Docker multi-stage
+<a id="__codelineno-14-76" name="__codelineno-14-76" href="#__codelineno-14-76"></a>├── Makefile                                 # Commandes utiles (run, test, lint, etc.)
+<a id="__codelineno-14-77" name="__codelineno-14-77" href="#__codelineno-14-77"></a>├── setup.sh                                 # Script de configuration automatique
+<a id="__codelineno-14-78" name="__codelineno-14-78" href="#__codelineno-14-78"></a>├── go.mod                                   # Module Go et dépendances
+<a id="__codelineno-14-79" name="__codelineno-14-79" href="#__codelineno-14-79"></a>└── README.md                                # Documentation du projet
+</code></pre></div>
+<p><strong>Total</strong>: ~45+ fichiers créés automatiquement!</p>
+<h2 id="explication-detaillee-de-chaque-repertoire">Explication détaillée de chaque répertoire<a class="headerlink" href="#explication-detaillee-de-chaque-repertoire" title="Permanent link">&para;</a></h2>
+<h3 id="cmd"><code>/cmd</code><a class="headerlink" href="#cmd" title="Permanent link">&para;</a></h3>
+<p><strong>Rôle</strong>: Point d'entrée de l'application.</p>
+<p><strong>Contenu</strong>:
+- <code>main.go</code>: Bootstrap de l'application avec uber-go/fx
+  - Initialise tous les modules (database, server, logger, etc.)
+  - Configure le lifecycle (OnStart, OnStop)
+  - Lance l'application avec <code>fx.New().Run()</code></p>
+<p><strong>Pattern</strong>: Un seul fichier minimal qui orchestre les dépendances.</p>
+<h3 id="internalmodels"><code>/internal/models</code><a class="headerlink" href="#internalmodels" title="Permanent link">&para;</a></h3>
+<p><strong>Rôle</strong>: Entités de domaine partagées (domain entities) utilisées à travers toute l'application.</p>
+<p><strong>Contenu</strong>:
+- <code>user.go</code>: Définit toutes les entités liées aux utilisateurs
+  - <code>User</code>: Entité principale avec tags GORM (ID, Email, PasswordHash, timestamps)
+  - <code>RefreshToken</code>: Entité pour la gestion des refresh tokens JWT
+  - <code>AuthResponse</code>: DTO pour les réponses d'authentification</p>
+<p><strong>Pourquoi un package séparé?</strong>
+- <strong>Évite les dépendances circulaires</strong>: Avant, <code>interfaces</code> → <code>domain/user</code> → <code>interfaces</code> créait un cycle
+- <strong>Maintenant</strong>: <code>interfaces</code> → <code>models</code> ← <code>domain/user</code> (pas de cycle!)
+- <strong>Centralisation</strong>: Les entités sont définies en un seul endroit
+- <strong>Réutilisabilité</strong>: Tous les layers (domain, interfaces, adapters) peuvent importer models sans conflit</p>
+<p><strong>Import</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">import</span><span class="w"> </span><span class="s">&quot;mon-projet/internal/models&quot;</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="nx">user</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">models</span><span class="p">.</span><span class="nx">User</span><span class="p">{</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="nx">Email</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user@example.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span><span class="nx">PasswordHash</span><span class="p">:</span><span class="w"> </span><span class="nx">hashedPassword</span><span class="p">,</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="p">}</span>
+</code></pre></div></p>
+<h3 id="internaldomain"><code>/internal/domain</code><a class="headerlink" href="#internaldomain" title="Permanent link">&para;</a></h3>
+<p><strong>Rôle</strong>: Couche métier (logique business), cœur de l'architecture hexagonale.</p>
+<p><strong>Contenu</strong>:
+- <code>errors.go</code>: Définition des erreurs métier (DomainError, NotFoundError, ValidationError, etc.)
+- <code>user/</code>: Domaine User
+  - <code>service.go</code>: Logique métier (Register, Login, GetUserByID, UpdateUser, DeleteUser)
+  - <code>module.go</code>: Module fx qui fournit le service</p>
+<p><strong>Principe</strong>: Le domaine ne doit <strong>jamais</strong> importer d'autres packages (adapters, infrastructure). Les dépendances sont inversées via interfaces (ports). Les entités sont maintenant dans <code>internal/models</code> pour éviter les cycles de dépendances.</p>
+<h3 id="internaladapters"><code>/internal/adapters</code><a class="headerlink" href="#internaladapters" title="Permanent link">&para;</a></h3>
+<p><strong>Rôle</strong>: Adaptateurs qui connectent le domaine au monde extérieur (HTTP, DB).</p>
+<h4 id="internaladaptershandlers"><code>/internal/adapters/handlers</code><a class="headerlink" href="#internaladaptershandlers" title="Permanent link">&para;</a></h4>
+<p><strong>Rôle</strong>: Handlers HTTP qui exposent l'API REST.</p>
+<p><strong>Contenu</strong>:
+- <code>auth_handler.go</code>:
+  - <code>Register</code>: POST /api/v1/auth/register
+  - <code>Login</code>: POST /api/v1/auth/login
+  - <code>RefreshToken</code>: POST /api/v1/auth/refresh
+- <code>user_handler.go</code>:
+  - <code>List</code>: GET /api/v1/users
+  - <code>GetByID</code>: GET /api/v1/users/:id
+  - <code>Update</code>: PUT /api/v1/users/:id
+  - <code>Delete</code>: DELETE /api/v1/users/:id</p>
+<p><strong>Pattern</strong>: Handlers parsent les requêtes, valident, appellent les services du domaine, retournent les réponses.</p>
+<h4 id="internaladaptersmiddleware"><code>/internal/adapters/middleware</code><a class="headerlink" href="#internaladaptersmiddleware" title="Permanent link">&para;</a></h4>
+<p><strong>Rôle</strong>: Middleware Fiber pour cross-cutting concerns.</p>
+<p><strong>Contenu</strong>:
+- <code>auth_middleware.go</code>: Vérifie le JWT token dans les requêtes
+- <code>error_handler.go</code>: Gestion centralisée des erreurs (convertit DomainError en réponses HTTP)</p>
+<h4 id="internaladaptersrepository"><code>/internal/adapters/repository</code><a class="headerlink" href="#internaladaptersrepository" title="Permanent link">&para;</a></h4>
+<p><strong>Rôle</strong>: Implémentation du pattern Repository avec GORM.</p>
+<p><strong>Contenu</strong>:
+- <code>user_repository.go</code>: Implémentation de l'interface UserRepository
+  - Create, FindByID, FindByEmail, Update, Delete
+  - Utilise GORM pour les opérations DB</p>
+<p><strong>Pattern</strong>: Repository isole le domaine de la couche de persistance.</p>
+<h4 id="internaladaptershttp"><code>/internal/adapters/http</code><a class="headerlink" href="#internaladaptershttp" title="Permanent link">&para;</a></h4>
+<p><strong>Rôle</strong>: Routes HTTP et handlers utilitaires.</p>
+<p><strong>Contenu</strong>:
+- <code>health.go</code>: Endpoint GET /health pour monitoring
+- <code>routes.go</code>: Configuration centralisée de toutes les routes de l'API</p>
+<p><strong>Avantages de la centralisation des routes</strong>:
+- Vue d'ensemble de toutes les routes en un seul fichier
+- Facilite la documentation et le versioning de l'API
+- Séparation claire entre définition des routes et logique des handlers</p>
+<h3 id="internalinfrastructure"><code>/internal/infrastructure</code><a class="headerlink" href="#internalinfrastructure" title="Permanent link">&para;</a></h3>
+<p><strong>Rôle</strong>: Configuration de l'infrastructure (DB, serveur).</p>
+<h4 id="internalinfrastructuredatabase"><code>/internal/infrastructure/database</code><a class="headerlink" href="#internalinfrastructuredatabase" title="Permanent link">&para;</a></h4>
+<p><strong>Rôle</strong>: Configuration et connexion à la base de données.</p>
+<p><strong>Contenu</strong>:
+- <code>database.go</code>:
+  - Connexion PostgreSQL via GORM
+  - Configuration du pool de connexions
+  - AutoMigrate des entités (<code>models.User</code>, <code>models.RefreshToken</code>)
+  - Gestion du lifecycle (fermeture connexion)</p>
+<h4 id="internalinfrastructureserver"><code>/internal/infrastructure/server</code><a class="headerlink" href="#internalinfrastructureserver" title="Permanent link">&para;</a></h4>
+<p><strong>Rôle</strong>: Configuration du serveur HTTP Fiber.</p>
+<p><strong>Contenu</strong>:
+- <code>server.go</code>:
+  - Configuration Fiber app
+  - Middleware error handler
+  - Lifecycle du serveur (start, graceful shutdown)
+  - Note: Les routes sont enregistrées via <code>server.Module</code> qui invoque <code>httpRoutes.RegisterRoutes()</code> avec <code>fx.Invoke</code></p>
+<h3 id="internalinterfaces"><code>/internal/interfaces</code><a class="headerlink" href="#internalinterfaces" title="Permanent link">&para;</a></h3>
+<p><strong>Rôle</strong>: Définition des ports (interfaces) pour l'architecture hexagonale.</p>
+<p><strong>Contenu</strong>:
+- <code>user_repository.go</code>: Interface pour la persistance utilisateur</p>
+<p><strong>Principe</strong>:
+- Les adapters dépendent de ces interfaces, pas des implémentations concrètes
+- Les interfaces référencent <code>models.*</code> pour les types de retour/paramètres
+- Exemple: <code>CreateUser(ctx context.Context, user *models.User) error</code></p>
+<h3 id="pkg"><code>/pkg</code><a class="headerlink" href="#pkg" title="Permanent link">&para;</a></h3>
+<p><strong>Rôle</strong>: Packages réutilisables, peuvent être importés par d'autres projets.</p>
+<h4 id="pkgauth"><code>/pkg/auth</code><a class="headerlink" href="#pkgauth" title="Permanent link">&para;</a></h4>
+<p><strong>Rôle</strong>: Utilitaires JWT.</p>
+<p><strong>Contenu</strong>:
+- <code>jwt.go</code>: Génération et validation de tokens JWT
+  - GenerateAccessToken (15min)
+  - GenerateRefreshToken (7 jours)
+  - ParseToken
+- <code>middleware.go</code>: Middleware Fiber pour JWT</p>
+<h4 id="pkgconfig"><code>/pkg/config</code><a class="headerlink" href="#pkgconfig" title="Permanent link">&para;</a></h4>
+<p><strong>Rôle</strong>: Chargement de la configuration.</p>
+<p><strong>Contenu</strong>:
+- <code>env.go</code>: Charge les variables .env (godotenv) et les expose via struct Config</p>
+<h4 id="pkglogger"><code>/pkg/logger</code><a class="headerlink" href="#pkglogger" title="Permanent link">&para;</a></h4>
+<p><strong>Rôle</strong>: Configuration du logger.</p>
+<p><strong>Contenu</strong>:
+- <code>logger.go</code>: Configure zerolog (niveau, format, output)</p>
+<h3 id="githubworkflows"><code>/.github/workflows</code><a class="headerlink" href="#githubworkflows" title="Permanent link">&para;</a></h3>
+<p><strong>Rôle</strong>: CI/CD avec GitHub Actions.</p>
+<p><strong>Contenu</strong>:
+- <code>ci.yml</code>: Pipeline qui exécute:
+  1. golangci-lint (quality checks)
+  2. Tests avec PostgreSQL (service container)
+  3. Build verification</p>
+<h2 id="fichiers-de-configuration-detailles">Fichiers de configuration détaillés<a class="headerlink" href="#fichiers-de-configuration-detailles" title="Permanent link">&para;</a></h2>
+<h3 id="env-et-envexample"><code>.env</code> et <code>.env.example</code><a class="headerlink" href="#env-et-envexample" title="Permanent link">&para;</a></h3>
+<p>Le fichier <code>.env.example</code> est un template, et <code>.env</code> est copié automatiquement lors de la génération.</p>
+<p><strong>Variables</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Application</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="nv">APP_NAME</span><span class="o">=</span>mon-projet<span class="w">                </span><span class="c1"># Nom de l&#39;app (utilisé dans logs)</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="nv">APP_ENV</span><span class="o">=</span>development<span class="w">                </span><span class="c1"># Environnement (development, staging, production)</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="nv">APP_PORT</span><span class="o">=</span><span class="m">8080</span><span class="w">                      </span><span class="c1"># Port HTTP</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="c1"># Database PostgreSQL</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="nv">DB_HOST</span><span class="o">=</span>localhost<span class="w">                  </span><span class="c1"># Hôte de la DB</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="nv">DB_PORT</span><span class="o">=</span><span class="m">5432</span><span class="w">                       </span><span class="c1"># Port PostgreSQL</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="nv">DB_USER</span><span class="o">=</span>postgres<span class="w">                   </span><span class="c1"># Utilisateur DB</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="nv">DB_PASSWORD</span><span class="o">=</span>postgres<span class="w">               </span><span class="c1"># Mot de passe DB</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="nv">DB_NAME</span><span class="o">=</span>mon-projet<span class="w">                 </span><span class="c1"># Nom de la base de données</span>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="nv">DB_SSLMODE</span><span class="o">=</span>disable<span class="w">                 </span><span class="c1"># SSL mode (require pour production)</span>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="c1"># JWT Authentication</span>
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="nv">JWT_SECRET</span><span class="o">=</span><span class="w">                        </span><span class="c1"># SECRET CRITIQUE - À générer!</span>
+<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="nv">JWT_EXPIRY</span><span class="o">=</span>15m<span class="w">                     </span><span class="c1"># Durée des access tokens (15 minutes)</span>
+<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a><span class="nv">REFRESH_TOKEN_EXPIRY</span><span class="o">=</span>168h<span class="w">          </span><span class="c1"># Durée des refresh tokens (7 jours)</span>
+</code></pre></div>
+<p><strong>Important</strong>: Générez un JWT_SECRET sécurisé:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>openssl<span class="w"> </span>rand<span class="w"> </span>-base64<span class="w"> </span><span class="m">32</span>
+</code></pre></div>
+<p>Puis ajoutez-le dans <code>.env</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nv">JWT_SECRET</span><span class="o">=</span>votre_secret_genere_ici
+</code></pre></div>
+<h3 id="gomod"><code>go.mod</code><a class="headerlink" href="#gomod" title="Permanent link">&para;</a></h3>
+<p>Définit le module Go et les dépendances:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nx">module</span><span class="w"> </span><span class="nx">mon</span><span class="o">-</span><span class="nx">projet</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="k">go</span><span class="w"> </span><span class="mf">1.25</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="nx">require</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">    </span><span class="nx">github</span><span class="p">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">gofiber</span><span class="o">/</span><span class="nx">fiber</span><span class="o">/</span><span class="nx">v2</span><span class="w"> </span><span class="nx">v2</span><span class="p">.</span><span class="nx">x</span><span class="p">.</span><span class="nx">x</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">    </span><span class="nx">github</span><span class="p">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">golang</span><span class="o">-</span><span class="nx">jwt</span><span class="o">/</span><span class="nx">jwt</span><span class="o">/</span><span class="nx">v5</span><span class="w"> </span><span class="nx">v5</span><span class="p">.</span><span class="nx">x</span><span class="p">.</span><span class="nx">x</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">    </span><span class="nx">gorm</span><span class="p">.</span><span class="nx">io</span><span class="o">/</span><span class="nx">gorm</span><span class="w"> </span><span class="nx">v1</span><span class="p">.</span><span class="nx">x</span><span class="p">.</span><span class="nx">x</span>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">    </span><span class="nx">gorm</span><span class="p">.</span><span class="nx">io</span><span class="o">/</span><span class="nx">driver</span><span class="o">/</span><span class="nx">postgres</span><span class="w"> </span><span class="nx">v1</span><span class="p">.</span><span class="nx">x</span><span class="p">.</span><span class="nx">x</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">    </span><span class="k">go</span><span class="p">.</span><span class="nx">uber</span><span class="p">.</span><span class="nx">org</span><span class="o">/</span><span class="nx">fx</span><span class="w"> </span><span class="nx">v1</span><span class="p">.</span><span class="nx">x</span><span class="p">.</span><span class="nx">x</span>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="w">    </span><span class="nx">github</span><span class="p">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">rs</span><span class="o">/</span><span class="nx">zerolog</span><span class="w"> </span><span class="nx">v1</span><span class="p">.</span><span class="nx">x</span><span class="p">.</span><span class="nx">x</span>
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">    </span><span class="nx">github</span><span class="p">.</span><span class="nx">com</span><span class="o">/</span><span class="k">go</span><span class="o">-</span><span class="nx">playground</span><span class="o">/</span><span class="nx">validator</span><span class="o">/</span><span class="nx">v10</span><span class="w"> </span><span class="nx">v10</span><span class="p">.</span><span class="nx">x</span><span class="p">.</span><span class="nx">x</span>
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="w">    </span><span class="nx">golang</span><span class="p">.</span><span class="nx">org</span><span class="o">/</span><span class="nx">x</span><span class="o">/</span><span class="nx">crypto</span><span class="w"> </span><span class="nx">v0</span><span class="p">.</span><span class="nx">x</span><span class="p">.</span><span class="nx">x</span>
+<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="w">    </span><span class="nx">github</span><span class="p">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">joho</span><span class="o">/</span><span class="nx">godotenv</span><span class="w"> </span><span class="nx">v1</span><span class="p">.</span><span class="nx">x</span><span class="p">.</span><span class="nx">x</span>
+<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="w">    </span><span class="c1">// ... autres dépendances</span>
+<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a><span class="p">)</span>
+</code></pre></div>
+<h3 id="makefile"><code>Makefile</code><a class="headerlink" href="#makefile" title="Permanent link">&para;</a></h3>
+<p>Commandes utiles pour le développement:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nf">.PHONY</span><span class="o">:</span><span class="w"> </span><span class="n">help</span> <span class="n">run</span> <span class="n">build</span> <span class="n">test</span> <span class="n">test</span>-<span class="n">coverage</span> <span class="n">lint</span> <span class="n">clean</span> <span class="n">docker</span>-<span class="n">build</span> <span class="n">docker</span>-<span class="n">run</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="nf">help</span><span class="o">:</span><span class="w">           </span><span class="c"># Afficher toutes les commandes</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="nf">run</span><span class="o">:</span><span class="w">            </span><span class="c"># Lancer l&#39;application (go run)</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="nf">build</span><span class="o">:</span><span class="w">          </span><span class="c"># Compiler le binaire</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="nf">test</span><span class="o">:</span><span class="w">           </span><span class="c"># Exécuter les tests avec race detector</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="nf">test-coverage</span><span class="o">:</span><span class="w">  </span><span class="c"># Tests avec rapport HTML de coverage</span>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="nf">lint</span><span class="o">:</span><span class="w">           </span><span class="c"># Linter avec golangci-lint</span>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="nf">clean</span><span class="o">:</span><span class="w">          </span><span class="c"># Nettoyer les artifacts</span>
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="nf">docker-build</span><span class="o">:</span><span class="w">   </span><span class="c"># Build l&#39;image Docker</span>
+<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="nf">docker-run</span><span class="o">:</span><span class="w">     </span><span class="c"># Lancer le conteneur Docker</span>
+</code></pre></div>
+<h3 id="golangciyml"><code>.golangci.yml</code><a class="headerlink" href="#golangciyml" title="Permanent link">&para;</a></h3>
+<p>Configuration du linter avec règles strictes:</p>
+<ul>
+<li>errcheck, gosimple, govet, ineffassign, staticcheck</li>
+<li>gofmt, goimports</li>
+<li>misspell, revive</li>
+<li>Exclusions pour tests et code généré</li>
+</ul>
+<h3 id="dockerfile"><code>Dockerfile</code><a class="headerlink" href="#dockerfile" title="Permanent link">&para;</a></h3>
+<p>Build multi-stage optimisé:</p>
+<p><strong>Stage 1 (builder)</strong>:
+- Image golang:1.25-alpine
+- Build du binaire statique</p>
+<p><strong>Stage 2 (runtime)</strong>:
+- Image alpine:latest (légère)
+- Copie du binaire seulement
+- Exécution en tant que non-root
+- EXPOSE 8080</p>
+<p><strong>Taille finale</strong>: ~15-20MB (vs ~1GB avec image golang complète)</p>
+<h2 id="workflow-apres-generation">Workflow après génération<a class="headerlink" href="#workflow-apres-generation" title="Permanent link">&para;</a></h2>
+<p>Une fois le projet créé, vous avez deux options pour configurer votre projet:</p>
+<h3 id="option-a-configuration-automatique-avec-setupsh-recommande">Option A: Configuration automatique avec setup.sh (Recommandé) <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m13.13 22.19-1.63-3.83c1.57-.58 3.04-1.36 4.4-2.27zM5.64 12.5l-3.83-1.63 6.1-2.77C7 9.46 6.22 10.93 5.64 12.5M21.61 2.39S16.66.269 11 5.93c-2.19 2.19-3.5 4.6-4.35 6.71-.28.75-.09 1.57.46 2.13l2.13 2.12c.55.56 1.37.74 2.12.46A19.1 19.1 0 0 0 18.07 13c5.66-5.66 3.54-10.61 3.54-10.61m-7.07 7.07c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0c.77.78.78 2.05 0 2.83s-2.05.78-2.83 0m-5.66 7.07-1.41-1.41zM6.24 22l3.64-3.64c-.34-.09-.67-.24-.97-.45L4.83 22zM2 22h1.41l4.77-4.76-1.42-1.41L2 20.59zm0-2.83 4.09-4.08c-.21-.3-.36-.62-.45-.97L2 17.76z"/></svg></span><a class="headerlink" href="#option-a-configuration-automatique-avec-setupsh-recommande" title="Permanent link">&para;</a></h3>
+<p>Le CLI génère automatiquement un script <code>setup.sh</code> qui automatise toute la configuration initiale.</p>
+<p><strong>Fonctionnalités du script</strong>:
+- <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span> Vérification des prérequis (Go, OpenSSL, Docker)
+- <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span> Installation des dépendances Go (<code>go mod tidy</code>)
+- <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span> Génération automatique du JWT secret
+- <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span> Configuration de PostgreSQL (Docker ou local)
+- <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span> Exécution des tests
+- <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span> Vérification de l'installation</p>
+<p><strong>Utilisation</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nb">cd</span><span class="w"> </span>mon-projet
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>./setup.sh
+</code></pre></div>
+<p>Le script est <strong>interactif</strong> et vous guidera à travers les choix:
+- Docker ou PostgreSQL local
+- Régénération du JWT secret si déjà configuré
+- Validation à chaque étape</p>
+<p><strong>Après l'exécution du script</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>make<span class="w"> </span>run
+</code></pre></div>
+<p>C'est tout! Votre application est prête.</p>
+<hr />
+<h3 id="option-b-configuration-manuelle">Option B: Configuration manuelle<a class="headerlink" href="#option-b-configuration-manuelle" title="Permanent link">&para;</a></h3>
+<p>Si vous préférez configurer manuellement ou si le script setup.sh échoue, suivez ces étapes:</p>
+<h3 id="etape-1-naviguer-dans-le-projet">Étape 1: Naviguer dans le projet<a class="headerlink" href="#etape-1-naviguer-dans-le-projet" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nb">cd</span><span class="w"> </span>mon-projet
+</code></pre></div>
+<h3 id="etape-2-configurer-les-variables-denvironnement">Étape 2: Configurer les variables d'environnement<a class="headerlink" href="#etape-2-configurer-les-variables-denvironnement" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># Générer un JWT secret</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>openssl<span class="w"> </span>rand<span class="w"> </span>-base64<span class="w"> </span><span class="m">32</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="c1"># Éditer .env et ajouter le secret</span>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>nano<span class="w"> </span>.env<span class="w">  </span><span class="c1"># ou vim, code, etc.</span>
+</code></pre></div>
+<p>Ajoutez:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>JWT_SECRET=le_secret_genere
+</code></pre></div></p>
+<h3 id="etape-3-installer-les-dependances">Étape 3: Installer les dépendances<a class="headerlink" href="#etape-3-installer-les-dependances" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>go<span class="w"> </span>mod<span class="w"> </span>tidy
+</code></pre></div>
+<h3 id="etape-4-lancer-postgresql">Étape 4: Lancer PostgreSQL<a class="headerlink" href="#etape-4-lancer-postgresql" title="Permanent link">&para;</a></h3>
+<p><strong>Option A: Docker (recommandé)</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">  </span>--name<span class="w"> </span>postgres<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">  </span>-e<span class="w"> </span><span class="nv">POSTGRES_DB</span><span class="o">=</span>mon-projet<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">  </span>-e<span class="w"> </span><span class="nv">POSTGRES_PASSWORD</span><span class="o">=</span>postgres<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">  </span>-p<span class="w"> </span><span class="m">5432</span>:5432<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">  </span>postgres:16-alpine
+</code></pre></div>
+<p><strong>Option B: Installation locale</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="c1"># macOS</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>brew<span class="w"> </span>install<span class="w"> </span>postgresql
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>brew<span class="w"> </span>services<span class="w"> </span>start<span class="w"> </span>postgresql
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>createdb<span class="w"> </span>mon-projet
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="c1"># Linux</span>
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>postgresql
+<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>postgresql
+<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a>sudo<span class="w"> </span>-u<span class="w"> </span>postgres<span class="w"> </span>createdb<span class="w"> </span>mon-projet
+</code></pre></div>
+<h3 id="etape-5-lancer-lapplication">Étape 5: Lancer l'application<a class="headerlink" href="#etape-5-lancer-lapplication" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>make<span class="w"> </span>run
+</code></pre></div>
+<p>Ou directement:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>go<span class="w"> </span>run<span class="w"> </span>cmd/main.go
+</code></pre></div>
+<p>Vous devriez voir:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>{&quot;level&quot;:&quot;info&quot;,&quot;time&quot;:&quot;...&quot;,&quot;message&quot;:&quot;Starting server on :8080&quot;}
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>{&quot;level&quot;:&quot;info&quot;,&quot;time&quot;:&quot;...&quot;,&quot;message&quot;:&quot;Database connected successfully&quot;}
+</code></pre></div>
+<h3 id="etape-6-tester-lapi">Étape 6: Tester l'API<a class="headerlink" href="#etape-6-tester-lapi" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="c1"># Health check</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>curl<span class="w"> </span>http://localhost:8080/health
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="c1"># {&quot;status&quot;:&quot;ok&quot;}</span>
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>
+<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="c1"># Register un utilisateur</span>
+<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8080/api/v1/auth/register<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;email&quot;:&quot;test@example.com&quot;,&quot;password&quot;:&quot;password123&quot;}&#39;</span>
+<a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a>
+<a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a><span class="c1"># Login</span>
+<a id="__codelineno-32-11" name="__codelineno-32-11" href="#__codelineno-32-11"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8080/api/v1/auth/login<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-32-12" name="__codelineno-32-12" href="#__codelineno-32-12"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-32-13" name="__codelineno-32-13" href="#__codelineno-32-13"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;email&quot;:&quot;test@example.com&quot;,&quot;password&quot;:&quot;password123&quot;}&#39;</span>
+</code></pre></div>
+<h2 id="commandes-make-disponibles">Commandes Make disponibles<a class="headerlink" href="#commandes-make-disponibles" title="Permanent link">&para;</a></h2>
+<p>Le Makefile généré inclut ces commandes:</p>
+<table>
+<thead>
+<tr>
+<th>Commande</th>
+<th>Description</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>make help</code></td>
+<td>Afficher l'aide</td>
+<td>Voir toutes les commandes</td>
+</tr>
+<tr>
+<td><code>make run</code></td>
+<td>Lancer l'app</td>
+<td>Développement local</td>
+</tr>
+<tr>
+<td><code>make build</code></td>
+<td>Compiler le binaire</td>
+<td>Créer l'exécutable</td>
+</tr>
+<tr>
+<td><code>make test</code></td>
+<td>Tests avec race detector</td>
+<td>Vérifier le code</td>
+</tr>
+<tr>
+<td><code>make test-coverage</code></td>
+<td>Tests + rapport HTML</td>
+<td>Voir le coverage</td>
+</tr>
+<tr>
+<td><code>make lint</code></td>
+<td>golangci-lint</td>
+<td>Vérifier la qualité</td>
+</tr>
+<tr>
+<td><code>make clean</code></td>
+<td>Nettoyer</td>
+<td>Supprimer artifacts</td>
+</tr>
+<tr>
+<td><code>make docker-build</code></td>
+<td>Build image Docker</td>
+<td>Containerisation</td>
+</tr>
+<tr>
+<td><code>make docker-run</code></td>
+<td>Lancer conteneur</td>
+<td>Test Docker</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exemples</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="c1"># Développement quotidien</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>make<span class="w"> </span>run<span class="w">          </span><span class="c1"># Lance l&#39;app avec hot-reload (si air installé)</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="c1"># Avant commit</span>
+<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a>make<span class="w"> </span><span class="nb">test</span><span class="w">         </span><span class="c1"># Vérifie que tous les tests passent</span>
+<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a>make<span class="w"> </span>lint<span class="w">         </span><span class="c1"># Vérifie la qualité du code</span>
+<a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a>
+<a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a><span class="c1"># Build pour production</span>
+<a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a>make<span class="w"> </span>build<span class="w">        </span><span class="c1"># Crée le binaire</span>
+<a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a>./mon-projet<span class="w">      </span><span class="c1"># Exécute le binaire</span>
+<a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a>
+<a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a><span class="c1"># Docker</span>
+<a id="__codelineno-33-13" name="__codelineno-33-13" href="#__codelineno-33-13"></a>make<span class="w"> </span>docker-build<span class="w"> </span><span class="c1"># Build l&#39;image</span>
+<a id="__codelineno-33-14" name="__codelineno-33-14" href="#__codelineno-33-14"></a>make<span class="w"> </span>docker-run<span class="w">   </span><span class="c1"># Teste le conteneur</span>
+</code></pre></div>
+<h2 id="prochaines-etapes">Prochaines étapes<a class="headerlink" href="#prochaines-etapes" title="Permanent link">&para;</a></h2>
+<p>Maintenant que vous comprenez la structure, consultez:</p>
+<ol>
+<li><strong><a href="../generated-project-guide/">Guide des projets générés</a></strong> - Guide complet pour:</li>
+<li>Comprendre l'architecture hexagonale</li>
+<li>Développer de nouvelles fonctionnalités</li>
+<li>Utiliser l'API (endpoints, authentification)</li>
+<li>Écrire des tests</li>
+<li>
+<p>Déployer en production</p>
+</li>
+<li>
+<p><strong><a href="../cli-architecture/">Architecture du CLI</a></strong> - Si vous voulez:</p>
+</li>
+<li>Comprendre comment fonctionne le générateur</li>
+<li>Contribuer au projet</li>
+<li>
+<p>Étendre les templates</p>
+</li>
+<li>
+<p><strong>Commencer à développer</strong>:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="c1"># Lancer l&#39;app</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>make<span class="w"> </span>run
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>
+<a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="c1"># Dans un autre terminal, tester l&#39;API</span>
+<a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a>curl<span class="w"> </span>http://localhost:8080/health
+<a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a>
+<a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a><span class="c1"># Lire le code généré</span>
+<a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a>cat<span class="w"> </span>internal/domain/user/service.go
+<a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a>cat<span class="w"> </span>internal/adapters/handlers/auth_handler.go
+</code></pre></div></p>
+</li>
+</ol>
+<h2 id="conseils">Conseils<a class="headerlink" href="#conseils" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Lisez le code généré</strong>: Chaque fichier est un exemple de best practice Go</li>
+<li><strong>Modifiez selon vos besoins</strong>: La structure est un point de départ, adaptez-la</li>
+<li><strong>Suivez les patterns</strong>: Repository, dependency injection, error handling centralisé</li>
+<li><strong>Testez régulièrement</strong>: <code>make test</code> avant chaque commit</li>
+<li><strong>Utilisez le linter</strong>: <code>make lint</code> pour maintenir la qualité</li>
+</ul>
+<p>Bon développement! <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m13.13 22.19-1.63-3.83c1.57-.58 3.04-1.36 4.4-2.27zM5.64 12.5l-3.83-1.63 6.1-2.77C7 9.46 6.22 10.93 5.64 12.5M21.61 2.39S16.66.269 11 5.93c-2.19 2.19-3.5 4.6-4.35 6.71-.28.75-.09 1.57.46 2.13l2.13 2.12c.55.56 1.37.74 2.12.46A19.1 19.1 0 0 0 18.07 13c5.66-5.66 3.54-10.61 3.54-10.61m-7.07 7.07c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0c.77.78.78 2.05 0 2.83s-2.05.78-2.83 0m-5.66 7.07-1.41-1.41zM6.24 22l3.64-3.64c-.34-.09-.67-.24-.97-.45L4.83 22zM2 22h1.41l4.77-4.76-1.42-1.41L2 20.59zm0-2.83 4.09-4.08c-.21-.3-.36-.62-.45-.97L2 17.76z"/></svg></span></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Retour en haut de la page
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 tky0065
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/tky0065/go-starter-kit" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.indexes", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit", "content.action.view"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+  
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    // Initialize Mermaid
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get current theme
+      var scheme = document.querySelector('[data-md-color-scheme]');
+      var theme = scheme && scheme.getAttribute('data-md-color-scheme') === 'slate' ? 'dark' : 'default';
+      
+      // Initialize mermaid
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: theme
+      });
+      
+      // Watch for theme changes
+      var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.attributeName === 'data-md-color-scheme') {
+            var newTheme = mutation.target.getAttribute('data-md-color-scheme') === 'slate' ? 'dark' : 'default';
+            mermaid.initialize({ 
+              startOnLoad: true, 
+              theme: newTheme 
+            });
+            // Re-render diagrams
+            document.querySelectorAll('.mermaid').forEach(function(el) {
+              el.removeAttribute('data-processed');
+            });
+            mermaid.init(undefined, '.mermaid');
+          }
+        });
+      });
+      
+      if (scheme) {
+        observer.observe(scheme, {
+          attributes: true,
+          attributeFilter: ['data-md-color-scheme']
+        });
+      }
+    });
+  </script>
+
+  </body>
+</html>
