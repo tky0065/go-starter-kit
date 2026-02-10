@@ -267,9 +267,9 @@ func TestGitignoreTemplate(t *testing.T) {
 		".idea/",
 		".DS_Store",
 		"vendor/",
-		"*.db",      // SQLite database files
-		"*.db-shm",  // SQLite shared memory files
-		"*.db-wal",  // SQLite write-ahead log files
+		"*.db",     // SQLite database files
+		"*.db-shm", // SQLite shared memory files
+		"*.db-wal", // SQLite write-ahead log files
 	}
 
 	for _, ignore := range essentialIgnores {

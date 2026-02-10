@@ -61,7 +61,7 @@ development_status:
   7-1-database-selection-flag: done
   7-2-mysql-mariadb-support: done
   7-3-sqlite-support: done
-  7-4-mongodb-support-optional: backlog (LAISSE D'ABORDE)
+  7-4-mongodb-support-optional: backlog (LAISSE CA D'ABORDE )
   7-5-database-tests-documentation: review
   epic-7-retrospective: optional
 
