@@ -145,7 +145,9 @@ Chaque modèle généré inclut:
 
 ### <i class="material-icons warning">warning</i> Limitations connues
 
-- **Template minimal**: add-model non supporté (utiliser templates full ou graphql)
+- **Template minimal**: add-model non supporté (pas de structure internal/models/)
+- **Template graphql**: add-model non supporté (architecture GraphQL différente - prévu v1.3.0)
+- **Template full**: ✅ Entièrement supporté avec add-model
 - **Pluralisation**: Règles simples (ajoute 's'). Pluriels irréguliers nécessitent édition manuelle
 - **Relations many-to-many**: Pas encore supportées (prévu v1.3.0)
 - **Validations custom**: Doivent être ajoutées manuellement après génération
