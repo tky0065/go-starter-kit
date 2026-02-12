@@ -122,6 +122,235 @@ func generateProjectFiles(projectPath, projectName string) error {
 }
 ```
 
+### 2.1. Générateur de Modèles (add-model Command)
+
+**Nouveau dans v1.2.0!** Le générateur CRUD scaffolding permet d'ajouter automatiquement de nouveaux modèles à un projet existant.
+
+**Responsabilités**:
+- Génération automatique de modèles CRUD complets
+- Mise à jour des fichiers existants (database, routes, main)
+- Support des relations (BelongsTo, HasMany)
+- Génération de tests unitaires
+
+**Structure des fichiers**:
+
+```
+cmd/create-go-starter/
+├── add_model.go           # CLI orchestration add-model
+├── model.go               # Structures: Field, Model, Relation
+└── model_generator.go     # 13+ générateurs de templates
+```
+
+**Structures de données (model.go)**:
+
+```go
+// Field représente un champ du modèle
+type Field struct {
+    Name      string   // Nom du champ (ex: "Title")
+    Type      string   // Type Go (ex: "string", "int", "time.Time")
+    GormTags  []string // Tags GORM (ex: ["unique", "not null"])
+    JSONTag   string   // Tag JSON (ex: "title")
+}
+
+// Model représente le modèle complet
+type Model struct {
+    Name       string   // Nom du modèle (ex: "Todo")
+    NamePlural string   // Forme plurielle (ex: "Todos")
+    Fields     []Field  // Champs custom
+    Relations  []Relation // Relations avec autres modèles
+}
+
+// Relation représente une relation entre modèles
+type Relation struct {
+    Type        string // "belongs_to" ou "has_many"
+    ModelName   string // Nom du modèle lié (ex: "Post")
+    ForeignKey  string // Clé étrangère (ex: "PostID")
+}
+```
+
+**Commande CLI (add_model.go)**:
+
+```go
+func handleAddModel(args []string) error {
+    // Parse flags
+    var (
+        fieldsFlag   string
+        belongsTo    string
+        hasMany      string
+        public       bool
+        skipConfirm  bool
+    )
+
+    // Validation
+    // - Vérifie que nous sommes dans un projet go-starter-kit
+    // - Vérifie que le modèle n'existe pas déjà
+    // - Parse et valide les champs
+    // - Vérifie que les modèles parents existent (pour relations)
+
+    // Génération
+    model := BuildModel(modelName, fields, relations)
+    generator := NewModelGenerator(model, projectPath)
+
+    // Génère les 8 fichiers
+    generator.GenerateAll()
+
+    // Met à jour les 3 fichiers existants
+    generator.UpdateExistingFiles()
+
+    return nil
+}
+```
+
+**Générateurs de templates (model_generator.go)**:
+
+```go
+type ModelGenerator struct {
+    model       Model
+    projectPath string
+    projectName string
+}
+
+// 13+ méthodes de génération
+
+// 1-8: Fichiers neufs
+func (g *ModelGenerator) GenerateModel() string
+func (g *ModelGenerator) GenerateRepositoryInterface() string
+func (g *ModelGenerator) GenerateRepositoryImpl() string
+func (g *ModelGenerator) GenerateService() string
+func (g *ModelGenerator) GenerateServiceModule() string
+func (g *ModelGenerator) GenerateHandler() string
+func (g *ModelGenerator) GenerateServiceTests() string
+func (g *ModelGenerator) GenerateHandlerTests() string
+
+// 9-13: Mise à jour de fichiers existants
+func (g *ModelGenerator) UpdateDatabaseMigrations() error
+func (g *ModelGenerator) UpdateRoutes() error
+func (g *ModelGenerator) UpdateMainModule() error
+func (g *ModelGenerator) UpdateParentModel() error
+func (g *ModelGenerator) AddBelongsToImport() error
+```
+
+**Workflow de génération**:
+
+```
+add-model Todo --fields "title:string,completed:bool"
+    │
+    ├─> 1. Parse et valide arguments
+    │   ├─ ModelName: "Todo" → "todos" (pluralisation)
+    │   ├─ Fields: [{Name:"Title", Type:"string"}, {Name:"Completed", Type:"bool"}]
+    │   └─ Validate: Pas de conflit, types valides
+    │
+    ├─> 2. Génère 8 fichiers neufs
+    │   ├─ internal/models/todo.go (GORM entity)
+    │   ├─ internal/interfaces/todo_repository.go (port)
+    │   ├─ internal/adapters/repository/todo_repository.go (GORM impl)
+    │   ├─ internal/domain/todo/service.go (business logic)
+    │   ├─ internal/domain/todo/module.go (fx module)
+    │   ├─ internal/adapters/handlers/todo_handler.go (HTTP)
+    │   ├─ internal/domain/todo/service_test.go (tests)
+    │   └─ internal/adapters/handlers/todo_handler_test.go (tests)
+    │
+    └─> 3. Met à jour 3 fichiers existants
+        ├─ internal/infrastructure/database/database.go (AutoMigrate)
+        ├─ internal/adapters/http/routes.go (Routes CRUD)
+        └─ cmd/main.go (fx module registration)
+```
+
+**Exemple de génération (model)**:
+
+Input:
+```bash
+create-go-starter add-model Product --fields "name:string:unique:not_null,price:float64,stock:int:index"
+```
+
+Output (`internal/models/product.go`):
+```go
+package models
+
+import (
+    "time"
+    "gorm.io/gorm"
+)
+
+type Product struct {
+    ID        uint           `gorm:"primaryKey" json:"id"`
+    Name      string         `gorm:"unique;not null" json:"name"`
+    Price     float64        `gorm:"not null" json:"price"`
+    Stock     int            `gorm:"index;not null" json:"stock"`
+    CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`
+    UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+    DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+}
+```
+
+**Relations supportées**:
+
+1. **BelongsTo (enfant → parent)**:
+   ```bash
+   create-go-starter add-model Comment --fields "content:string" --belongs-to Post
+   ```
+   - Ajoute `PostID uint` + `Post Post` dans Comment
+   - Endpoints: `GET /posts/:postId/comments`, `POST /posts/:postId/comments`
+
+2. **HasMany (parent → enfants)**:
+   ```bash
+   create-go-starter add-model Category --fields "name:string" --has-many Product
+   ```
+   - Ajoute `Products []Product` dans Category
+   - Preloading: `GET /categories/:id?include=products`
+
+**Types supportés**:
+
+| Type CLI | Go Type | GORM Tag | Description |
+|----------|---------|----------|-------------|
+| `string` | `string` | `gorm:"not null"` | Chaîne de caractères |
+| `int` | `int` | `gorm:"not null"` | Entier signé |
+| `uint` | `uint` | `gorm:"not null"` | Entier non-signé |
+| `float64` | `float64` | `gorm:"not null"` | Nombre décimal |
+| `bool` | `bool` | `gorm:"not null"` | Booléen |
+| `time` | `time.Time` | `gorm:"not null"` | Date/heure |
+
+**Modificateurs GORM**:
+
+| Modificateur | Tag GORM | Description |
+|--------------|----------|-------------|
+| `unique` | `gorm:"unique"` | Contrainte d'unicité |
+| `not_null` | `gorm:"not null"` | Non nullable |
+| `index` | `gorm:"index"` | Index DB |
+
+**Pluralisation**:
+
+Le générateur utilise des règles simples de pluralisation:
+- Ajoute 's': Todo → Todos, Product → Products
+- Gère 'y': Category → Categories
+- Gère 's/x/z': Class → Classes, Box → Boxes
+
+Pour pluriels irréguliers (Person→People), éditer manuellement après génération.
+
+**Validation et sécurité**:
+
+```go
+// Validation stricte
+- Modèle parent existe (pour --belongs-to)
+- Modèle enfant existe (pour --has-many)
+- Pas de conflit de noms de fichiers
+- Types de champs valides
+- Pas de champs réservés (ID, CreatedAt, etc.)
+
+// Sécurité
+- Confirmation prompt (sauf --yes)
+- Dry-run preview des fichiers générés
+- Backup automatique des fichiers modifiés
+```
+
+**Intégration tests**:
+
+Chaque modèle généré inclut:
+- Tests service: CRUD operations
+- Tests handler: HTTP endpoints
+- Mock repository (interface)
+- Test fixtures
+
 **Liste complète des fichiers générés** (45+ fichiers):
 
 1. **Configuration** (6 fichiers):

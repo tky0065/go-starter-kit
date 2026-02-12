@@ -474,6 +474,338 @@ create-go-starter add-model Product --fields "name:string,price:float64" --belon
 create-go-starter add-model --help
 ```
 
+### Exemple Complet: Blog System
+
+Voici un exemple complet de création d'un système de blog avec 3 modèles imbriqués: **Category** → **Post** → **Comment**.
+
+#### 1. Créer le projet initial
+
+```bash
+create-go-starter blog-api
+cd blog-api
+./setup.sh  # Configurer la base de données
+```
+
+#### 2. Ajouter le modèle Category (racine)
+
+```bash
+create-go-starter add-model Category --fields "name:string:unique:not_null,description:string"
+```
+
+**Fichiers générés:**
+- `internal/models/category.go` - Entity
+- `internal/interfaces/category_repository.go` - Port
+- `internal/adapters/repository/category_repository.go` - GORM impl
+- `internal/domain/category/service.go` - Business logic
+- `internal/domain/category/module.go` - fx module
+- `internal/adapters/handlers/category_handler.go` - HTTP handlers
+- Tests: `service_test.go`, `handler_test.go`
+
+**Endpoints disponibles:**
+- `POST /api/v1/categories` - Créer catégorie
+- `GET /api/v1/categories` - Liste catégories
+- `GET /api/v1/categories/:id` - Récupérer catégorie
+- `PUT /api/v1/categories/:id` - Modifier catégorie
+- `DELETE /api/v1/categories/:id` - Supprimer catégorie
+
+#### 3. Ajouter le modèle Post (enfant de Category)
+
+```bash
+create-go-starter add-model Post --fields "title:string:not_null,content:string,published:bool" --belongs-to Category
+```
+
+**Ce qui est ajouté automatiquement:**
+- Champs dans `internal/models/post.go`:
+  ```go
+  CategoryID uint     `gorm:"not null;index" json:"category_id"`
+  Category   Category `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
+  ```
+- Routes imbriquées dans `internal/adapters/http/routes.go`:
+  ```go
+  categories.Get("/:categoryId/posts", postHandler.GetByParent)
+  categories.Post("/:categoryId/posts", postHandler.CreateForParent)
+  ```
+
+**Endpoints disponibles:**
+- CRUD standard: `POST/GET/PUT/DELETE /api/v1/posts`
+- **Relation parent**: `GET /api/v1/categories/:categoryId/posts` - Posts d'une catégorie
+- **Relation parent**: `POST /api/v1/categories/:categoryId/posts` - Créer post dans catégorie
+- **Preloading**: `GET /api/v1/posts/:id?include=category` - Post avec sa catégorie
+
+#### 4. Ajouter le modèle Comment (enfant de Post)
+
+```bash
+create-go-starter add-model Comment --fields "author:string:not_null,content:string:not_null" --belongs-to Post
+```
+
+**Ce qui est ajouté automatiquement:**
+- Champs dans `internal/models/comment.go`:
+  ```go
+  PostID  uint `gorm:"not null;index" json:"post_id"`
+  Post    Post `gorm:"foreignKey:PostID" json:"post,omitempty"`
+  ```
+- Routes imbriquées:
+  ```go
+  posts.Get("/:postId/comments", commentHandler.GetByParent)
+  posts.Post("/:postId/comments", commentHandler.CreateForParent)
+  ```
+
+**Endpoints disponibles:**
+- CRUD standard: `POST/GET/PUT/DELETE /api/v1/comments`
+- **Relation parent**: `GET /api/v1/posts/:postId/comments` - Comments d'un post
+- **Relation parent**: `POST /api/v1/posts/:postId/comments` - Créer comment sur post
+- **Preloading**: `GET /api/v1/comments/:id?include=post` - Comment avec son post
+
+#### 5. Ajouter HasMany au parent (optionnel)
+
+Si vous voulez preload les enfants depuis le parent:
+
+```bash
+# Ajouter Posts à Category
+create-go-starter add-model Category --has-many Post
+
+# Ajouter Comments à Post
+create-go-starter add-model Post --has-many Comment
+```
+
+**Ce qui est ajouté:**
+- Dans `internal/models/category.go`:
+  ```go
+  Posts []Post `gorm:"foreignKey:CategoryID" json:"posts,omitempty"`
+  ```
+- Dans `internal/models/post.go`:
+  ```go
+  Comments []Comment `gorm:"foreignKey:PostID" json:"comments,omitempty"`
+  ```
+
+**Nouveaux endpoints de preloading:**
+- `GET /api/v1/categories/:id?include=posts` - Catégorie avec tous ses posts
+- `GET /api/v1/posts/:id?include=comments` - Post avec tous ses comments
+- `GET /api/v1/posts/:id?include=category,comments` - Post avec catégorie ET comments
+
+#### 6. Tester le système complet
+
+```bash
+# Rebuild le projet
+go mod tidy
+go build ./...
+
+# Générer Swagger (optionnel)
+make swagger
+
+# Lancer tests
+make test
+
+# Démarrer le serveur
+make run
+```
+
+#### 7. Exemples d'utilisation API
+
+**Créer une catégorie:**
+```bash
+curl -X POST http://localhost:8080/api/v1/categories \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Technology", "description": "Tech articles"}'
+```
+
+**Créer un post dans cette catégorie:**
+```bash
+curl -X POST http://localhost:8080/api/v1/categories/1/posts \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Introduction to Go",
+    "content": "Go is a statically typed language...",
+    "published": true
+  }'
+```
+
+**Créer un commentaire sur ce post:**
+```bash
+curl -X POST http://localhost:8080/api/v1/posts/1/comments \
+  -H "Content-Type: application/json" \
+  -d '{
+    "author": "John Doe",
+    "content": "Great article!"
+  }'
+```
+
+**Récupérer un post avec sa catégorie et ses comments:**
+```bash
+curl http://localhost:8080/api/v1/posts/1?include=category,comments
+```
+
+**Réponse attendue:**
+```json
+{
+  "data": {
+    "id": 1,
+    "title": "Introduction to Go",
+    "content": "Go is a statically typed language...",
+    "published": true,
+    "category_id": 1,
+    "category": {
+      "id": 1,
+      "name": "Technology",
+      "description": "Tech articles"
+    },
+    "comments": [
+      {
+        "id": 1,
+        "author": "John Doe",
+        "content": "Great article!",
+        "post_id": 1
+      }
+    ],
+    "created_at": "2026-02-12T10:00:00Z",
+    "updated_at": "2026-02-12T10:00:00Z"
+  }
+}
+```
+
+### Conventions et Limitations
+
+#### Pluralisation
+
+La commande `add-model` utilise des règles de pluralisation simples:
+
+**Règles appliquées:**
+- Ajoute 's': `Todo` → `todos`, `Product` → `products`
+- Remplace 'y' par 'ies': `Category` → `categories`, `Company` → `companies`
+- Ajoute 'es' pour s/x/z: `Class` → `classes`, `Box` → `boxes`, `Quiz` → `quizzes`
+
+**Pluriels irréguliers non supportés:**
+- `Person` → `People` (sera `persons`)
+- `Child` → `Children` (sera `childs`)
+- `Mouse` → `Mice` (sera `mouses`)
+
+<i class="material-icons info">info</i> **Solution:** Éditez manuellement les fichiers générés pour corriger les pluriels irréguliers:
+- Renommer fichiers: `internal/domain/persons/` → `internal/domain/people/`
+- Mettre à jour imports et références dans le code
+- Mettre à jour routes: `/api/v1/persons` → `/api/v1/people`
+
+#### Relations supportées
+
+| Relation | Status | Description |
+|----------|--------|-------------|
+| **BelongsTo** (N:1) | <i class="material-icons success">check</i> Supporté | Enfant appartient à un parent |
+| **HasMany** (1:N) | <i class="material-icons success">check</i> Supporté | Parent a plusieurs enfants |
+| **Many-to-Many** | <i class="material-icons warning">error</i> Pas encore | Prévue pour v1.3.0 |
+
+**Workaround Many-to-Many:**
+
+Pour créer une relation many-to-many entre `User` et `Role`:
+
+```bash
+# 1. Créer la table de jointure
+create-go-starter add-model UserRole --fields "user_id:uint:index,role_id:uint:index" --belongs-to User --belongs-to Role
+
+# 2. Éditer manuellement pour ajouter contrainte unique composite
+# Dans internal/models/user_role.go:
+# type UserRole struct {
+#     UserID uint `gorm:"uniqueIndex:user_role_unique;not null"`
+#     RoleID uint `gorm:"uniqueIndex:user_role_unique;not null"`
+#     ...
+# }
+```
+
+#### Champs réservés
+
+Ces champs sont **automatiquement ajoutés** et ne doivent PAS être spécifiés dans `--fields`:
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `ID` | `uint` | Clé primaire |
+| `CreatedAt` | `time.Time` | Date de création (auto) |
+| `UpdatedAt` | `time.Time` | Date de modification (auto) |
+| `DeletedAt` | `gorm.DeletedAt` | Soft delete (nullable) |
+
+<i class="material-icons warning">warning</i> Si vous spécifiez ces champs, ils seront **ignorés** par le générateur.
+
+#### Validations custom
+
+Les validations de base sont générées automatiquement, mais les validations complexes doivent être ajoutées manuellement.
+
+**Validations automatiques:**
+- `not_null` → Tag GORM: `gorm:"not null"`
+- `unique` → Tag GORM: `gorm:"unique"`
+
+**Validations à ajouter manuellement:**
+
+```go
+// Dans internal/models/user.go
+type User struct {
+    Email string `gorm:"unique;not null" json:"email" validate:"required,email"` // Ajouter validate tag
+    Age   int    `gorm:"not null" json:"age" validate:"gte=0,lte=150"`          // Validation range
+}
+```
+
+```go
+// Dans internal/domain/user/service.go
+func (s *Service) Create(ctx context.Context, user *models.User) error {
+    // Ajouter validation custom
+    if user.Age < 18 {
+        return domain.ErrValidation("user must be at least 18 years old")
+    }
+    return s.repo.Create(ctx, user)
+}
+```
+
+#### Swagger documentation
+
+Après avoir généré un nouveau modèle, **vous devez regénérer la documentation Swagger**:
+
+```bash
+make swagger
+# Ou
+swag init -g cmd/api/main.go -o docs/swagger
+```
+
+<i class="material-icons warning">warning</i> Sans regénération, les nouveaux endpoints n'apparaîtront pas dans Swagger UI.
+
+**Ajouter annotations Swagger** (optionnel):
+
+```go
+// Dans internal/adapters/handlers/todo_handler.go
+
+// Create godoc
+// @Summary      Create todo
+// @Description  Create a new todo item
+// @Tags         todos
+// @Accept       json
+// @Produce      json
+// @Param        todo body models.Todo true "Todo object"
+// @Success      201  {object}  models.Todo
+// @Failure      400  {object}  map[string]interface{}
+// @Router       /api/v1/todos [post]
+func (h *Handler) Create(c *fiber.Ctx) error {
+    // ...
+}
+```
+
+#### Routes et middleware
+
+**Par défaut**, toutes les routes générées sont **protégées par JWT** (authentification requise).
+
+Pour créer des **routes publiques** (sans authentification):
+
+```bash
+create-go-starter add-model Article --fields "title:string,content:string" --public
+```
+
+Cela génère les routes **sans** middleware `auth.RequireAuth`:
+
+```go
+// routes.go - routes publiques
+api.Get("/articles", articleHandler.List)
+api.Get("/articles/:id", articleHandler.GetByID)
+api.Post("/articles", articleHandler.Create)        // Public!
+api.Put("/articles/:id", articleHandler.Update)     // Public!
+api.Delete("/articles/:id", articleHandler.Delete)  // Public!
+```
+
+<i class="material-icons warning">warning</i> **Utilisez --public avec précaution** pour éviter les failles de sécurité.
+
 ## Conventions de nommage
 
 Le nom du projet doit respecter certaines règles:

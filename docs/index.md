@@ -31,6 +31,38 @@ Un outil CLI puissant pour générer des projets Go prêts pour la production en
 - **Validation** - go-playground/validator pour valider les entrées
 - **Makefile** - Commandes utiles pour dev, test, build et déploiement
 
+### <i class="material-icons success">new_releases</i> Nouveau dans v1.2.0: Générateur CRUD
+
+**Ajoutez de nouveaux modèles en 2 secondes!** La commande `add-model` génère automatiquement tout le code CRUD nécessaire:
+
+```bash
+cd mon-projet
+create-go-starter add-model Todo --fields "title:string,completed:bool"
+```
+
+**Ce qui est généré automatiquement:**
+- <i class="material-icons success small">check</i> Model avec tags GORM
+- <i class="material-icons success small">check</i> Repository (interface + implémentation)
+- <i class="material-icons success small">check</i> Service (logique métier)
+- <i class="material-icons success small">check</i> Handlers HTTP (REST endpoints)
+- <i class="material-icons success small">check</i> Tests (unitaires + intégration)
+- <i class="material-icons success small">check</i> Routes, migrations, modules fx
+
+**Relations supportées:**
+- `--belongs-to Parent` - Relation N:1 (enfant → parent)
+- `--has-many Child` - Relation 1:N (parent → enfants)
+
+**Exemple avec relations:**
+```bash
+create-go-starter add-model Category --fields "name:string:unique"
+create-go-starter add-model Post --fields "title:string,content:string" --belongs-to Category
+create-go-starter add-model Comment --fields "author:string,content:string" --belongs-to Post
+```
+
+**Résultat:** Blog complet (Category → Post → Comment) avec endpoints imbriqués et preloading.
+
+<i class="material-icons">arrow_forward</i> [Guide complet add-model](./usage.md#ajouter-des-modeles-add-model)
+
 ## Installation rapide
 
 ### Méthode 1: Installation directe (Recommandée)
