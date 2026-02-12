@@ -1215,10 +1215,8 @@ func TestGenerateHandlerTemplateWithBelongsTo(t *testing.T) {
 		t.Error("Expected nested route Swagger annotation for CreateForPost")
 	}
 
-	// Verify "strings" import was injected for relations
-	if !strings.Contains(content, `"strings"`) {
-		t.Error("Expected 'strings' import for relation handlers")
-	}
+	// Note: "strings" import was removed as it was unused (fix for compilation error)
+	// The ?include= functionality is handled by service layer, not handlers
 
 	// Verify parent ID parsing
 	if !strings.Contains(content, `c.Params("postId")`) {
