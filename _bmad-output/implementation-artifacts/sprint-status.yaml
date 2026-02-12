@@ -74,6 +74,9 @@ development_status:
   8-5-relations-support: done
   epic-8-retrospective: optional
 
+  # v1.2.0 Release (2026-02-12) ✅
+  v1.2.0-release: done
+
   # Epic 9 - Advanced Observability (v1.3.0 - ROADMAP)
   epic-9: backlog
   9-1-prometheus-metrics-endpoint: backlog
