@@ -145,10 +145,12 @@ Chaque modèle généré inclut:
 
 ### <i class="material-icons warning">warning</i> Limitations connues
 
+- **Template minimal**: add-model non supporté (utiliser templates full ou graphql)
 - **Pluralisation**: Règles simples (ajoute 's'). Pluriels irréguliers nécessitent édition manuelle
 - **Relations many-to-many**: Pas encore supportées (prévu v1.3.0)
 - **Validations custom**: Doivent être ajoutées manuellement après génération
 - **Swagger**: Doit être regénéré manuellement (`make swagger`) après add-model
+- **Flags automation**: `--dir` et `--yes` pour création projet prévus v1.2.1
 
 ### <i class="material-icons">link</i> Liens
 
