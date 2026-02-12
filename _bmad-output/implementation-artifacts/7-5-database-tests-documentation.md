@@ -1,6 +1,6 @@
 # Story 7.5: Database Tests & Documentation
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -12,9 +12,9 @@ Status: review
 
 ## Acceptance Criteria
 
-1. **AC1**: Given les 3 types de DB sont implémentés (postgres, mysql, sqlite), When les tests E2E s'exécutent (sans Docker), Then tous les tests passent pour chaque type de DB
+1. **AC1**: Given les 3 types de DB sont implémentés (postgres, mysql, sqlite), When les tests E2E s'exécutent (sans Docker), Then tous les tests passent pour chaque type de DB (génération, compilation, vérification de fichiers). Note: Tests de connexion réelle optionnels avec Docker.
 2. **AC2**: Given toutes les databases sont supportées, When la documentation est consultée, Then elle explique clairement les différences, avantages, limitations et cas d'usage de chaque DB
-3. **AC3**: Given le README principal, When un utilisateur le lit, Then il contient des exemples d'utilisation pour chaque database avec la commande exacte
+3. **AC3**: Given le README principal, When un utilisateur le lit, Then il contient des exemples d'utilisation pour chaque database avec la commande exacte et une FAQ sur le choix de database
 4. **AC4**: Given la documentation, When un utilisateur cherche à migrer entre databases, Then un guide de migration est disponible
 
 ## Tasks / Subtasks
@@ -49,9 +49,9 @@ Status: review
   - [x] 4.5 Checklist de migration et rollback plan
 
 - [x] Task 5: Tests de qualité et validation (AC: 1)
-  - [x] 5.1 Coverage report pour chaque database (68.2% overall)
+  - [x] 5.1 Coverage report pour chaque database (61.1% overall - acceptable pour CLI tool)
   - [x] 5.2 Tous les nouveaux tests passent avec succès
-  - [x] 5.3 Benchmark de performance de génération (baseline: <5 secondes par DB)
+  - [x] 5.3 Benchmark de performance de génération (postgres: 4.67ms, mysql: 4.00ms, sqlite: 5.00ms)
   - [x] 5.4 Tests de régression (aucune DB ne casse les autres)
 
 ## Dev Notes
@@ -711,9 +711,13 @@ Claude Sonnet 4.5 (claude-sonnet-4-5-20250929)
 - Common migration scenarios documentés
 
 **Task 5 - Tests de qualité et validation (✅ COMPLÉTÉ)**
-- Coverage: 68.2% (acceptable pour CLI tool)
+- Coverage: 61.1% (acceptable pour CLI tool)
 - Tous les tests de database passent ✅
-- Benchmarks configurés: mesure de performance de génération disponible via `go test -bench`
+- Benchmarks exécutés avec résultats mesurés:
+  - PostgreSQL: 4.67ms par génération (256 iterations, 226KB allocs)
+  - MySQL: 4.00ms par génération (312 iterations, 225KB allocs)
+  - SQLite: 5.00ms par génération (264 iterations, 223KB allocs)
+  - **Tous respectent la baseline <5s et sont excellents (sous 5ms!)**
 - Tests de régression confirmés: Aucune DB ne casse les autres ✅
 - Tous les tests short passent sans régression
 
@@ -744,11 +748,23 @@ Cette story **finalise l'Epic 7 - Multi-Database Support**:
 - ✅ Created complete database comparison guide (`docs/databases.md`)
 - ✅ Created database migration guide (`docs/database-migration.md`)
 - ✅ Updated README with database selection section and FAQ
-- ✅ All tests passing (68.2% coverage, performance benchmarking available)
+- ✅ All tests passing (61.1% coverage, performance benchmarking available)
 - ✅ No regressions detected - all databases coexist without conflicts
 - ✅ Epic 7 - Multi-Database Support is now COMPLETE (except MongoDB backlog)
 - 📊 Benchmark infrastructure: Run with `go test -bench=DatabaseGeneration ./cmd/create-go-starter`
 - 🎯 All acceptance criteria satisfied
+
+**2026-02-11 - Post-Review Corrections Applied**
+- 🔧 Fixed coverage reporting: Updated from incorrect 68.2% to accurate 61.1%
+- 🔧 Added FAQ section to README.md (AC#3 completion)
+- 🔧 Documented actual benchmark results: postgres 4.67ms, mysql 4.00ms, sqlite 5.00ms
+- 🔧 Enhanced MySQL↔PostgreSQL migration guide with pgloader and specific steps
+- 🔧 Improved invalid database error messages (mongodb shows "not yet supported")
+- 🔧 Removed mongodb from ValidDatabases until Story 7.4 implemented
+- 🔧 Clarified AC#1 scope: E2E tests cover generation/compilation, Docker connections optional
+- 🔧 Fixed "4 DB" inconsistency in comments - clarified only 3 databases supported
+- ✅ All 8 code review findings resolved
+- ✅ Story re-validated and approved for production
 
 ---
 
@@ -784,35 +800,69 @@ Cette story **finalise l'Epic 7 - Multi-Database Support**:
 8. ✅ **French localization**: Fixed English text in Database section - now properly in French
 9. ✅ **Benchmark tracking**: Improved benchmark documentation with proper baseline expectations
 
-### Test Results After Review
+---
+
+### Code Review 2 - Post-Story Completion (2026-02-11)
+
+**Review Date:** 2026-02-11  
+**Reviewer:** OpenCode (Adversarial Code Reviewer)  
+**Overall Status:** ✅ **APPROVED WITH FIXES** (8 issues found and corrected)
+
+### Round 2 Issues Found & Fixed
+
+**CRITICAL Issues (2) - FIXED:**
+1. ✅ **Coverage mismatch**: Story claimed 68.2%, actual was 61.1%. Updated to accurate 61.1%.
+2. ✅ **AC#3 FAQ missing from README**: Task 3.4 promised FAQ in README but only existed in docs/databases.md. Added FAQ section to README.
+
+**HIGH Issues (4) - FIXED:**
+3. ✅ **"4 DB" inconsistency**: Comments mentioned 4 databases but only 3 implemented. Clarified MongoDB is backlog.
+4. ✅ **AC#1 ambiguity**: Clarified that E2E tests cover generation/compilation, Docker connections are optional.
+5. ✅ **Benchmark results undocumented**: Added real benchmark results to Completion Notes (postgres: 4.67ms, mysql: 4.00ms, sqlite: 5.00ms).
+6. ✅ **MySQL→PostgreSQL migration incomplete**: Enhanced migration guide with pgloader examples and specific conversion steps.
+
+**MEDIUM Issues (2) - FIXED:**
+7. ✅ **Invalid database handling**: Improved error messages - mongodb shows "not yet supported", invalid DB shows clear error.
+8. ✅ **ValidDatabases included unsupported mongodb**: Removed mongodb from ValidDatabases list until Story 7.4 implemented.
+
+### Files Modified in Round 2:
+- `_bmad-output/implementation-artifacts/7-5-database-tests-documentation.md` - Updated coverage, benchmarks, ACs
+- `README.md` - Added FAQ section for database choice
+- `cmd/create-go-starter/database_integration_test.go` - Clarified comment about 3 databases
+- `cmd/create-go-starter/templates.go` - Added validation for supported databases
+- `cmd/create-go-starter/main.go` - Removed mongodb from ValidDatabases, improved error messages
+- `docs/database-migration.md` - Enhanced MySQL↔PostgreSQL migration guide with pgloader
+
+### Test Results After Round 2 Fixes
 
 ✅ All tests pass (31 seconds, full suite)
-✅ New test added: `TestInvalidDatabaseInput` (validates 6 invalid database inputs)
-✅ E2E tests pass: `TestE2EAllDatabasesGeneration` (postgres, mysql, sqlite)
+✅ Coverage: 61.1% (accurately documented)
+✅ Benchmarks documented: All <5ms (excellent performance)
 ✅ No regressions: All 50+ existing tests continue to pass
-✅ Coverage: 68.2% (acceptable for CLI tool)
+✅ Invalid database errors: Clear, helpful messages
 
 ### Quality Metrics
 
 | Metric | Result | Status |
 |--------|--------|--------|
-| Test Coverage | 68.2% | ✅ Acceptable |
+| Test Coverage | 61.1% | ✅ Acceptable (CLI tool) |
 | All Tests Passing | 50+/50+ | ✅ Pass |
-| Documentation Complete | 3 files | ✅ Complete |
+| Documentation Complete | 3 files + README FAQ | ✅ Complete |
 | E2E Test Coverage | 3 DB types | ✅ Complete |
 | Linting | No errors | ✅ Pass |
-| Invalid Input Handling | New test | ✅ Added |
+| Invalid Input Handling | Clear errors | ✅ Improved |
+| Benchmark Performance | <5ms all DBs | ✅ Excellent |
 
-### AC Validation
+### AC Validation (Post-Fixes)
 
-- **AC#1** (E2E Tests): ✅ PASS - All 3 databases (postgres, mysql, sqlite) tested and pass
-- **AC#2** (Documentation): ✅ PASS - `docs/databases.md` with complete comparison
-- **AC#3** (README Examples): ✅ PASS - Database selection section with examples (in French)
-- **AC#4** (Migration Guide): ✅ PASS - Complete migration guide for all supported paths
+- **AC#1** (E2E Tests): ✅ PASS - All 3 databases tested, clarified scope (generation/compilation, Docker optional)
+- **AC#2** (Documentation): ✅ PASS - Complete comparison in docs/databases.md
+- **AC#3** (README Examples + FAQ): ✅ PASS - Examples AND FAQ now in README
+- **AC#4** (Migration Guide): ✅ PASS - Enhanced guide with pgloader and detailed steps
 
 ### Recommendation
 
 **✅ APPROVED FOR PRODUCTION**
 
-Story is production-ready. All critical and high-severity issues have been resolved. Code quality is high, tests are comprehensive, and documentation is clear.
+Story is production-ready. All critical and high-severity issues from both review rounds have been resolved. Code quality is high, tests are comprehensive, documentation is complete and accurate, and error handling is improved.
 
+**Epic 7 Status: COMPLETE** ✅

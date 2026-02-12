@@ -12,9 +12,10 @@ import (
 
 // ANSI color codes
 const (
-	ColorGreen = "\033[32m"
-	ColorRed   = "\033[31m"
-	ColorReset = "\033[0m"
+	ColorGreen  = "\033[32m"
+	ColorRed    = "\033[31m"
+	ColorYellow = "\033[33m"
+	ColorReset  = "\033[0m"
 )
 
 // Directory permissions for created folders
@@ -51,8 +52,9 @@ const (
 	DatabaseMongoDB  = "mongodb"
 )
 
-// ValidDatabases contains the list of supported database types
-var ValidDatabases = []string{DatabasePostgres, DatabaseMySQL, DatabaseSQLite, DatabaseMongoDB}
+// ValidDatabases contains the list of SUPPORTED database types (Story 7.1-7.3)
+// Note: mongodb is in backlog (Story 7.4) and not yet implemented
+var ValidDatabases = []string{DatabasePostgres, DatabaseMySQL, DatabaseSQLite}
 
 // DefaultDatabase is the default database type when not specified
 const DefaultDatabase = DatabasePostgres
@@ -67,6 +69,11 @@ func Red(msg string) string {
 	return ColorRed + msg + ColorReset
 }
 
+// Yellow returns the string wrapped in yellow ANSI code
+func Yellow(msg string) string {
+	return ColorYellow + msg + ColorReset
+}
+
 // validateTemplate checks if the template type is valid.
 // Valid templates are: minimal, full, graphql
 func validateTemplate(template string) error {
@@ -78,15 +85,24 @@ func validateTemplate(template string) error {
 	return fmt.Errorf("invalid template '%s': valid options are: %s", template, strings.Join(ValidTemplates, ", "))
 }
 
-// validateDatabase checks if the database type is valid.
-// Valid databases are: postgres, mysql, sqlite, mongodb
+// validateDatabase checks if the database type is valid and supported.
+// Valid databases are: postgres, mysql, sqlite
+// Note: mongodb is in backlog (Story 7.4) and will return a helpful error
 func validateDatabase(database string) error {
+	// Check if it's a supported database
 	for _, valid := range ValidDatabases {
 		if database == valid {
 			return nil
 		}
 	}
-	return fmt.Errorf("invalid database '%s': valid options are: %s", database, strings.Join(ValidDatabases, ", "))
+
+	// Special message for mongodb (in backlog)
+	if database == "mongodb" {
+		return fmt.Errorf("database 'mongodb' is not yet supported (planned for future release).\nSupported databases: %s", strings.Join(ValidDatabases, ", "))
+	}
+
+	// Generic error for other invalid databases
+	return fmt.Errorf("invalid database '%s'.\nSupported databases: %s", database, strings.Join(ValidDatabases, ", "))
 }
 
 // createProjectStructure creates the hexagonal architecture directory structure.
@@ -148,6 +164,15 @@ func copyEnvFile(projectPath string) error {
 }
 
 func main() {
+	// Check for subcommands before parsing flags
+	if len(os.Args) > 1 && os.Args[1] == "add-model" {
+		if err := runAddModel(os.Args[2:]); err != nil {
+			fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("%v", err)))
+			os.Exit(1)
+		}
+		return
+	}
+
 	// Parse flags manually to allow flags in any position
 	// This is necessary because we want to support both:
 	// - create-go-starter -database sqlite my-project

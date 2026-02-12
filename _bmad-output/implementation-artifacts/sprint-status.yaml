@@ -56,22 +56,22 @@ development_status:
   6-5-documentation-et-aide-cli: done
   epic-6-retrospective: optional
 
-   # Epic 7 - Multi-Database Support (v1.1.0 - ROADMAP)
-  epic-7: in-progress
+   # Epic 7 - Multi-Database Support (v1.1.0 - COMPLÉTÉ ✅)
+  epic-7: done
   7-1-database-selection-flag: done
   7-2-mysql-mariadb-support: done
   7-3-sqlite-support: done
   7-4-mongodb-support-optional: backlog (LAISSE CA D'ABORDE )
-  7-5-database-tests-documentation: review
+  7-5-database-tests-documentation: done
   epic-7-retrospective: optional
 
-  # Epic 8 - CRUD Scaffolding Generator (v1.2.0 - ROADMAP)
-  epic-8: backlog
-  8-1-add-model-cli-command: backlog
-  8-2-model-repository-generation: backlog
-  8-3-service-handler-generation: backlog
-  8-4-tests-swagger-auto-update: backlog
-  8-5-relations-support: backlog
+  # Epic 8 - CRUD Scaffolding Generator (v1.2.0 - COMPLÉTÉ ✅)
+  epic-8: done
+  8-1-add-model-cli-command: done
+  8-2-model-repository-generation: done
+  8-3-service-handler-generation: done
+  8-4-tests-swagger-auto-update: done
+  8-5-relations-support: done
   epic-8-retrospective: optional
 
   # Epic 9 - Advanced Observability (v1.3.0 - ROADMAP)

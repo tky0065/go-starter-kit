@@ -40,8 +40,11 @@ Ce guide vous aide à migrer entre différents systèmes de bases de données da
 
 2. **Régénérer le projet avec la base cible**
    ```bash
-   # Dans votre répertoire de projet
-   create-go-starter monapp --database=mysql  # ou postgres
+   # Postgres → MySQL
+   create-go-starter monapp --database=mysql
+   
+   # MySQL → Postgres
+   create-go-starter monapp --database=postgres
    ```
 
 3. **Convertir la syntaxe SQL si nécessaire**
@@ -50,6 +53,26 @@ Ce guide vous aide à migrer entre différents systèmes de bases de données da
      - Serial → AUTO_INCREMENT (géré par GORM)
      - BOOLEAN → TINYINT(1) (géré par GORM)
      - TEXT vs LONGTEXT (généralement compatible)
+   
+   **Pour MySQL → PostgreSQL:**
+   ```bash
+   # Convertir le dump MySQL en format PostgreSQL
+   # Option 1: Utiliser pgloader (recommandé)
+   pgloader mysql://user:pass@localhost/monapp postgresql://postgres:pass@localhost/monapp
+   
+   # Option 2: Conversion manuelle
+   # Remplacer AUTO_INCREMENT par SERIAL
+   # Remplacer `backticks` par "quotes"
+   # Ajuster les types de données
+   ```
+   
+   **Pour PostgreSQL → MySQL:**
+   ```bash
+   # Exporter en SQL puis convertir
+   pg_dump -U postgres monapp -f dump.sql
+   # Éditer dump.sql: remplacer SERIAL par AUTO_INCREMENT, etc.
+   mysql -u root -p monapp < dump_converted.sql
+   ```
 
 4. **Importer les données**
    ```bash
@@ -70,6 +93,12 @@ Ce guide vous aide à migrer entre différents systèmes de bases de données da
 - Serial vs AUTO_INCREMENT (géré par GORM)
 - Certains types de données diffèrent (TEXT vs LONGTEXT)
 - La syntaxe des fonctions peut différer (DATE_ADD vs INTERVAL)
+- Identifiants: MySQL utilise `backticks`, PostgreSQL utilise "double quotes"
+
+**Outils recommandés:**
+- **pgloader**: Migration automatique MySQL→PostgreSQL
+- **mysql2postgres**: Script de conversion de schemas
+- **GORM AutoMigrate**: Recréer le schéma automatiquement (perte de données custom)
 
 ---
 

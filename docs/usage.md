@@ -306,6 +306,174 @@ create-go-starter mon-projet --template=minimal --database=sqlite
 > - Le flag `--template` est optionnel. Si non spécifié, le template **full** est utilisé par défaut.
 > - Le flag `--database` est optionnel. Si non spécifié, **PostgreSQL** est utilisé par défaut.
 
+## Ajouter des modèles (add-model) <i class="material-icons success">new_releases</i>
+
+**Nouveau dans v1.2.0!** Une fois votre projet créé, vous pouvez générer automatiquement de nouveaux modèles CRUD complets avec la commande `add-model`.
+
+### Syntaxe de base
+
+```bash
+create-go-starter add-model <ModelName> --fields "field1:type1,field2:type2,..."
+```
+
+### Exemple simple
+
+```bash
+cd mon-projet  # Naviguer dans un projet go-starter-kit existant
+
+# Ajouter un modèle Todo
+create-go-starter add-model Todo --fields "title:string,completed:bool"
+```
+
+**Cette commande génère automatiquement:**
+- <i class="material-icons success small">circle</i> `internal/models/todo.go` - Model avec tags GORM
+- <i class="material-icons success small">circle</i> `internal/interfaces/todo_repository.go` - Interface repository
+- <i class="material-icons success small">circle</i> `internal/adapters/repository/todo_repository.go` - Implémentation GORM
+- <i class="material-icons success small">circle</i> `internal/domain/todo/service.go` - Logique métier
+- <i class="material-icons success small">circle</i> `internal/domain/todo/module.go` - Module fx
+- <i class="material-icons success small">circle</i> `internal/adapters/handlers/todo_handler.go` - Handlers HTTP
+- <i class="material-icons success small">circle</i> `internal/domain/todo/service_test.go` - Tests service
+- <i class="material-icons success small">circle</i> `internal/adapters/handlers/todo_handler_test.go` - Tests handler
+
+**Et modifie automatiquement:**
+- <i class="material-icons warning small">circle</i> `internal/infrastructure/database/database.go` - Ajoute AutoMigrate
+- <i class="material-icons warning small">circle</i> `internal/adapters/http/routes.go` - Ajoute routes CRUD
+- <i class="material-icons warning small">circle</i> `cmd/main.go` - Ajoute module fx
+
+### Types de champs supportés
+
+| Type | Go Type | Exemple | Description |
+|------|---------|---------|-------------|
+| `string` | `string` | `"title:string"` | Chaîne de caractères |
+| `int` | `int` | `"age:int"` | Entier signé |
+| `uint` | `uint` | `"count:uint"` | Entier non-signé |
+| `float64` | `float64` | `"price:float64"` | Nombre décimal |
+| `bool` | `bool` | `"active:bool"` | Booléen (true/false) |
+| `time` | `time.Time` | `"birthdate:time"` | Date et heure |
+
+### Modificateurs GORM
+
+Ajoutez des modificateurs après le type pour personnaliser les contraintes de base de données:
+
+| Modificateur | GORM Tag | Description |
+|--------------|----------|-------------|
+| `unique` | `gorm:"unique"` | Contrainte d'unicité |
+| `not_null` | `gorm:"not null"` | Ne peut pas être NULL |
+| `index` | `gorm:"index"` | Créer un index DB |
+
+**Syntaxe:**
+```
+field:type:modifier1:modifier2:...
+```
+
+**Exemples:**
+```bash
+# Email unique et obligatoire
+create-go-starter add-model User --fields "email:string:unique:not_null"
+
+# Product avec contraintes
+create-go-starter add-model Product --fields "name:string:unique:not_null,price:float64,stock:int:index"
+```
+
+### Relations entre modèles
+
+`add-model` supporte les relations **BelongsTo** (enfant → parent) et **HasMany** (parent → enfants).
+
+#### BelongsTo (enfant appartient à un parent)
+
+Ajoute une **foreign key** et un champ de relation au modèle enfant.
+
+```bash
+# Le modèle parent DOIT exister d'abord
+create-go-starter add-model Todo --fields "title:string,completed:bool"
+
+# Créer Comment qui appartient à Todo
+create-go-starter add-model Comment --fields "content:string" --belongs-to Todo
+```
+
+**Résultat dans `internal/models/comment.go`:**
+```go
+type Comment struct {
+    ID        uint           `gorm:"primaryKey" json:"id"`
+    Content   string         `gorm:"not null" json:"content"`
+    TodoID    uint           `gorm:"not null;index" json:"todo_id"`      // Foreign key
+    Todo      Todo           `gorm:"foreignKey:TodoID" json:"todo,omitempty"` // Relation
+    CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`
+    UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+    DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+}
+```
+
+**Endpoints générés:**
+- `GET /api/v1/comments/:id?include=todo` - Récupère comment avec preload du todo
+- `GET /api/v1/todos/:todoId/comments` - Liste tous les comments d'un todo
+- `POST /api/v1/todos/:todoId/comments` - Créer un comment pour un todo
+
+#### HasMany (parent a plusieurs enfants)
+
+Modifie le **modèle parent** pour ajouter un slice d'enfants.
+
+```bash
+# Créer Category avec relation has-many vers Product
+create-go-starter add-model Category --fields "name:string:unique" --has-many Product
+```
+
+**Résultat dans `internal/models/category.go`:**
+```go
+type Category struct {
+    ID        uint           `gorm:"primaryKey" json:"id"`
+    Name      string         `gorm:"unique;not null" json:"name"`
+    Products  []Product      `gorm:"foreignKey:CategoryID" json:"products,omitempty"` // Slice ajouté
+    CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`
+    UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+    DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+}
+```
+
+**Note:** Le modèle `Product` DOIT déjà exister avant d'utiliser `--has-many`.
+
+#### Exemple complet avec relations
+
+```bash
+# 1. Créer le modèle parent
+create-go-starter add-model Category --fields "name:string:unique"
+
+# 2. Créer le modèle enfant avec belongs-to
+create-go-starter add-model Product --fields "name:string,price:float64" --belongs-to Category
+
+# 3. Optionnel: Ajouter has-many au parent après coup
+# (pas nécessaire si fait pendant création de Product)
+
+# 4. Utiliser le preloading dans les requêtes
+# GET /api/v1/products/1?include=category
+# GET /api/v1/categories/1?include=products
+```
+
+### Flags disponibles
+
+| Flag | Description | Requis |
+|------|-------------|--------|
+| `--fields` | Définition des champs (`"name:type:mod,..."`) | <i class="material-icons success">check</i> Oui |
+| `--belongs-to <Model>` | Ajoute relation BelongsTo (foreign key) | Non |
+| `--has-many <Model>` | Ajoute relation HasMany (slice d'enfants) | Non |
+| `--public` | Routes publiques (sans auth middleware) | Non |
+| `--yes`, `-y` | Skip confirmation prompt | Non |
+| `--help`, `-h` | Afficher l'aide | Non |
+
+### Notes importantes
+
+<i class="material-icons warning">warning</i> **Pluralisation:** La commande utilise des règles simples de pluralisation (ajoute un 's'). Pour les pluriels irréguliers (Person→People, Child→Children), éditez manuellement le code généré.
+
+<i class="material-icons warning">warning</i> **Relations many-to-many:** Pas encore supportées. Utilisez `--belongs-to` pour créer des relations via tables de jointure manuelles.
+
+<i class="material-icons info">info</i> **Swagger:** Après génération, exécutez `make swagger` ou `swag init -g cmd/api/main.go -o docs/swagger` pour mettre à jour la documentation API.
+
+### Aide en ligne
+
+```bash
+create-go-starter add-model --help
+```
+
 ## Conventions de nommage
 
 Le nom du projet doit respecter certaines règles:

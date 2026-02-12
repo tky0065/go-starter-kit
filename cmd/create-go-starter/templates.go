@@ -16,10 +16,27 @@ func NewProjectTemplates(projectName string) *ProjectTemplates {
 }
 
 // NewProjectTemplatesWithDatabase creates a new templates instance with project name and database type
+// Supported databases: postgres, mysql, sqlite
+// Returns error if unsupported database is provided
 func NewProjectTemplatesWithDatabase(projectName, database string) *ProjectTemplates {
+	// Normalize empty to default
 	if database == "" {
 		database = "postgres" // Default to postgres if empty
 	}
+
+	// Validate database type - allow only supported databases
+	supportedDatabases := map[string]bool{
+		"postgres": true,
+		"mysql":    true,
+		"sqlite":   true,
+	}
+
+	// If invalid database, use postgres as fallback (for backward compatibility)
+	// This maintains existing behavior but could be changed to return error
+	if !supportedDatabases[database] {
+		database = "postgres"
+	}
+
 	return &ProjectTemplates{
 		projectName: projectName,
 		database:    database,

@@ -154,9 +154,23 @@ create-go-starter mon-app --database=sqlite
 - Cas d'usage recommandés
 - Guide de migration entre databases
 
+#### FAQ - Choix de base de données
+
+**Quelle base de données dois-je choisir?**  
+PostgreSQL (défaut) pour la production, MySQL pour la compatibilité large, SQLite pour le prototypage rapide.
+
+**Puis-je changer de base de données plus tard?**  
+Oui, mais nécessite de régénérer le projet. Voir le [guide de migration](./docs/database-migration.md).
+
+**SQLite est-il adapté à la production?**  
+Pour petite échelle (<100 utilisateurs concurrents) seulement. PostgreSQL/MySQL recommandés pour production.
+
+**Ai-je besoin de Docker?**  
+PostgreSQL et MySQL nécessitent Docker pour développement local. SQLite fonctionne sans Docker.
+
 ### Lancer le projet généré
 
-#### Option 1: Configuration automatique (Recommandé) :material-rocket-launch:
+#### Option 1: Configuration automatique (Recommandé) <i class="material-icons">rocket_launch</i>
 
 ```bash
 cd mon-super-projet
@@ -199,6 +213,57 @@ L'API sera disponible sur `http://localhost:8080`
 curl http://localhost:8080/health
 # {"status":"ok"}
 ```
+
+### Ajouter des modèles avec Relations (Nouveau! v1.2.0)
+
+Une fois votre projet créé, vous pouvez ajouter de nouveaux modèles avec la commande `add-model`:
+
+```bash
+# Ajouter un modèle simple
+create-go-starter add-model Todo --fields "title:string,completed:bool"
+
+# Ajouter un modèle avec relation BelongsTo (enfant → parent)
+create-go-starter add-model Comment --fields "content:string" --belongs-to Todo
+
+# Ajouter un modèle avec relation HasMany (parent → enfants)
+create-go-starter add-model Category --fields "name:string:unique" --has-many Product
+```
+
+**Fonctionnalités générées automatiquement:**
+- ✅ Model avec tags GORM (`internal/models/`)
+- ✅ Repository interface et implémentation
+- ✅ Service avec logique métier
+- ✅ Handlers HTTP avec endpoints CRUD complets
+- ✅ Tests unitaires (service + handler)
+- ✅ Routes automatiquement ajoutées
+- ✅ Support des relations (foreign keys, preloading)
+
+**Relations supportées:**
+- `--belongs-to <Parent>` - Ajoute foreign key + champ relation (ex: `Comment` belongs to `Todo`)
+- `--has-many <Child>` - Modifie le parent pour ajouter slice d'enfants (ex: `Todo` has many `Comment`)
+
+**Exemple complet avec relations:**
+
+```bash
+# 1. Créer le projet
+create-go-starter blog-api
+
+# 2. Ajouter un modèle Category
+cd blog-api
+create-go-starter add-model Category --fields "name:string:unique"
+
+# 3. Ajouter Post qui appartient à Category
+create-go-starter add-model Post --fields "title:string,content:string" --belongs-to Category
+
+# 4. Ajouter Comment qui appartient à Post
+create-go-starter add-model Comment --fields "content:string,author:string" --belongs-to Post
+
+# 5. Lancer et tester
+make run
+curl http://localhost:8080/api/v1/posts?include=category  # Preload relation
+```
+
+**Note:** La pluralisation utilise des règles simples. Pour les pluriels irréguliers (Person→People, Child→Children), éditez manuellement le code généré.
 
 ## Structure générée
 
