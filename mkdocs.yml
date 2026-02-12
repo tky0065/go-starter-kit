@@ -39,16 +39,50 @@ plugins:
       lang: fr
 
 nav:
+  # Getting Started
   - Accueil: index.md
   - Installation: installation.md
+  - Quick Start: quick-start.md
   - Utilisation: usage.md
+
+  # Databases
   - Bases de données:
       - Guide de sélection: databases.md
       - Guide de migration: database-migration.md
-  - Projet généré: generated-project-guide.md
-  - Tutoriel complet: tutorial-exemple-complet.md
-  - Architecture CLI: cli-architecture.md
-  - Contribuer: contributing.md
+
+  # Tutorial
+  - Tutorial:
+      - tutorial/index.md
+      - Partie 1 - Installation: tutorial/01-setup.md
+      - Partie 2 - Premier domaine: tutorial/02-first-domain.md
+      - Partie 3 - API HTTP: tutorial/03-api-integration.md
+      - Partie 4 - Tests & Deploy: tutorial/04-testing-deployment.md
+
+  # Complete Guide
+  - Guide complet:
+      - guide/index.md
+      - Architecture: guide/architecture.md
+      - Structure du projet: guide/structure.md
+      - Configuration: guide/configuration.md
+      - Développement: guide/development.md
+      - Exemples pratiques: guide/examples.md
+      - API Reference: guide/api-reference.md
+      - Tests: guide/testing.md
+      - Base de données: guide/database.md
+      - Sécurité: guide/security.md
+      - Déploiement: guide/deployment.md
+      - Monitoring: guide/monitoring.md
+      - Bonnes pratiques: guide/best-practices.md
+
+  # Reference
+  - Référence:
+      - Glossaire: reference/glossary.md
+      - FAQ: reference/faq.md
+
+  # Development
+  - Développement:
+      - Architecture CLI: cli-architecture.md
+      - Contribuer: contributing.md
 
 markdown_extensions:
   - admonition
