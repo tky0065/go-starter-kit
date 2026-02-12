@@ -329,7 +329,7 @@ go clean -cache
 
 **Solutions**:
 
-**Solution 1: Recharger le cache du shell (:material-flash: Rapide - Essayez ça d'abord!)**
+**Solution 1: Recharger le cache du shell (<i class="material-icons info">bolt</i> Rapide - Essayez ça d'abord!)**
 
 Après `go install`, votre shell (zsh/bash) peut avoir une version en cache de la liste des commandes disponibles. Rechargez-la :
 
@@ -510,4 +510,4 @@ cd mon-premier-projet
 # Suivez les instructions affichées!
 ```
 
-Bon coding! :material-rocket-launch:
+Bon coding! <i class="material-icons success">rocket_launch</i>

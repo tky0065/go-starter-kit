@@ -2,15 +2,15 @@
 
 Un outil CLI puissant pour générer des projets Go prêts pour la production en quelques secondes.
 
-## :material-information: À propos
+## <i class="material-icons info">info</i> À propos
 
 **create-go-starter** est un générateur CLI stable et production-ready pour créer des applications Go modernes.
 
-- :material-check: **Version stable** - v1.0.0 disponible
-- :material-check: **3 templates** - minimal, full, GraphQL
-- :material-check: **Testé et validé** - Utilisé en production
-- :material-check: **Open source** - MIT License
-- :material-check: **Activement maintenu** - Mises à jour régulières
+- <i class="material-icons success">check</i> **Version stable** - v1.0.0 disponible
+- <i class="material-icons success">check</i> **3 templates** - minimal, full, GraphQL
+- <i class="material-icons success">check</i> **Testé et validé** - Utilisé en production
+- <i class="material-icons success">check</i> **Open source** - MIT License
+- <i class="material-icons success">check</i> **Activement maintenu** - Mises à jour régulières
 
 ## Aperçu
 
@@ -140,7 +140,7 @@ Pour plus de détails sur les différences entre templates, consultez le [guide 
 
 ### Lancer le projet généré
 
-#### Option 1: Configuration automatique (Recommandé) :material-rocket-launch:
+#### Option 1: Configuration automatique (Recommandé) <i class="material-icons">rocket_launch</i>
 
 ```bash
 cd mon-super-projet

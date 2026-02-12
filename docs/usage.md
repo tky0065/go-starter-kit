@@ -40,20 +40,20 @@ create-go-starter mon-projet --template graphql    # API GraphQL
 
 | Fonctionnalité | minimal | full | graphql |
 |----------------|---------|------|---------|
-| **API REST** | :material-check-circle: | :material-check-circle: | ❌ |
-| **API GraphQL** | ❌ | ❌ | :material-check-circle: |
-| **Authentification JWT** | ❌ | :material-check-circle: | ❌ |
-| **Gestion utilisateurs** | ❌ | :material-check-circle: | :material-check-circle: |
-| **Documentation Swagger** | :material-check-circle: | :material-check-circle: | ❌ |
-| **GraphQL Playground** | ❌ | ❌ | :material-check-circle: |
-| **Base de données (GORM)** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
-| **PostgreSQL** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
-| **Dependency Injection (fx)** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
-| **Logging structuré (zerolog)** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
-| **Architecture hexagonale** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
-| **Tests unitaires** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
-| **Docker** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
-| **CI/CD (GitHub Actions)** | :material-check-circle: | :material-check-circle: | :material-check-circle: |
+| **API REST** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | ❌ |
+| **API GraphQL** | ❌ | ❌ | <i class="material-icons success">check_circle</i> |
+| **Authentification JWT** | ❌ | <i class="material-icons success">check_circle</i> | ❌ |
+| **Gestion utilisateurs** | ❌ | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> |
+| **Documentation Swagger** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | ❌ |
+| **GraphQL Playground** | ❌ | ❌ | <i class="material-icons success">check_circle</i> |
+| **Base de données (GORM)** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> |
+| **PostgreSQL** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> |
+| **Dependency Injection (fx)** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> |
+| **Logging structuré (zerolog)** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> |
+| **Architecture hexagonale** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> |
+| **Tests unitaires** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> |
+| **Docker** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> |
+| **CI/CD (GitHub Actions)** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> |
 
 ### Différences structurelles majeures
 
@@ -111,10 +111,10 @@ GET    /health                      # Health check
 POST   /api/v1/auth/register        # Inscription utilisateur
 POST   /api/v1/auth/login           # Connexion (retourne access + refresh tokens)
 POST   /api/v1/auth/refresh         # Rafraîchir l'access token
-GET    /api/v1/users                # Liste utilisateurs (:material-lock: JWT requis)
-GET    /api/v1/users/:id            # Récupère utilisateur (:material-lock: JWT requis)
-PUT    /api/v1/users/:id            # Met à jour utilisateur (:material-lock: JWT requis)
-DELETE /api/v1/users/:id            # Supprime utilisateur (:material-lock: JWT requis)
+GET    /api/v1/users                # Liste utilisateurs (<i class="material-icons warning small">lock</i> JWT requis)
+GET    /api/v1/users/:id            # Récupère utilisateur (<i class="material-icons warning small">lock</i> JWT requis)
+PUT    /api/v1/users/:id            # Met à jour utilisateur (<i class="material-icons warning small">lock</i> JWT requis)
+DELETE /api/v1/users/:id            # Supprime utilisateur (<i class="material-icons warning small">lock</i> JWT requis)
 GET    /swagger/*                   # Documentation Swagger UI
 ```
 
@@ -453,7 +453,7 @@ create-go-starter add-model Product --fields "name:string,price:float64" --belon
 
 | Flag | Description | Requis |
 |------|-------------|--------|
-| `--fields` | Définition des champs (`"name:type:mod,..."`) | <i class="material-icons success">check</i> Oui |
+| `--fields` | Définition des champs (`"name:type:mod,..."`) | Oui <i class="material-icons success small">check</i> |
 | `--belongs-to <Model>` | Ajoute relation BelongsTo (foreign key) | Non |
 | `--has-many <Model>` | Ajoute relation HasMany (slice d'enfants) | Non |
 | `--public` | Routes publiques (sans auth middleware) | Non |
@@ -688,8 +688,8 @@ La commande `add-model` utilise des règles de pluralisation simples:
 
 | Relation | Status | Description |
 |----------|--------|-------------|
-| **BelongsTo** (N:1) | <i class="material-icons success">check</i> Supporté | Enfant appartient à un parent |
-| **HasMany** (1:N) | <i class="material-icons success">check</i> Supporté | Parent a plusieurs enfants |
+| **BelongsTo** (N:1) | <i class="material-icons success">check_circle</i> Supporté | Enfant appartient à un parent |
+| **HasMany** (1:N) | <i class="material-icons success">check_circle</i> Supporté | Parent a plusieurs enfants |
 | **Many-to-Many** | <i class="material-icons warning">error</i> Pas encore | Prévue pour v1.3.0 |
 
 **Workaround Many-to-Many:**
@@ -827,11 +827,11 @@ Le nom du projet doit respecter certaines règles:
 ### Exemples valides
 
 ```bash
-create-go-starter mon-projet           :material-check-circle:
-create-go-starter my-awesome-api       :material-check-circle:
-create-go-starter user_service         :material-check-circle:
-create-go-starter app2024              :material-check-circle:
-create-go-starter MonProjet            :material-check-circle:
+create-go-starter mon-projet           # ✅ Valide
+create-go-starter my-awesome-api       # ✅ Valide
+create-go-starter user_service         # ✅ Valide
+create-go-starter app2024              # ✅ Valide
+create-go-starter MonProjet            # ✅ Valide
 ```
 
 ### Exemples invalides
@@ -1224,17 +1224,17 @@ Build multi-stage optimisé:
 
 Une fois le projet créé, vous avez deux options pour configurer votre projet:
 
-### Option A: Configuration automatique avec setup.sh (Recommandé) :material-rocket-launch:
+### Option A: Configuration automatique avec setup.sh (Recommandé) <i class="material-icons success">rocket_launch</i>
 
 Le CLI génère automatiquement un script `setup.sh` qui automatise toute la configuration initiale.
 
 **Fonctionnalités du script**:
-- :material-check-circle: Vérification des prérequis (Go, OpenSSL, Docker)
-- :material-check-circle: Installation des dépendances Go (`go mod tidy`)
-- :material-check-circle: Génération automatique du JWT secret
-- :material-check-circle: Configuration de PostgreSQL (Docker ou local)
-- :material-check-circle: Exécution des tests
-- :material-check-circle: Vérification de l'installation
+- <i class="material-icons success small">check_circle</i> Vérification des prérequis (Go, OpenSSL, Docker)
+- <i class="material-icons success small">check_circle</i> Installation des dépendances Go (`go mod tidy`)
+- <i class="material-icons success small">check_circle</i> Génération automatique du JWT secret
+- <i class="material-icons success small">check_circle</i> Configuration de PostgreSQL (Docker ou local)
+- <i class="material-icons success small">check_circle</i> Exécution des tests
+- <i class="material-icons success small">check_circle</i> Vérification de l'installation
 
 **Utilisation**:
 
@@ -1425,4 +1425,4 @@ Maintenant que vous comprenez la structure, consultez:
 - **Testez régulièrement**: `make test` avant chaque commit
 - **Utilisez le linter**: `make lint` pour maintenir la qualité
 
-Bon développement! :material-rocket-launch:
+Bon développement! <i class="material-icons success">rocket_launch</i>
