@@ -1176,11 +1176,8 @@ func (h *%sHandler) CreateFor%s(c *fiber.Ctx) error {
 		result += relationHandlers
 	}
 
-	// Add ?include= support on GetByID - modify the import to include "strings" if needed
-	if relations != nil && relations.BelongsTo != "" {
-		// We need "strings" import - inject it into the handler file
-		result = strings.Replace(result, "\"strconv\"", "\"strconv\"\n\t\"strings\"", 1)
-	}
+	// Note: ?include= support is handled by the service layer, not in handlers
+	// Therefore, "strings" import is not needed in handlers
 
 	return result
 }
