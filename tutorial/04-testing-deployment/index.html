@@ -12,9 +12,13 @@
         <meta name="author" content="tky0065">
       
       
-        <link rel="canonical" href="https://tky0065.github.io/go-starter-kit/README-SITE/">
+        <link rel="canonical" href="https://tky0065.github.io/go-starter-kit/tutorial/04-testing-deployment/">
       
       
+        <link rel="prev" href="../03-api-integration/">
+      
+      
+        <link rel="next" href="../../guide/">
       
       
         
@@ -24,19 +28,19 @@
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
-        <title>Régénération du site GitHub Pages - Go Starter Kit</title>
+        <title>Partie 4 - Tests & Deploy - Go Starter Kit</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -55,9 +59,9 @@
       
     
     
-      <link rel="stylesheet" href="../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -82,7 +86,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#regeneration-du-site-github-pages" class="md-skip">
+        <a href="#partie-4-tests-et-deploiement" class="md-skip">
           Aller au contenu
         </a>
       
@@ -98,7 +102,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="En-tête">
-    <a href=".." title="Go Starter Kit" class="md-header__button md-logo" aria-label="Go Starter Kit" data-md-component="logo">
+    <a href="../.." title="Go Starter Kit" class="md-header__button md-logo" aria-label="Go Starter Kit" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -118,7 +122,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Régénération du site GitHub Pages
+              Partie 4 - Tests & Deploy
             
           </span>
         </div>
@@ -262,7 +266,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Go Starter Kit" class="md-nav__button md-logo" aria-label="Go Starter Kit" data-md-component="logo">
+    <a href="../.." title="Go Starter Kit" class="md-nav__button md-logo" aria-label="Go Starter Kit" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -292,7 +296,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -319,7 +323,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../installation/" class="md-nav__link">
+      <a href="../../installation/" class="md-nav__link">
         
   
   
@@ -346,7 +350,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../quick-start/" class="md-nav__link">
+      <a href="../../quick-start/" class="md-nav__link">
         
   
   
@@ -373,7 +377,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
+      <a href="../../usage/" class="md-nav__link">
         
   
   
@@ -458,7 +462,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../databases/" class="md-nav__link">
+      <a href="../../databases/" class="md-nav__link">
         
   
   
@@ -486,7 +490,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../database-migration/" class="md-nav__link">
+      <a href="../../database-migration/" class="md-nav__link">
         
   
   
@@ -518,6 +522,8 @@
       
   
   
+    
+  
   
   
     
@@ -544,15 +550,15 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../tutorial/" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   
@@ -576,7 +582,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -596,7 +602,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial/01-setup/" class="md-nav__link">
+      <a href="../01-setup/" class="md-nav__link">
         
   
   
@@ -624,7 +630,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial/02-first-domain/" class="md-nav__link">
+      <a href="../02-first-domain/" class="md-nav__link">
         
   
   
@@ -652,7 +658,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial/03-api-integration/" class="md-nav__link">
+      <a href="../03-api-integration/" class="md-nav__link">
         
   
   
@@ -677,10 +683,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../tutorial/04-testing-deployment/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Partie 4 - Tests & Deploy
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -696,6 +729,187 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#objectif" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objectif
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#etape-12-tests-unitaires" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 12: Tests unitaires
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Étape 12: Tests unitaires">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#121-tester-le-service-post" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.1 Tester le service Post
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#122-lancer-les-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.2 Lancer les tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#etape-13-deploiement-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Étape 13: Déploiement Docker
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Étape 13: Déploiement Docker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#131-build-limage-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13.1 Build l'image Docker
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#132-lancer-avec-docker-compose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13.2 Lancer avec docker-compose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#133-verifier-le-deploiement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13.3 Vérifier le déploiement
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conclusion
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Conclusion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#resume-de-ce-que-vous-avez-appris" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Résumé de ce que vous avez appris
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prochaines-etapes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prochaines étapes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ressources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ressources
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#navigation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Navigation
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -762,7 +976,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../guide/" class="md-nav__link ">
+            <a href="../../guide/" class="md-nav__link ">
               
   
   
@@ -806,7 +1020,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guide/architecture/" class="md-nav__link">
+      <a href="../../guide/architecture/" class="md-nav__link">
         
   
   
@@ -834,7 +1048,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guide/structure/" class="md-nav__link">
+      <a href="../../guide/structure/" class="md-nav__link">
         
   
   
@@ -862,7 +1076,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guide/configuration/" class="md-nav__link">
+      <a href="../../guide/configuration/" class="md-nav__link">
         
   
   
@@ -890,7 +1104,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guide/development/" class="md-nav__link">
+      <a href="../../guide/development/" class="md-nav__link">
         
   
   
@@ -918,7 +1132,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guide/examples/" class="md-nav__link">
+      <a href="../../guide/examples/" class="md-nav__link">
         
   
   
@@ -946,7 +1160,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guide/api-reference/" class="md-nav__link">
+      <a href="../../guide/api-reference/" class="md-nav__link">
         
   
   
@@ -974,7 +1188,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guide/testing/" class="md-nav__link">
+      <a href="../../guide/testing/" class="md-nav__link">
         
   
   
@@ -1002,7 +1216,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guide/database/" class="md-nav__link">
+      <a href="../../guide/database/" class="md-nav__link">
         
   
   
@@ -1030,7 +1244,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guide/security/" class="md-nav__link">
+      <a href="../../guide/security/" class="md-nav__link">
         
   
   
@@ -1058,7 +1272,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guide/deployment/" class="md-nav__link">
+      <a href="../../guide/deployment/" class="md-nav__link">
         
   
   
@@ -1086,7 +1300,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guide/monitoring/" class="md-nav__link">
+      <a href="../../guide/monitoring/" class="md-nav__link">
         
   
   
@@ -1114,7 +1328,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guide/best-practices/" class="md-nav__link">
+      <a href="../../guide/best-practices/" class="md-nav__link">
         
   
   
@@ -1207,7 +1421,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/glossary/" class="md-nav__link">
+      <a href="../../reference/glossary/" class="md-nav__link">
         
   
   
@@ -1235,7 +1449,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/faq/" class="md-nav__link">
+      <a href="../../reference/faq/" class="md-nav__link">
         
   
   
@@ -1328,7 +1542,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../cli-architecture/" class="md-nav__link">
+      <a href="../../cli-architecture/" class="md-nav__link">
         
   
   
@@ -1356,7 +1570,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../contributing/" class="md-nav__link">
+      <a href="../../contributing/" class="md-nav__link">
         
   
   
@@ -1411,10 +1625,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prerequis" class="md-nav__link">
+  <a href="#objectif" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Prérequis
+        Objectif
       
     </span>
   </a>
@@ -1422,109 +1636,149 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation-de-mkdocs-premiere-fois" class="md-nav__link">
+  <a href="#etape-12-tests-unitaires" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation de MkDocs (première fois)
+        Étape 12: Tests unitaires
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Étape 12: Tests unitaires">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#121-tester-le-service-post" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.1 Tester le service Post
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#regeneration-du-site" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#122-lancer-les-tests" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Régénération du site
+        12.2 Lancer les tests
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#previsualisation-locale" class="md-nav__link">
+  <a href="#etape-13-deploiement-docker" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Prévisualisation locale
+        Étape 13: Déploiement Docker
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Étape 13: Déploiement Docker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#131-build-limage-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13.1 Build l'image Docker
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#workflow-complet" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#132-lancer-avec-docker-compose" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Workflow complet
+        13.2 Lancer avec docker-compose
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#structure-des-fichiers" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#133-verifier-le-deploiement" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Structure des fichiers
+        13.3 Vérifier le déploiement
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#configuration-mkdocs" class="md-nav__link">
+  <a href="#conclusion" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration MkDocs
+        Conclusion
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Conclusion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#resume-de-ce-que-vous-avez-appris" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Résumé de ce que vous avez appris
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#notes-importantes" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#prochaines-etapes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Notes importantes
+        Prochaines étapes
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#synchronisation-avec-readmemd" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#ressources" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Synchronisation avec README.md
+        Ressources
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#depannage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dépannage
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#liens-utiles" class="md-nav__link">
+  <a href="#navigation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Liens utiles
+        Navigation
       
     </span>
   </a>
@@ -1551,110 +1805,122 @@
   
 
 
-<h1 id="regeneration-du-site-github-pages">Régénération du site GitHub Pages<a class="headerlink" href="#regeneration-du-site-github-pages" title="Permanent link">&para;</a></h1>
-<p>Ce guide explique comment régénérer le site GitHub Pages après avoir modifié la documentation dans le dossier <code>docs/</code>.</p>
-<h2 id="prerequis">Prérequis<a class="headerlink" href="#prerequis" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Python 3.x installé</li>
-<li>pip installé</li>
-</ul>
-<h2 id="installation-de-mkdocs-premiere-fois">Installation de MkDocs (première fois)<a class="headerlink" href="#installation-de-mkdocs-premiere-fois" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Créer un environnement virtuel Python</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Activer l&#39;environnement virtuel</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate<span class="w">  </span><span class="c1"># Sur macOS/Linux</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># .\venv\Scripts\activate  # Sur Windows</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># Installer MkDocs et le thème Material</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>pip<span class="w"> </span>install<span class="w"> </span>mkdocs<span class="w"> </span>mkdocs-material
+<h1 id="partie-4-tests-et-deploiement">Partie 4: Tests et Déploiement<a class="headerlink" href="#partie-4-tests-et-deploiement" title="Permanent link">&para;</a></h1>
+<p><i class="material-icons small">circle</i> <strong>Partie 4/4</strong> - Temps estimé: 20 minutes</p>
+<p><a href="../"><i class="material-icons">arrow_back</i> Retour à l'index</a></p>
+<hr />
+<h2 id="objectif">Objectif<a class="headerlink" href="#objectif" title="Permanent link">&para;</a></h2>
+<p>Dans cette dernière partie, vous allez ajouter des tests unitaires et déployer votre API Blog avec Docker.</p>
+<p><strong>Ce que vous allez faire</strong>:
+- Écrire des tests unitaires pour le service Post
+- Lancer les tests
+- Créer une image Docker
+- Déployer avec docker-compose</p>
+<hr />
+<h2 id="etape-12-tests-unitaires">Étape 12: Tests unitaires<a class="headerlink" href="#etape-12-tests-unitaires" title="Permanent link">&para;</a></h2>
+<h3 id="121-tester-le-service-post">12.1 Tester le service Post<a class="headerlink" href="#121-tester-le-service-post" title="Permanent link">&para;</a></h3>
+<p>Créer <code>internal/domain/post/service_test.go</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">package</span><span class="w"> </span><span class="nx">post_test</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">import</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="s">&quot;context&quot;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="s">&quot;testing&quot;</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="s">&quot;blog-api/internal/models&quot;</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="s">&quot;blog-api/internal/interfaces/mocks&quot;</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="s">&quot;blog-api/pkg/logger&quot;</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="s">&quot;github.com/stretchr/testify/assert&quot;</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="s">&quot;github.com/stretchr/testify/mock&quot;</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="p">)</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="kd">func</span><span class="w"> </span><span class="nx">TestPostService_Create</span><span class="p">(</span><span class="nx">t</span><span class="w"> </span><span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="c1">// Arrange</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">    </span><span class="nx">mockRepo</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">new</span><span class="p">(</span><span class="nx">mocks</span><span class="p">.</span><span class="nx">PostRepository</span><span class="p">)</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="nx">log</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">logger</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">config</span><span class="p">.</span><span class="nx">Config</span><span class="p">{</span><span class="nx">AppEnv</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;test&quot;</span><span class="p">})</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">    </span><span class="nx">service</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">post</span><span class="p">.</span><span class="nx">NewService</span><span class="p">(</span><span class="nx">mockRepo</span><span class="p">,</span><span class="w"> </span><span class="nx">log</span><span class="p">)</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">    </span><span class="nx">mockRepo</span><span class="p">.</span><span class="nx">On</span><span class="p">(</span><span class="s">&quot;Create&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">mock</span><span class="p">.</span><span class="nx">Anything</span><span class="p">,</span><span class="w"> </span><span class="nx">mock</span><span class="p">.</span><span class="nx">AnythingOfType</span><span class="p">(</span><span class="s">&quot;*models.Post&quot;</span><span class="p">)).</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">        </span><span class="nx">Return</span><span class="p">(</span><span class="kc">nil</span><span class="p">)</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">    </span><span class="c1">// Act</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">    </span><span class="nx">result</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">service</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nx">Background</span><span class="p">(),</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Test Title&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Test Content&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;tag1,tag2&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">    </span><span class="c1">// Assert</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">    </span><span class="nx">assert</span><span class="p">.</span><span class="nx">NoError</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">)</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">    </span><span class="nx">assert</span><span class="p">.</span><span class="nx">NotNil</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span><span class="w"> </span><span class="nx">result</span><span class="p">)</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="w">    </span><span class="nx">assert</span><span class="p">.</span><span class="nx">Equal</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Test Title&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">result</span><span class="p">.</span><span class="nx">Title</span><span class="p">)</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="w">    </span><span class="nx">assert</span><span class="p">.</span><span class="nx">Equal</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;test-title&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">result</span><span class="p">.</span><span class="nx">Slug</span><span class="p">)</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="w">    </span><span class="nx">mockRepo</span><span class="p">.</span><span class="nx">AssertExpectations</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="p">}</span>
 </code></pre></div>
-<h2 id="regeneration-du-site">Régénération du site<a class="headerlink" href="#regeneration-du-site" title="Permanent link">&para;</a></h2>
-<p>Chaque fois que tu modifies les fichiers dans <code>docs/</code>, tu dois régénérer le site HTML:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Activer l&#39;environnement virtuel</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate<span class="w">  </span><span class="c1"># Sur macOS/Linux</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># .\venv\Scripts\activate  # Sur Windows</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># Régénérer le site (supprime l&#39;ancien et crée le nouveau)</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>mkdocs<span class="w"> </span>build<span class="w"> </span>--clean
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="c1"># Désactiver l&#39;environnement virtuel (optionnel)</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>deactivate
+<h3 id="122-lancer-les-tests">12.2 Lancer les tests<a class="headerlink" href="#122-lancer-les-tests" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>make<span class="w"> </span><span class="nb">test</span>
 </code></pre></div>
-<p>Le site sera généré dans le dossier <code>site/</code>.</p>
-<h2 id="previsualisation-locale">Prévisualisation locale<a class="headerlink" href="#previsualisation-locale" title="Permanent link">&para;</a></h2>
-<p>Pour prévisualiser le site localement avant de commit:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>mkdocs<span class="w"> </span>serve
+<hr />
+<h2 id="etape-13-deploiement-docker">Étape 13: Déploiement Docker<a class="headerlink" href="#etape-13-deploiement-docker" title="Permanent link">&para;</a></h2>
+<h3 id="131-build-limage-docker">13.1 Build l'image Docker<a class="headerlink" href="#131-build-limage-docker" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>docker-build
 </code></pre></div>
-<p>Ouvre ensuite http://127.0.0.1:8000/ dans ton navigateur.</p>
-<h2 id="workflow-complet">Workflow complet<a class="headerlink" href="#workflow-complet" title="Permanent link">&para;</a></h2>
+<h3 id="132-lancer-avec-docker-compose">13.2 Lancer avec docker-compose<a class="headerlink" href="#132-lancer-avec-docker-compose" title="Permanent link">&para;</a></h3>
+<p>Le fichier <code>docker-compose.yml</code> est déjà généré:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>docker-compose<span class="w"> </span>up<span class="w"> </span>-d
+</code></pre></div>
+<p>Cela lance:
+- L'application sur le port 8080
+- PostgreSQL sur le port 5432</p>
+<h3 id="133-verifier-le-deploiement">13.3 Vérifier le déploiement<a class="headerlink" href="#133-verifier-le-deploiement" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>curl<span class="w"> </span>http://localhost:8080/health
+</code></pre></div>
+<hr />
+<h2 id="conclusion">Conclusion<a class="headerlink" href="#conclusion" title="Permanent link">&para;</a></h2>
+<p>Félicitations! Vous avez créé une API Blog complète avec:</p>
+<p><i class="material-icons success">check_circle</i> <strong>Authentification JWT</strong> (User, Login, Register)
+<i class="material-icons success">check_circle</i> <strong>Articles</strong> (CRUD complet avec slug, tags, publish/unpublish)
+<i class="material-icons success">check_circle</i> <strong>Commentaires</strong> (Create, List, Delete)
+<i class="material-icons success">check_circle</i> <strong>Relations</strong> (Post → Author, Comment → Post + Author)
+<i class="material-icons success">check_circle</i> <strong>Pagination</strong> (Limit/Offset)
+<i class="material-icons success">check_circle</i> <strong>Tests unitaires</strong>
+<i class="material-icons success">check_circle</i> <strong>Déploiement Docker</strong>
+<i class="material-icons success">check_circle</i> <strong>Architecture hexagonale</strong>
+<i class="material-icons success">check_circle</i> <strong>Logging structuré</strong>
+<i class="material-icons success">check_circle</i> <strong>Error handling centralisé</strong></p>
+<h3 id="resume-de-ce-que-vous-avez-appris">Résumé de ce que vous avez appris<a class="headerlink" href="#resume-de-ce-que-vous-avez-appris" title="Permanent link">&para;</a></h3>
 <ol>
-<li>Modifier les fichiers Markdown dans <code>docs/</code> (par exemple <code>docs/usage.md</code>)</li>
-<li>Régénérer le site:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>mkdocs<span class="w"> </span>build<span class="w"> </span>--clean
-</code></pre></div></li>
-<li>Vérifier les changements:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mkdocs<span class="w"> </span>serve<span class="w">  </span><span class="c1"># Optionnel</span>
-</code></pre></div></li>
-<li>Commit et push:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>add<span class="w"> </span>docs/<span class="w"> </span>site/
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;docs: Update documentation&quot;</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>develop
-</code></pre></div></li>
+<li><strong>Installation</strong> de create-go-starter</li>
+<li><strong>Génération</strong> d'un projet complet</li>
+<li><strong>Configuration</strong> (.env, PostgreSQL, JWT)</li>
+<li><strong>Architecture hexagonale</strong>:</li>
+<li>Domain (entities, services)</li>
+<li>Adapters (handlers, repositories)</li>
+<li>Interfaces (ports)</li>
+<li><strong>Dependency Injection</strong> avec uber-go/fx</li>
+<li><strong>GORM</strong> (migrations, queries, relations)</li>
+<li><strong>Fiber</strong> (routes, middleware, handlers)</li>
+<li><strong>Tests</strong> avec testify et mocks</li>
+<li><strong>Docker</strong> et docker-compose</li>
 </ol>
-<h2 id="structure-des-fichiers">Structure des fichiers<a class="headerlink" href="#structure-des-fichiers" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>.
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>├── docs/                          # Fichiers Markdown sources
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>│   ├── index.md                   # Page d&#39;accueil (copie du README.md)
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>│   ├── usage.md                   # Guide d&#39;utilisation
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>│   ├── installation.md            # Guide d&#39;installation
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>│   ├── generated-project-guide.md # Guide projet généré
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>│   ├── tutorial-exemple-complet.md # Tutoriel
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>│   ├── cli-architecture.md        # Architecture du CLI
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>│   └── contributing.md            # Guide de contribution
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>│
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>├── site/                          # Site HTML généré (ne pas modifier manuellement)
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>│   ├── index.html
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>│   ├── usage/
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>│   ├── installation/
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>│   └── ...
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>│
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>├── mkdocs.yml                     # Configuration MkDocs
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>└── venv/                          # Environnement virtuel Python (ignoré par git)
-</code></pre></div>
-<h2 id="configuration-mkdocs">Configuration MkDocs<a class="headerlink" href="#configuration-mkdocs" title="Permanent link">&para;</a></h2>
-<p>Le fichier <code>mkdocs.yml</code> contient la configuration du site:
-- Thème: Material for MkDocs
-- Langue: Français
-- Navigation: Structure du menu
-- Extensions Markdown: Syntax highlighting, admonitions, etc.</p>
-<h2 id="notes-importantes">Notes importantes<a class="headerlink" href="#notes-importantes" title="Permanent link">&para;</a></h2>
+<h3 id="prochaines-etapes">Prochaines étapes<a class="headerlink" href="#prochaines-etapes" title="Permanent link">&para;</a></h3>
+<p>Pour aller plus loin:</p>
 <ul>
-<li><strong>Ne pas modifier</strong> manuellement les fichiers dans <code>site/</code> - ils sont régénérés automatiquement</li>
-<li>Toujours <strong>régénérer le site</strong> après avoir modifié <code>docs/</code></li>
-<li>Le dossier <code>venv/</code> est ignoré par git (ne pas le commit)</li>
-<li>Le site utilise MkDocs 1.6.1 et Material theme 9.7.1</li>
+<li><strong>Upload d'images</strong> pour les articles</li>
+<li><strong>Recherche full-text</strong> dans les posts</li>
+<li><strong>Likes/Votes</strong> sur les articles</li>
+<li><strong>Catégories</strong> pour organiser les posts</li>
+<li><strong>Swagger</strong> pour documenter l'API</li>
+<li><strong>CI/CD</strong> avec GitHub Actions</li>
+<li><strong>Kubernetes</strong> pour déploiement en production</li>
 </ul>
-<h2 id="synchronisation-avec-readmemd">Synchronisation avec README.md<a class="headerlink" href="#synchronisation-avec-readmemd" title="Permanent link">&para;</a></h2>
-<p>Si tu modifies <code>README.md</code> à la racine, n'oublie pas de mettre à jour <code>docs/index.md</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>cp<span class="w"> </span>README.md<span class="w"> </span>docs/index.md
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>mkdocs<span class="w"> </span>build<span class="w"> </span>--clean
-</code></pre></div>
-<h2 id="depannage">Dépannage<a class="headerlink" href="#depannage" title="Permanent link">&para;</a></h2>
-<p><strong>Problème</strong>: <code>mkdocs: command not found</code>
-- <strong>Solution</strong>: Active l'environnement virtuel avec <code>source venv/bin/activate</code></p>
-<p><strong>Problème</strong>: Erreurs d'installation de pip
-- <strong>Solution</strong>: Sur macOS avec Python système, utilise <code>--break-system-packages</code> ou crée un venv</p>
-<p><strong>Problème</strong>: Le site n'affiche pas les dernières modifications
-- <strong>Solution</strong>: Utilise <code>mkdocs build --clean</code> pour forcer la régénération complète</p>
-<h2 id="liens-utiles">Liens utiles<a class="headerlink" href="#liens-utiles" title="Permanent link">&para;</a></h2>
+<h3 id="ressources">Ressources<a class="headerlink" href="#ressources" title="Permanent link">&para;</a></h3>
 <ul>
-<li><a href="https://www.mkdocs.org/">Documentation MkDocs</a></li>
-<li><a href="https://squidfunk.github.io/mkdocs-material/">Material for MkDocs</a></li>
-<li><a href="https://www.markdownguide.org/">Markdown Guide</a></li>
+<li><a href="../../generated-project-guide/">Guide des projets générés</a> - Documentation complète</li>
+<li><a href="https://github.com/tky0065/go-starter-kit/tree/main/examples/blog-api">Repository exemple</a> - Code complet</li>
+<li><a href="https://docs.gofiber.io/">Fiber documentation</a></li>
+<li><a href="https://gorm.io/docs/">GORM documentation</a></li>
 </ul>
+<p><strong>Bon coding!</strong> <i class="material-icons">rocket_launch</i></p>
+<hr />
+<h2 id="navigation">Navigation<a class="headerlink" href="#navigation" title="Permanent link">&para;</a></h2>
+<p><a href="../03-api-integration/"><i class="material-icons">arrow_back</i> Partie 3: Exposer l'API HTTP</a> | <a href="../"><i class="material-icons">arrow_back</i> Retour à l'index</a></p>
 
 
 
@@ -1730,11 +1996,11 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.indexes", "toc.follow", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.indexes", "toc.follow", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
     
     
   
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>

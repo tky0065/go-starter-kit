@@ -12,9 +12,13 @@
         <meta name="author" content="tky0065">
       
       
-        <link rel="canonical" href="https://tky0065.github.io/go-starter-kit/README-SITE/">
+        <link rel="canonical" href="https://tky0065.github.io/go-starter-kit/tutorial/">
       
       
+        <link rel="prev" href="../database-migration/">
+      
+      
+        <link rel="next" href="01-setup/">
       
       
         
@@ -29,7 +33,7 @@
     
     
       
-        <title>Régénération du site GitHub Pages - Go Starter Kit</title>
+        <title>Tutorial: Créer une API Blog complète avec create-go-starter - Go Starter Kit</title>
       
     
     
@@ -82,7 +86,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#regeneration-du-site-github-pages" class="md-skip">
+        <a href="#tutorial-creer-une-api-blog-complete-avec-create-go-starter" class="md-skip">
           Aller au contenu
         </a>
       
@@ -118,7 +122,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Régénération du site GitHub Pages
+              Tutorial: Créer une API Blog complète avec create-go-starter
             
           </span>
         </div>
@@ -518,6 +522,8 @@
       
   
   
+    
+  
   
   
     
@@ -544,15 +550,15 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../tutorial/" class="md-nav__link ">
+            <a href="./" class="md-nav__link md-nav__link--active">
               
   
   
@@ -570,13 +576,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+              <label class="md-nav__link md-nav__link--active" for="__nav_6" id="__nav_6_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -596,7 +602,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial/01-setup/" class="md-nav__link">
+      <a href="01-setup/" class="md-nav__link">
         
   
   
@@ -624,7 +630,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial/02-first-domain/" class="md-nav__link">
+      <a href="02-first-domain/" class="md-nav__link">
         
   
   
@@ -652,7 +658,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial/03-api-integration/" class="md-nav__link">
+      <a href="03-api-integration/" class="md-nav__link">
         
   
   
@@ -680,7 +686,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial/04-testing-deployment/" class="md-nav__link">
+      <a href="04-testing-deployment/" class="md-nav__link">
         
   
   
@@ -1411,6 +1417,67 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#structure-du-tutorial" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structure du tutorial
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Structure du tutorial">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#partie-1-installation-et-configuration-15-min" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Partie 1: Installation et Configuration (15 min)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#partie-2-creer-votre-premier-domaine-30-min" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Partie 2: Créer votre premier domaine (30 min)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#partie-3-exposer-lapi-http-30-min" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Partie 3: Exposer l'API HTTP (30 min)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#partie-4-tests-et-deploiement-20-min" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Partie 4: Tests et Déploiement (20 min)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#prerequis" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1419,13 +1486,41 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Prérequis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#logiciels-requis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logiciels requis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connaissances-recommandees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connaissances recommandées
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation-de-mkdocs-premiere-fois" class="md-nav__link">
+  <a href="#temps-total-estime" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation de MkDocs (première fois)
+        Temps total estimé
       
     </span>
   </a>
@@ -1433,98 +1528,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#regeneration-du-site" class="md-nav__link">
+  <a href="#navigation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Régénération du site
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#previsualisation-locale" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prévisualisation locale
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#workflow-complet" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Workflow complet
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#structure-des-fichiers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Structure des fichiers
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration-mkdocs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration MkDocs
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#notes-importantes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Notes importantes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#synchronisation-avec-readmemd" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Synchronisation avec README.md
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#depannage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dépannage
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#liens-utiles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Liens utiles
+        Navigation
       
     </span>
   </a>
@@ -1551,109 +1558,74 @@
   
 
 
-<h1 id="regeneration-du-site-github-pages">Régénération du site GitHub Pages<a class="headerlink" href="#regeneration-du-site-github-pages" title="Permanent link">&para;</a></h1>
-<p>Ce guide explique comment régénérer le site GitHub Pages après avoir modifié la documentation dans le dossier <code>docs/</code>.</p>
+<h1 id="tutorial-creer-une-api-blog-complete-avec-create-go-starter">Tutorial: Créer une API Blog complète avec create-go-starter<a class="headerlink" href="#tutorial-creer-une-api-blog-complete-avec-create-go-starter" title="Permanent link">&para;</a></h1>
+<p>Guide pas-à-pas pour créer une API Blog avec <code>create-go-starter</code>, de l'installation au déploiement.</p>
+<h2 id="structure-du-tutorial">Structure du tutorial<a class="headerlink" href="#structure-du-tutorial" title="Permanent link">&para;</a></h2>
+<p>Ce tutorial est divisé en 4 parties progressives:</p>
+<h3 id="partie-1-installation-et-configuration-15-min">Partie 1: Installation et Configuration (15 min)<a class="headerlink" href="#partie-1-installation-et-configuration-15-min" title="Permanent link">&para;</a></h3>
+<p><i class="material-icons info">developer_board</i>
+<strong>Objectif</strong>: Installer le CLI, générer le projet, le configurer et le tester</p>
+<p><strong>Vous allez apprendre</strong>:
+- Installer <code>create-go-starter</code>
+- Générer un nouveau projet
+- Configurer PostgreSQL et JWT
+- Tester l'API d'authentification générée</p>
+<p><a href="01-setup/">Commencer la Partie 1</a></p>
+<hr />
+<h3 id="partie-2-creer-votre-premier-domaine-30-min">Partie 2: Créer votre premier domaine (30 min)<a class="headerlink" href="#partie-2-creer-votre-premier-domaine-30-min" title="Permanent link">&para;</a></h3>
+<p><i class="material-icons success">architecture</i>
+<strong>Objectif</strong>: Implémenter le domaine Posts (articles de blog)</p>
+<p><strong>Vous allez apprendre</strong>:
+- Créer une entité GORM
+- Implémenter un service métier
+- Créer un repository avec GORM
+- Appliquer l'architecture hexagonale</p>
+<p><a href="02-first-domain/">Commencer la Partie 2</a></p>
+<hr />
+<h3 id="partie-3-exposer-lapi-http-30-min">Partie 3: Exposer l'API HTTP (30 min)<a class="headerlink" href="#partie-3-exposer-lapi-http-30-min" title="Permanent link">&para;</a></h3>
+<p><i class="material-icons warning">http</i>
+<strong>Objectif</strong>: Créer les endpoints CRUD pour Posts</p>
+<p><strong>Vous allez apprendre</strong>:
+- Créer un handler HTTP avec Fiber
+- Enregistrer les routes
+- Intégrer avec fx (DI)
+- Tester l'API avec curl</p>
+<p><a href="03-api-integration/">Commencer la Partie 3</a></p>
+<hr />
+<h3 id="partie-4-tests-et-deploiement-20-min">Partie 4: Tests et Déploiement (20 min)<a class="headerlink" href="#partie-4-tests-et-deploiement-20-min" title="Permanent link">&para;</a></h3>
+<p><i class="material-icons">rocket_launch</i>
+<strong>Objectif</strong>: Ajouter des tests et déployer avec Docker</p>
+<p><strong>Vous allez apprendre</strong>:
+- Écrire des tests unitaires
+- Tester avec des mocks
+- Créer une image Docker
+- Déployer avec docker-compose</p>
+<p><a href="04-testing-deployment/">Commencer la Partie 4</a></p>
+<hr />
 <h2 id="prerequis">Prérequis<a class="headerlink" href="#prerequis" title="Permanent link">&para;</a></h2>
+<h3 id="logiciels-requis">Logiciels requis<a class="headerlink" href="#logiciels-requis" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Python 3.x installé</li>
-<li>pip installé</li>
+<li><strong>Go 1.25+</strong> - <a href="https://golang.org/dl/">Télécharger</a></li>
+<li><strong>PostgreSQL</strong> ou <strong>Docker</strong> - Pour la base de données</li>
+<li><strong>curl</strong> ou <strong>Postman</strong> - Pour tester l'API</li>
+<li>Éditeur de code (VS Code, GoLand, etc.)</li>
 </ul>
-<h2 id="installation-de-mkdocs-premiere-fois">Installation de MkDocs (première fois)<a class="headerlink" href="#installation-de-mkdocs-premiere-fois" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Créer un environnement virtuel Python</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Activer l&#39;environnement virtuel</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate<span class="w">  </span><span class="c1"># Sur macOS/Linux</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># .\venv\Scripts\activate  # Sur Windows</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># Installer MkDocs et le thème Material</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>pip<span class="w"> </span>install<span class="w"> </span>mkdocs<span class="w"> </span>mkdocs-material
-</code></pre></div>
-<h2 id="regeneration-du-site">Régénération du site<a class="headerlink" href="#regeneration-du-site" title="Permanent link">&para;</a></h2>
-<p>Chaque fois que tu modifies les fichiers dans <code>docs/</code>, tu dois régénérer le site HTML:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Activer l&#39;environnement virtuel</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate<span class="w">  </span><span class="c1"># Sur macOS/Linux</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># .\venv\Scripts\activate  # Sur Windows</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># Régénérer le site (supprime l&#39;ancien et crée le nouveau)</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>mkdocs<span class="w"> </span>build<span class="w"> </span>--clean
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="c1"># Désactiver l&#39;environnement virtuel (optionnel)</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>deactivate
-</code></pre></div>
-<p>Le site sera généré dans le dossier <code>site/</code>.</p>
-<h2 id="previsualisation-locale">Prévisualisation locale<a class="headerlink" href="#previsualisation-locale" title="Permanent link">&para;</a></h2>
-<p>Pour prévisualiser le site localement avant de commit:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>mkdocs<span class="w"> </span>serve
-</code></pre></div>
-<p>Ouvre ensuite http://127.0.0.1:8000/ dans ton navigateur.</p>
-<h2 id="workflow-complet">Workflow complet<a class="headerlink" href="#workflow-complet" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Modifier les fichiers Markdown dans <code>docs/</code> (par exemple <code>docs/usage.md</code>)</li>
-<li>Régénérer le site:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">source</span><span class="w"> </span>venv/bin/activate
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>mkdocs<span class="w"> </span>build<span class="w"> </span>--clean
-</code></pre></div></li>
-<li>Vérifier les changements:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mkdocs<span class="w"> </span>serve<span class="w">  </span><span class="c1"># Optionnel</span>
-</code></pre></div></li>
-<li>Commit et push:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>add<span class="w"> </span>docs/<span class="w"> </span>site/
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;docs: Update documentation&quot;</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>develop
-</code></pre></div></li>
-</ol>
-<h2 id="structure-des-fichiers">Structure des fichiers<a class="headerlink" href="#structure-des-fichiers" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>.
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>├── docs/                          # Fichiers Markdown sources
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>│   ├── index.md                   # Page d&#39;accueil (copie du README.md)
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>│   ├── usage.md                   # Guide d&#39;utilisation
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>│   ├── installation.md            # Guide d&#39;installation
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>│   ├── generated-project-guide.md # Guide projet généré
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>│   ├── tutorial-exemple-complet.md # Tutoriel
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>│   ├── cli-architecture.md        # Architecture du CLI
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>│   └── contributing.md            # Guide de contribution
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>│
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>├── site/                          # Site HTML généré (ne pas modifier manuellement)
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>│   ├── index.html
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>│   ├── usage/
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>│   ├── installation/
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>│   └── ...
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>│
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>├── mkdocs.yml                     # Configuration MkDocs
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>└── venv/                          # Environnement virtuel Python (ignoré par git)
-</code></pre></div>
-<h2 id="configuration-mkdocs">Configuration MkDocs<a class="headerlink" href="#configuration-mkdocs" title="Permanent link">&para;</a></h2>
-<p>Le fichier <code>mkdocs.yml</code> contient la configuration du site:
-- Thème: Material for MkDocs
-- Langue: Français
-- Navigation: Structure du menu
-- Extensions Markdown: Syntax highlighting, admonitions, etc.</p>
-<h2 id="notes-importantes">Notes importantes<a class="headerlink" href="#notes-importantes" title="Permanent link">&para;</a></h2>
+<h3 id="connaissances-recommandees">Connaissances recommandées<a class="headerlink" href="#connaissances-recommandees" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Ne pas modifier</strong> manuellement les fichiers dans <code>site/</code> - ils sont régénérés automatiquement</li>
-<li>Toujours <strong>régénérer le site</strong> après avoir modifié <code>docs/</code></li>
-<li>Le dossier <code>venv/</code> est ignoré par git (ne pas le commit)</li>
-<li>Le site utilise MkDocs 1.6.1 et Material theme 9.7.1</li>
+<li>Bases de Go (structs, interfaces, error handling)</li>
+<li>Concepts REST API</li>
+<li>Familiarité avec SQL/PostgreSQL (basique)</li>
 </ul>
-<h2 id="synchronisation-avec-readmemd">Synchronisation avec README.md<a class="headerlink" href="#synchronisation-avec-readmemd" title="Permanent link">&para;</a></h2>
-<p>Si tu modifies <code>README.md</code> à la racine, n'oublie pas de mettre à jour <code>docs/index.md</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>cp<span class="w"> </span>README.md<span class="w"> </span>docs/index.md
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>mkdocs<span class="w"> </span>build<span class="w"> </span>--clean
-</code></pre></div>
-<h2 id="depannage">Dépannage<a class="headerlink" href="#depannage" title="Permanent link">&para;</a></h2>
-<p><strong>Problème</strong>: <code>mkdocs: command not found</code>
-- <strong>Solution</strong>: Active l'environnement virtuel avec <code>source venv/bin/activate</code></p>
-<p><strong>Problème</strong>: Erreurs d'installation de pip
-- <strong>Solution</strong>: Sur macOS avec Python système, utilise <code>--break-system-packages</code> ou crée un venv</p>
-<p><strong>Problème</strong>: Le site n'affiche pas les dernières modifications
-- <strong>Solution</strong>: Utilise <code>mkdocs build --clean</code> pour forcer la régénération complète</p>
-<h2 id="liens-utiles">Liens utiles<a class="headerlink" href="#liens-utiles" title="Permanent link">&para;</a></h2>
+<p>Pas besoin d'être expert! Ce tutorial explique chaque étape en détail.</p>
+<h2 id="temps-total-estime">Temps total estimé<a class="headerlink" href="#temps-total-estime" title="Permanent link">&para;</a></h2>
+<p><strong>95 minutes</strong> (~1h30) pour compléter l'ensemble du tutorial.</p>
+<p>Vous pouvez faire des pauses entre les parties - chaque partie a un checkpoint clair.</p>
+<h2 id="navigation">Navigation<a class="headerlink" href="#navigation" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="https://www.mkdocs.org/">Documentation MkDocs</a></li>
-<li><a href="https://squidfunk.github.io/mkdocs-material/">Material for MkDocs</a></li>
-<li><a href="https://www.markdownguide.org/">Markdown Guide</a></li>
+<li><a href="01-setup/">Partie 1: Installation et Configuration</a></li>
+<li><a href="02-first-domain/">Partie 2: Créer votre premier domaine</a></li>
+<li><a href="03-api-integration/">Partie 3: Exposer l'API HTTP</a></li>
+<li><a href="04-testing-deployment/">Partie 4: Tests et Déploiement</a></li>
 </ul>
 
 
