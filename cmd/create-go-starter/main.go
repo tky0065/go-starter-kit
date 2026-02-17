@@ -59,6 +59,22 @@ var ValidDatabases = []string{DatabasePostgres, DatabaseMySQL, DatabaseSQLite}
 // DefaultDatabase is the default database type when not specified
 const DefaultDatabase = DatabasePostgres
 
+// Observability level constants define the available observability modes.
+// - ObservabilityNone: No observability (default) — preserves current behavior
+// - ObservabilityBasic: Enhanced /health endpoint only (no Prometheus)
+// - ObservabilityAdvanced: Full Prometheus metrics endpoint + middleware
+const (
+	ObservabilityNone     = "none"
+	ObservabilityBasic    = "basic"
+	ObservabilityAdvanced = "advanced"
+)
+
+// ValidObservabilityLevels contains the list of valid observability levels
+var ValidObservabilityLevels = []string{ObservabilityNone, ObservabilityBasic, ObservabilityAdvanced}
+
+// DefaultObservabilityLevel is the default observability level when not specified
+const DefaultObservabilityLevel = ObservabilityNone
+
 // Green returns the string wrapped in green ANSI code
 func Green(msg string) string {
 	return ColorGreen + msg + ColorReset
@@ -83,6 +99,17 @@ func validateTemplate(template string) error {
 		}
 	}
 	return fmt.Errorf("invalid template '%s': valid options are: %s", template, strings.Join(ValidTemplates, ", "))
+}
+
+// validateObservabilityLevel checks if the observability level is valid.
+// Valid levels are: none, basic, advanced
+func validateObservabilityLevel(level string) error {
+	for _, valid := range ValidObservabilityLevels {
+		if level == valid {
+			return nil
+		}
+	}
+	return fmt.Errorf("invalid observability level '%s': valid options are: %s", level, strings.Join(ValidObservabilityLevels, ", "))
 }
 
 // validateDatabase checks if the database type is valid and supported.
@@ -180,6 +207,7 @@ func main() {
 	help := false
 	var template string = DefaultTemplate
 	var database string = DefaultDatabase
+	var observability string = DefaultObservabilityLevel
 	var projectName string
 
 	// Manually parse arguments to allow flags in any position
@@ -201,11 +229,20 @@ func main() {
 			if len(parts) == 2 {
 				database = parts[1]
 			}
+		} else if strings.HasPrefix(arg, "-observability=") || strings.HasPrefix(arg, "--observability=") {
+			// Handle -observability=value syntax
+			parts := strings.SplitN(arg, "=", 2)
+			if len(parts) == 2 {
+				observability = parts[1]
+			}
 		} else if (arg == "-template" || arg == "--template") && i+1 < len(args) {
 			template = args[i+1]
 			i++ // Skip next arg since we consumed it
 		} else if (arg == "-database" || arg == "--database") && i+1 < len(args) {
 			database = args[i+1]
+			i++ // Skip next arg since we consumed it
+		} else if (arg == "-observability" || arg == "--observability") && i+1 < len(args) {
+			observability = args[i+1]
 			i++ // Skip next arg since we consumed it
 		} else if !strings.HasPrefix(arg, "-") && projectName == "" {
 			// First non-flag argument is the project name
@@ -222,6 +259,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "        Database type to use (default \"postgres\")\n")
 		fmt.Fprintf(os.Stderr, "  -template string\n")
 		fmt.Fprintf(os.Stderr, "        Template type to generate (default \"full\")\n")
+		fmt.Fprintf(os.Stderr, "  -observability string\n")
+		fmt.Fprintf(os.Stderr, "        Observability level: none|basic|advanced (default \"none\")\n")
 		fmt.Fprintf(os.Stderr, "  -h, -help\n")
 		fmt.Fprintf(os.Stderr, "        Show help message\n")
 		fmt.Fprintf(os.Stderr, "\nTemplates:\n")
@@ -233,11 +272,16 @@ func main() {
 		fmt.Fprintf(os.Stderr, "  %-9s MySQL/MariaDB - Wide compatibility, shared hosting\n", DatabaseMySQL)
 		fmt.Fprintf(os.Stderr, "  %-9s SQLite - Quick prototyping, embedded apps\n", DatabaseSQLite)
 		fmt.Fprintf(os.Stderr, "  %-9s MongoDB - NoSQL, document-oriented\n", DatabaseMongoDB)
+		fmt.Fprintf(os.Stderr, "\nObservability:\n")
+		fmt.Fprintf(os.Stderr, "  %-9s No observability (default) - current behavior preserved\n", ObservabilityNone)
+		fmt.Fprintf(os.Stderr, "  %-9s Enhanced /health endpoint only (no Prometheus)\n", ObservabilityBasic)
+		fmt.Fprintf(os.Stderr, "  %-9s Full Prometheus metrics endpoint + HTTP metrics middleware\n", ObservabilityAdvanced)
 		fmt.Fprintf(os.Stderr, "\nExamples:\n")
 		fmt.Fprintf(os.Stderr, "  create-go-starter my-project\n")
 		fmt.Fprintf(os.Stderr, "  create-go-starter -database sqlite my-project\n")
 		fmt.Fprintf(os.Stderr, "  create-go-starter my-project -template minimal\n")
 		fmt.Fprintf(os.Stderr, "  create-go-starter -database mysql -template minimal my-project\n")
+		fmt.Fprintf(os.Stderr, "  create-go-starter my-project --observability=advanced\n")
 	}
 
 	if help {
@@ -272,8 +316,20 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Validate observability level
+	if err := validateObservabilityLevel(observability); err != nil {
+		fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("%v", err)))
+		os.Exit(1)
+	}
+
+	// Validate observability + template combination
+	if observability == ObservabilityAdvanced && template != TemplateFull {
+		fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("--observability=advanced is only supported with --template=full (got --template=%s)", template)))
+		os.Exit(1)
+	}
+
 	// Run the project creation logic
-	if err := run(projectName, template, database); err != nil {
+	if err := run(projectName, template, database, observability); err != nil {
 		// Changed to not include "Error: " prefix as Red() function will color the message itself.
 		fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("%v", err)))
 		os.Exit(1)
@@ -284,9 +340,9 @@ func main() {
 // It validates the project name, creates the directory structure,
 // generates files, and initializes git.
 // Returns an error if any step fails (except git initialization which is non-fatal).
-func run(projectName, template, database string) error {
+func run(projectName, template, database, observabilityLevel string) error {
 	// Display start message with template info
-	fmt.Println(Green(fmt.Sprintf("Creating project: %s (template: %s, database: %s)", projectName, template, database)))
+	fmt.Println(Green(fmt.Sprintf("Creating project: %s (template: %s, database: %s, observability: %s)", projectName, template, database, observabilityLevel)))
 
 	// Validate project name again to ensure safety when run() is called directly (e.g. in tests)
 	if err := utils.ValidateGoModuleName(projectName); err != nil {
@@ -309,7 +365,7 @@ func run(projectName, template, database string) error {
 	// Generate project files with dynamic context injection
 	fmt.Println("📝 Generating core files...") // Changed to English
 
-	if err := generateProjectFiles(projectPath, projectName, template, database); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, template, database, observabilityLevel); err != nil {
 		return err
 	}
 
@@ -456,7 +512,11 @@ func printSuccessMessage(projectName, database string) {
 
 	fmt.Println("5️⃣  Verify installation:") // Changed to English
 	fmt.Println("    curl http://localhost:8080/health")
-	fmt.Println("    # Should return: {\"status\":\"ok\"}") // Changed to English
+	fmt.Println("    # Should return: {\"status\":\"alive\",\"service\":\"" + projectName + "\",\"timestamp\":\"...\"}") // Changed to English
+	fmt.Println()
+	fmt.Println("    # Advanced health checks:")
+	fmt.Println("    curl http://localhost:8080/health/liveness    # Liveness probe (K8s)")
+	fmt.Println("    curl http://localhost:8080/health/readiness   # Readiness probe (K8s)")
 	fmt.Println()
 
 	fmt.Println(Green("📚 Full documentation:"))                                    // Changed to English

@@ -25,7 +25,7 @@ func TestE2ESQLiteProjectGeneration(t *testing.T) {
 			t.Fatalf("Failed to create project structure: %v", err)
 		}
 
-		if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, "sqlite"); err != nil {
+		if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, "sqlite", DefaultObservabilityLevel); err != nil {
 			t.Fatalf("Failed to generate project files: %v", err)
 		}
 
@@ -195,7 +195,7 @@ func TestE2ESQLiteVsPostgresComparison(t *testing.T) {
 	if err := createProjectStructure(sqliteProjectPath, TemplateFull); err != nil {
 		t.Fatalf("Failed to create SQLite project: %v", err)
 	}
-	if err := generateProjectFiles(sqliteProjectPath, "sqlite-project", DefaultTemplate, "sqlite"); err != nil {
+	if err := generateProjectFiles(sqliteProjectPath, "sqlite-project", DefaultTemplate, "sqlite", DefaultObservabilityLevel); err != nil {
 		t.Fatalf("Failed to generate SQLite project: %v", err)
 	}
 
@@ -204,7 +204,7 @@ func TestE2ESQLiteVsPostgresComparison(t *testing.T) {
 	if err := createProjectStructure(postgresProjectPath, TemplateFull); err != nil {
 		t.Fatalf("Failed to create PostgreSQL project: %v", err)
 	}
-	if err := generateProjectFiles(postgresProjectPath, "postgres-project", DefaultTemplate, "postgres"); err != nil {
+	if err := generateProjectFiles(postgresProjectPath, "postgres-project", DefaultTemplate, "postgres", DefaultObservabilityLevel); err != nil {
 		t.Fatalf("Failed to generate PostgreSQL project: %v", err)
 	}
 
@@ -284,7 +284,7 @@ func TestE2ESQLiteReadmeContent(t *testing.T) {
 		t.Fatalf("Failed to create project structure: %v", err)
 	}
 
-	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, "sqlite"); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, "sqlite", DefaultObservabilityLevel); err != nil {
 		t.Fatalf("Failed to generate project files: %v", err)
 	}
 

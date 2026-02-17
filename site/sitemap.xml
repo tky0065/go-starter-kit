@@ -2,42 +2,126 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://tky0065.github.io/go-starter-kit/</loc>
-         <lastmod>2026-02-12</lastmod>
+         <lastmod>2026-02-17</lastmod>
     </url>
     <url>
          <loc>https://tky0065.github.io/go-starter-kit/README-SITE/</loc>
-         <lastmod>2026-02-12</lastmod>
+         <lastmod>2026-02-17</lastmod>
     </url>
     <url>
          <loc>https://tky0065.github.io/go-starter-kit/cli-architecture/</loc>
-         <lastmod>2026-02-12</lastmod>
+         <lastmod>2026-02-17</lastmod>
     </url>
     <url>
          <loc>https://tky0065.github.io/go-starter-kit/contributing/</loc>
-         <lastmod>2026-02-12</lastmod>
+         <lastmod>2026-02-17</lastmod>
     </url>
     <url>
          <loc>https://tky0065.github.io/go-starter-kit/database-migration/</loc>
-         <lastmod>2026-02-12</lastmod>
+         <lastmod>2026-02-17</lastmod>
     </url>
     <url>
          <loc>https://tky0065.github.io/go-starter-kit/databases/</loc>
-         <lastmod>2026-02-12</lastmod>
+         <lastmod>2026-02-17</lastmod>
     </url>
     <url>
          <loc>https://tky0065.github.io/go-starter-kit/generated-project-guide/</loc>
-         <lastmod>2026-02-12</lastmod>
+         <lastmod>2026-02-17</lastmod>
     </url>
     <url>
          <loc>https://tky0065.github.io/go-starter-kit/installation/</loc>
-         <lastmod>2026-02-12</lastmod>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/quick-start/</loc>
+         <lastmod>2026-02-17</lastmod>
     </url>
     <url>
          <loc>https://tky0065.github.io/go-starter-kit/tutorial-exemple-complet/</loc>
-         <lastmod>2026-02-12</lastmod>
+         <lastmod>2026-02-17</lastmod>
     </url>
     <url>
          <loc>https://tky0065.github.io/go-starter-kit/usage/</loc>
-         <lastmod>2026-02-12</lastmod>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/guide/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/guide/api-reference/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/guide/architecture/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/guide/best-practices/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/guide/configuration/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/guide/database/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/guide/deployment/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/guide/development/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/guide/examples/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/guide/monitoring/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/guide/security/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/guide/structure/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/guide/testing/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/reference/faq/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/reference/glossary/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/tutorial/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/tutorial/01-setup/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/tutorial/02-first-domain/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/tutorial/03-api-integration/</loc>
+         <lastmod>2026-02-17</lastmod>
+    </url>
+    <url>
+         <loc>https://tky0065.github.io/go-starter-kit/tutorial/04-testing-deployment/</loc>
+         <lastmod>2026-02-17</lastmod>
     </url>
 </urlset>

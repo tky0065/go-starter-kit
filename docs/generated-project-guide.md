@@ -2466,18 +2466,51 @@ protected.Get("/", userHandler.List)
 
 ### Endpoints disponibles
 
-#### Health Check
+#### Health Checks (Kubernetes-compatible)
 
-```
+**Liveness probe** — l'application tourne-t-elle ?
+```bash
+GET /health/liveness
+# Alias rétrocompatible :
 GET /health
 ```
 
-**Response** (200):
+**Response** (200 — toujours si l'app tourne) :
 ```json
 {
-  "status": "ok"
+  "status": "alive",
+  "service": "mon-projet",
+  "timestamp": "2026-02-17T10:00:00Z"
 }
 ```
+
+**Readiness probe** — l'application est-elle prête à recevoir du trafic ?
+```bash
+GET /health/readiness
+```
+
+**Response** (200 — DB accessible) :
+```json
+{
+  "status": "ready",
+  "service": "mon-projet",
+  "timestamp": "2026-02-17T10:00:00Z",
+  "checks": {"database": "ok"}
+}
+```
+
+**Response** (503 — DB inaccessible) :
+```json
+{
+  "status": "not_ready",
+  "service": "mon-projet",
+  "timestamp": "2026-02-17T10:00:00Z",
+  "checks": {"database": "error"},
+  "error": "database connection failed"
+}
+```
+
+> **Configuration K8s** : Le fichier `deployments/kubernetes/probes.yaml` est automatiquement généré avec les configurations recommandées pour `livenessProbe`, `readinessProbe` et `startupProbe`.
 
 ---
 
@@ -3713,13 +3746,13 @@ spec:
               key: jwt-secret
         livenessProbe:
           httpGet:
-            path: /health
+            path: /health/liveness
             port: 8080
           initialDelaySeconds: 10
           periodSeconds: 30
         readinessProbe:
           httpGet:
-            path: /health
+            path: /health/readiness
             port: 8080
           initialDelaySeconds: 5
           periodSeconds: 10
@@ -4106,35 +4139,94 @@ logger.Info().Str("email", email).Msg("User login attempt")
 logger.Info().Str("password", password).Msg("Login")  // NEVER!
 ```
 
-### Monitoring (recommandations)
+### Observabilité complète (`--observability=advanced`)
 
-Pour la production, intégrer:
+Lorsqu'un projet est généré avec `--observability=advanced`, un stack d'observabilité complet est inclus :
 
-#### 1. Prometheus + Grafana
+#### Stack inclus
 
-**Metrics à collecter**:
-- Request rate (requests/sec)
-- Response time (p50, p95, p99)
-- Error rate (%)
-- Database connection pool
-- CPU/Memory usage
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Grafana** | `http://localhost:3000` | Dashboards & alertes (admin/admin) |
+| **Prometheus** | `http://localhost:9090` | Métriques & règles d'alerte |
+| **Jaeger** | `http://localhost:16686` | Traces distribuées |
 
-**Implémenter avec fiber/prometheus**:
+#### Démarrage du stack
 
-```go
-import "github.com/gofiber/adaptor/v2"
-import "github.com/prometheus/client_golang/prometheus/promhttp"
-
-app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
+```bash
+docker-compose up -d
 ```
 
-#### 2. Jaeger / OpenTelemetry
+Grafana est **auto-provisionné** : le dashboard API est disponible immédiatement sans configuration manuelle.
 
-**Distributed tracing** pour suivre les requêtes à travers les services.
+#### Identifiants Grafana par défaut
 
-#### 3. Sentry
+```
+URL:       http://localhost:3000
+Login:     admin
+Mot de passe: admin  (ou valeur de GF_SECURITY_ADMIN_PASSWORD dans .env)
+```
 
-**Error tracking** en temps réel:
+> **Sécurité** : Modifier `GF_SECURITY_ADMIN_PASSWORD` dans `.env` avant de déployer en production.
+
+#### Métriques exposées (`/metrics`)
+
+L'application expose les métriques Prometheus sur `/metrics` :
+
+| Métrique | Type | Description |
+|----------|------|-------------|
+| `http_requests_total` | Counter | Nombre de requêtes HTTP par méthode/statut |
+| `http_request_duration_seconds` | Histogram | Latence des requêtes |
+| `health_check_status` | Gauge | Statut des health checks (1=OK, 0=KO) |
+| `health_check_duration_seconds` | Histogram | Durée des health checks |
+
+#### Dashboard Grafana — Panneaux
+
+Le dashboard `api-dashboard.json` contient 7 panneaux pré-configurés :
+
+- **Request Rate** — Requêtes/seconde (timeseries)
+- **Error Rate %** — Taux d'erreurs 5xx avec seuils (stat : vert/jaune/rouge)
+- **P95 Latency** — Latence au 95e percentile en ms (gauge)
+- **DB Query P95** — Durée des requêtes DB au 95e percentile (timeseries)
+- **Active DB Connections** — Connexions DB actives (stat)
+- **Health Status** — Statut de la base de données (UP/DOWN)
+- **HTTP Requests by Status** — Répartition des requêtes par code statut (timeseries)
+
+#### Alertes Prometheus pré-configurées
+
+Les règles d'alerte dans `deployments/prometheus/rules/api_alerts.yml` :
+
+| Alerte | Condition | Délai | Sévérité |
+|--------|-----------|-------|----------|
+| `HighErrorRate` | Taux d'erreurs > 5% | 2 min | warning |
+| `HighP95Latency` | P95 latency > 1s | 5 min | warning |
+| `DatabaseDown` | health_check_status == 0 | 1 min | critical |
+
+#### Structure des fichiers générés
+
+```
+<projet>/
+├── deployments/
+│   ├── prometheus/
+│   │   ├── prometheus.yml              # Config scraping + règles
+│   │   └── rules/
+│   │       └── api_alerts.yml          # Alertes (ErrorRate, Latency, DB)
+│   └── grafana/
+│       ├── provisioning/
+│       │   ├── datasources/
+│       │   │   └── prometheus.yaml     # Auto-datasource Prometheus
+│       │   └── dashboards/
+│       │       └── default.yaml        # Auto-provisioning dashboards
+│       └── dashboards/
+│           └── api-dashboard.json      # Dashboard principal (7 panneaux)
+└── docker-compose.yml                  # Inclut prometheus, grafana, jaeger
+```
+
+### Monitoring (recommandations supplémentaires)
+
+Pour la production, compléter avec:
+
+#### 1. Sentry (Error Tracking)
 
 ```go
 import "github.com/getsentry/sentry-go"
@@ -4147,7 +4239,7 @@ sentry.Init(sentry.ClientOptions{
 sentry.CaptureException(err)
 ```
 
-#### 4. APM (Application Performance Monitoring)
+#### 2. APM (Application Performance Monitoring)
 
 - **New Relic**: APM complet
 - **Datadog**: Monitoring + logs
@@ -4192,6 +4284,61 @@ func (h *HealthHandler) Check(c *fiber.Ctx) error {
     return c.JSON(response)
 }
 ```
+
+### Observabilité Avancée (v1.3.0)
+
+Si votre projet a été généré avec `--observability=advanced`, une stack d'observabilité complète est intégrée.
+
+#### Endpoints de monitoring
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /health/liveness` | Liveness probe — l'app tourne-t-elle ? |
+| `GET /health/readiness` | Readiness probe — la DB est-elle accessible ? |
+| `GET /health` | Alias rétrocompatible vers liveness |
+| `GET /metrics` | Métriques Prometheus (mode advanced uniquement) |
+
+#### Stack Docker Compose
+
+```bash
+# Démarrer tous les services de monitoring
+docker-compose up -d
+
+# Services disponibles :
+# - Jaeger UI:     http://localhost:16686  (traces distribuées)
+# - Prometheus UI: http://localhost:9090   (métriques)
+# - Grafana UI:    http://localhost:3000   (dashboards, credentials: admin/admin)
+```
+
+#### Métriques Prometheus
+
+Les métriques HTTP sont automatiquement collectées par le middleware :
+
+```bash
+curl http://localhost:8080/metrics
+# http_requests_total{method="GET",path="/health",status="200"} 42
+# http_request_duration_seconds_bucket{method="GET",path="/health",le="0.1"} 42
+```
+
+#### Traces distribuées
+
+Les traces OpenTelemetry sont exportées vers Jaeger via OTLP/gRPC. Chaque requête HTTP et query DB génère automatiquement des spans :
+
+```bash
+# Configurer l'endpoint Jaeger dans .env
+OTEL_EXPORTER_OTLP_ENDPOINT=localhost:4317
+
+# Accéder à Jaeger UI
+open http://localhost:16686
+```
+
+Les logs zerolog sont enrichis avec `trace_id` et `span_id` pour corréler logs et traces.
+
+#### Dashboard Grafana
+
+Un dashboard pré-configuré avec 7 panneaux (request rate, error rate, latency percentiles, etc.) est automatiquement provisionné au démarrage de Grafana.
+
+Pour plus de détails, consultez le [Guide Monitoring & Observabilité](./guide/monitoring.md).
 
 ---
 

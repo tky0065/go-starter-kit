@@ -77,12 +77,12 @@ development_status:
   # v1.2.0 Release (2026-02-12) ✅
   v1.2.0-release: done
 
-  # Epic 9 - Advanced Observability (v1.3.0 - ROADMAP)
-  epic-9: backlog
-  9-1-prometheus-metrics-endpoint: backlog
-  9-2-distributed-tracing: backlog
-  9-3-advanced-health-checks: backlog
-  9-4-grafana-dashboard-template: backlog
+  # Epic 9 - Advanced Observability (v1.3.0 - COMPLÉTÉ ✅)
+  epic-9: done
+  9-1-prometheus-metrics-endpoint: done
+  9-2-distributed-tracing: done
+  9-3-advanced-health-checks: done
+  9-4-grafana-dashboard-template: done
   epic-9-retrospective: optional
 
   # Epic 10 - CLI Enhancements & Developer Experience (ROADMAP)

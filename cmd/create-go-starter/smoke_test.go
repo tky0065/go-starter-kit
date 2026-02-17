@@ -32,7 +32,7 @@ func TestE2ESmokeTestValidation(t *testing.T) {
 		}
 
 		// Generate project files
-		if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, DefaultDatabase); err != nil {
+		if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel); err != nil {
 			t.Fatalf("Failed to generate project files: %v", err)
 		}
 

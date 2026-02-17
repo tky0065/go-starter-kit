@@ -72,7 +72,9 @@ create-go-starter mon-projet --template graphql    # API GraphQL
 
 **Endpoints générés**:
 ```
-GET    /health                  # Health check
+GET    /health                  # Health check (alias liveness — rétrocompatibilité)
+GET    /health/liveness         # Liveness probe K8s (toujours 200 si app tourne)
+GET    /health/readiness        # Readiness probe K8s (200 si DB ok, 503 si DB down)
 GET    /api/v1/users            # Liste tous les utilisateurs
 GET    /api/v1/users/:id        # Récupère un utilisateur
 POST   /api/v1/users            # Crée un utilisateur
@@ -107,7 +109,9 @@ GET    /swagger/*               # Documentation Swagger UI
 
 **Endpoints générés**:
 ```
-GET    /health                      # Health check
+GET    /health                      # Health check (alias liveness — rétrocompatibilité)
+GET    /health/liveness             # Liveness probe K8s
+GET    /health/readiness            # Readiness probe K8s (vérifie DB)
 POST   /api/v1/auth/register        # Inscription utilisateur
 POST   /api/v1/auth/login           # Connexion (retourne access + refresh tokens)
 POST   /api/v1/auth/refresh         # Rafraîchir l'access token
@@ -268,15 +272,195 @@ Pour une comparaison détaillée, exemples de configuration, et guides de migrat
 - **[Guide de sélection des databases](databases.md)** - Comparaison complète et aide au choix
 - **[Guide de migration](database-migration.md)** - Migration entre databases
 
+## Observabilité (--observability)
+
+<i class="material-icons success">new_releases</i> **Nouveau dans v1.3.0!** Go Starter Kit supporte **3 niveaux d'observabilité** pour monitorer vos projets générés en production.
+
+### Niveaux disponibles
+
+| Niveau | Description | Ce qui est généré |
+|--------|-------------|-------------------|
+| `none` | Aucune observabilité (défaut) | Comportement standard préservé |
+| `basic` | Health checks K8s avancés | `/health/liveness`, `/health/readiness` |
+| `advanced` | Stack complète d'observabilité | Prometheus + Jaeger + Grafana + Health Checks K8s |
+
+> <i class="material-icons warning">warning</i> Le flag `--observability` ne fonctionne qu'avec `--template=full`.
+
+### Mode `advanced` — Stack d'observabilité complète
+
+```bash
+# Générer un projet avec observabilité avancée
+create-go-starter mon-app --observability=advanced
+
+# Combiné avec database et template
+create-go-starter mon-app --template=full --database=postgres --observability=advanced
+```
+
+**Fichiers générés** (en plus des fichiers standard) :
+
+```
+mon-app/
+├── pkg/
+│   ├── metrics/
+│   │   └── prometheus.go                # Registry Prometheus + métriques HTTP
+│   └── tracing/
+│       └── tracer.go                    # Configuration OpenTelemetry + TracerProvider
+├── internal/adapters/
+│   ├── middleware/
+│   │   ├── metrics_middleware.go        # Middleware Prometheus pour métriques HTTP
+│   │   └── tracing_middleware.go        # Middleware OpenTelemetry pour spans HTTP
+│   ├── handlers/
+│   │   └── metrics_handler.go           # Handler GET /metrics
+│   └── http/
+│       └── health.go                    # Health checks avancés (liveness/readiness)
+├── internal/infrastructure/database/
+│   └── tracing.go                       # Instrumentation GORM avec spans DB
+├── pkg/logger/
+│   └── logger_tracing.go               # Logger enrichi avec trace_id/span_id
+├── monitoring/
+│   ├── grafana/
+│   │   ├── provisioning/
+│   │   │   ├── datasources/
+│   │   │   │   └── prometheus.yml       # Datasource Prometheus auto-configurée
+│   │   │   └── dashboards/
+│   │   │       └── dashboard.yml        # Auto-provisioning des dashboards
+│   │   └── dashboards/
+│   │       └── app-dashboard.json       # Dashboard Grafana 7 panneaux
+│   └── prometheus/
+│       ├── prometheus.yml               # Configuration scraping Prometheus
+│       └── alert_rules.yml              # Règles d'alerting
+├── deployments/
+│   └── kubernetes/
+│       └── probes.yaml                  # Configuration probes K8s
+└── docker-compose.yml                   # Stack complète (DB + Jaeger + Prometheus + Grafana)
+```
+
+#### Prometheus Metrics
+
+**Métriques exposées sur `GET /metrics`** :
+
+| Métrique | Type | Description |
+|----------|------|-------------|
+| `http_requests_total` | Counter | Requêtes totales par méthode, route et code status |
+| `http_request_duration_seconds` | Histogram | Latence HTTP par route (p50, p90, p95, p99) |
+| `http_requests_in_flight` | Gauge | Nombre de requêtes actives en cours |
+
+**Librairie** : [`fiberprometheus/v2`](https://github.com/ansrivas/fiberprometheus) v2.7.0.
+
+```bash
+# Tester les métriques
+curl http://localhost:8080/metrics
+```
+
+#### Distributed Tracing (OpenTelemetry + Jaeger)
+
+**Architecture** : Application → OTLP/gRPC → Jaeger Collector → Jaeger UI
+
+**Fonctionnalités** :
+- <i class="material-icons success small">check</i> Spans automatiques pour chaque requête HTTP
+- <i class="material-icons success small">check</i> Spans automatiques pour chaque query GORM
+- <i class="material-icons success small">check</i> Propagation W3C `traceparent` entre services
+- <i class="material-icons success small">check</i> Logs zerolog enrichis avec `trace_id` et `span_id`
+
+**Variables d'environnement** :
+```bash
+OTEL_EXPORTER_OTLP_ENDPOINT=localhost:4317
+OTEL_SERVICE_NAME=mon-app
+```
+
+**Accéder à Jaeger UI** :
+```bash
+open http://localhost:16686
+```
+
+#### Health Checks Kubernetes-compatible
+
+| Endpoint | Probe K8s | Comportement |
+|----------|-----------|--------------|
+| `GET /health/liveness` | livenessProbe | 200 si l'app tourne |
+| `GET /health/readiness` | readinessProbe | 200 si DB ok, 503 si DB down |
+| `GET /health` | — | Alias rétrocompatible vers liveness |
+
+**Readiness check** : Vérifie la connexion DB avec un timeout de 2 secondes. Retourne 503 avec détails si la DB est inaccessible.
+
+**Fichier Kubernetes** : `deployments/kubernetes/probes.yaml` est automatiquement généré avec les configurations recommandées pour `livenessProbe`, `readinessProbe` et `startupProbe`.
+
+#### Grafana Dashboard
+
+**Dashboard 7 panneaux** pré-configuré et auto-provisionné :
+
+| Panneau | Type | Description |
+|---------|------|-------------|
+| Request Rate | Time series | Requêtes/seconde |
+| Error Rate | Time series | % erreurs (4xx, 5xx) |
+| Latency P95 | Time series | 95ème percentile |
+| Latency P99 | Time series | 99ème percentile |
+| Requests in Flight | Gauge | Requêtes actives |
+| Status Codes | Pie chart | Répartition des codes |
+| Top Endpoints | Table | Endpoints les plus utilisés |
+
+**Règles d'alerting** incluses :
+- High Error Rate (> 5% pendant 5 min)
+- High Latency (p95 > 1s pendant 5 min)
+- Service Down (absence de métriques pendant 1 min)
+
+**Accéder à Grafana** :
+```bash
+open http://localhost:3000
+# Credentials: admin / admin
+```
+
+#### Docker Compose — Stack complète
+
+Le `docker-compose.yml` généré inclut tous les services :
+
+| Service | Image | Port | URL |
+|---------|-------|------|-----|
+| app | Build local | 8080 | `http://localhost:8080` |
+| db | postgres:16-alpine | 5432 | — |
+| jaeger | jaegertracing/all-in-one:1.56.0 | 16686 | `http://localhost:16686` |
+| prometheus | prom/prometheus:v2.51.0 | 9090 | `http://localhost:9090` |
+| grafana | grafana/grafana:10.4.0 | 3000 | `http://localhost:3000` |
+
+```bash
+# Démarrer toute la stack
+docker-compose up -d
+
+# Vérifier
+curl http://localhost:8080/health/readiness
+curl http://localhost:8080/metrics
+```
+
+### Mode `basic` — Health checks améliorés
+
+```bash
+create-go-starter mon-app --observability=basic
+```
+
+Génère les endpoints `/health/liveness` et `/health/readiness` sans Prometheus, Jaeger ni Grafana.
+
+### Mode `none` (défaut)
+
+```bash
+create-go-starter mon-app
+# équivalent à:
+create-go-starter mon-app --observability=none
+```
+
+Comportement standard préservé — aucune régression.
+
+---
+
 ## Options disponibles
 
 ### Flags actuels
 
 ```bash
-create-go-starter --help                  # Afficher l'aide
-create-go-starter -h                      # Alias pour --help
-create-go-starter --template <type>       # Choisir le template (minimal, full, graphql)
-create-go-starter --database <type>       # Choisir la base de données (postgres, mysql, sqlite)
+create-go-starter --help                      # Afficher l'aide
+create-go-starter -h                          # Alias pour --help
+create-go-starter --template <type>           # Choisir le template (minimal, full, graphql)
+create-go-starter --database <type>           # Choisir la base de données (postgres, mysql, sqlite)
+create-go-starter --observability <niveau>    # Niveau d'observabilité (none, basic, advanced)
 ```
 
 **Exemples**:

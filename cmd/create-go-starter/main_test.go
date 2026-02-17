@@ -187,7 +187,7 @@ func TestRunFunction(t *testing.T) {
 	}
 
 	// Run the main logic
-	err = run(projectName, DefaultTemplate, DefaultDatabase)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel)
 	if err != nil {
 		t.Errorf("run() returned error: %v", err)
 	}
@@ -217,7 +217,7 @@ func TestRunFunction(t *testing.T) {
 
 // TestRunFunctionWithInvalidName tests that run() fails with invalid project name
 func TestRunFunctionWithInvalidName(t *testing.T) {
-	err := run("../invalid-path", DefaultTemplate, DefaultDatabase)
+	err := run("../invalid-path", DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel)
 	if err == nil {
 		t.Error("Expected error for invalid project name, got nil")
 	}
@@ -228,7 +228,7 @@ func TestRunFunctionWithInvalidName(t *testing.T) {
 
 // TestRunFunctionWithEmptyName tests that run() fails with empty project name
 func TestRunFunctionWithEmptyName(t *testing.T) {
-	err := run("", DefaultTemplate, DefaultDatabase)
+	err := run("", DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel)
 	if err == nil {
 		t.Error("Expected error for empty project name, got nil")
 	}
@@ -257,7 +257,7 @@ func TestRunFunctionWithExistingDirectory(t *testing.T) {
 	}
 
 	// Run should fail because directory exists
-	err = run(projectName, DefaultTemplate, DefaultDatabase)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel)
 	if err == nil {
 		t.Error("Expected error for existing directory, got nil")
 	}

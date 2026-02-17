@@ -21,7 +21,7 @@ func TestGenerateProjectFiles(t *testing.T) {
 	}
 
 	// Generate project files
-	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, DefaultDatabase); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel); err != nil {
 		t.Fatalf("generateProjectFiles() error = %v", err)
 	}
 
@@ -86,7 +86,7 @@ func TestGenerateProjectFiles(t *testing.T) {
 
 func TestGenerateProjectFilesWithInvalidPath(t *testing.T) {
 	// Test with non-existent directory
-	err := generateProjectFiles("/non/existent/path", "test-project", DefaultTemplate, DefaultDatabase)
+	err := generateProjectFiles("/non/existent/path", "test-project", DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel)
 	if err == nil {
 		t.Error("generateProjectFiles() should return error for non-existent path")
 	}
@@ -167,7 +167,7 @@ func TestGenerateProjectFilesWithInvalidModuleName(t *testing.T) {
 
 	// Test with empty module name
 	var err error // Declared err here
-	err = generateProjectFiles(projectPath, "", DefaultTemplate, DefaultDatabase)
+	err = generateProjectFiles(projectPath, "", DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel)
 	if err == nil {
 		t.Error("generateProjectFiles() should return error for empty module name")
 	}
@@ -176,7 +176,7 @@ func TestGenerateProjectFilesWithInvalidModuleName(t *testing.T) {
 	}
 
 	// Test with invalid module name
-	err = generateProjectFiles(projectPath, "-invalid", DefaultTemplate, DefaultDatabase)
+	err = generateProjectFiles(projectPath, "-invalid", DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel)
 	if err == nil {
 		t.Error("generateProjectFiles() should return error for invalid module name")
 	}
@@ -197,7 +197,7 @@ func TestGenerateProjectFilesCreatesAllRequiredFiles(t *testing.T) {
 	}
 
 	// Generate project files
-	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, DefaultDatabase); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel); err != nil {
 		t.Fatalf("generateProjectFiles() error = %v", err)
 	}
 
@@ -222,8 +222,9 @@ func TestGenerateProjectFilesCreatesAllRequiredFiles(t *testing.T) {
 		"internal/adapters/handlers/auth_handler.go",
 		"internal/adapters/handlers/user_handler.go",
 		"internal/adapters/handlers/module.go",
-		"internal/adapters/http/health.go",
+		"internal/adapters/handlers/health_handler.go",
 		"internal/adapters/http/routes.go",
+		"deployments/kubernetes/probes.yaml",
 		"internal/infrastructure/database/database.go",
 		"internal/infrastructure/server/server.go",
 		"Dockerfile",
@@ -276,7 +277,7 @@ func TestE2EGeneratedProjectBuilds(t *testing.T) {
 	}
 
 	// Generate all project files
-	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, DefaultDatabase); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel); err != nil {
 		t.Fatalf("Failed to generate project files: %v", err)
 	}
 
@@ -348,7 +349,7 @@ func TestGoModTidyWorkflow(t *testing.T) {
 		t.Fatalf("Failed to create project structure: %v", err)
 	}
 
-	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, DefaultDatabase); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel); err != nil {
 		t.Fatalf("Failed to generate project files: %v", err)
 	}
 
@@ -406,8 +407,8 @@ func TestGenerateGraphQLTemplateFiles(t *testing.T) {
 	}
 
 	// Generate GraphQL project files
-	if err := generateProjectFiles(projectPath, projectName, TemplateGraphQL, DefaultDatabase); err != nil {
-		t.Fatalf("generateProjectFiles(graphql) error = %v", err)
+	if err := generateProjectFiles(projectPath, projectName, TemplateGraphQL, DefaultDatabase, DefaultObservabilityLevel); err != nil {
+		t.Fatalf("generateProjectFiles(graphql, DefaultObservabilityLevel) error = %v", err)
 	}
 
 	// List of all expected GraphQL template files
@@ -554,7 +555,7 @@ func TestE2EGraphQLProjectBuilds(t *testing.T) {
 	}
 
 	// Generate all project files
-	if err := generateProjectFiles(projectPath, projectName, TemplateGraphQL, DefaultDatabase); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, TemplateGraphQL, DefaultDatabase, DefaultObservabilityLevel); err != nil {
 		t.Fatalf("Failed to generate project files: %v", err)
 	}
 

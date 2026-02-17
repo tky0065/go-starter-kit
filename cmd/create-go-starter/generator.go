@@ -43,6 +43,8 @@ func getDirectoriesForTemplate(template string) []string {
 		// Full template: includes auth, user management, handlers, repository
 		fullDirs := append(commonDirs,
 			"pkg/auth",
+			"pkg/tracing",
+			"pkg/metrics",
 			"internal/domain",
 			"internal/domain/user",
 			"internal/interfaces",
@@ -56,6 +58,8 @@ func getDirectoriesForTemplate(template string) []string {
 		// Default to full template directories (defensive programming)
 		fullDirs := append(commonDirs,
 			"pkg/auth",
+			"pkg/tracing",
+			"pkg/metrics",
 			"internal/domain",
 			"internal/domain/user",
 			"internal/interfaces",
@@ -77,12 +81,10 @@ type FileGenerator struct {
 // generateProjectFiles creates all the initial project files with templates.
 // The template parameter specifies the type of project to generate (minimal, full, graphql).
 // The database parameter specifies the database type (postgres, mysql, sqlite, mongodb).
-// generateProjectFiles creates all the initial project files with templates.
-// The template parameter specifies the type of project to generate (minimal, full, graphql).
-// The database parameter specifies the database type (postgres, mysql, sqlite, mongodb).
+// The observabilityLevel parameter specifies the observability mode (none, basic, advanced).
 // Database-specific templates are used to generate the correct driver, DSN, and configurations.
 // This switch statement clarifies intent and returns an explicit error for unimplemented templates.
-func generateProjectFiles(projectPath, projectName, template, database string) error {
+func generateProjectFiles(projectPath, projectName, template, database, observabilityLevel string) error {
 	// Validate that the project directory exists
 	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
 		return fmt.Errorf("project directory does not exist: %s", projectPath)
@@ -95,7 +97,7 @@ func generateProjectFiles(projectPath, projectName, template, database string) e
 
 	switch template {
 	case "full":
-		return generateFullTemplateFiles(projectPath, projectName, database)
+		return generateFullTemplateFiles(projectPath, projectName, database, observabilityLevel)
 	case "minimal":
 		return generateMinimalTemplateFiles(projectPath, projectName, database)
 	case "graphql":
@@ -108,19 +110,44 @@ func generateProjectFiles(projectPath, projectName, template, database string) e
 
 // generateFullTemplateFiles generates all files for the "full" template.
 // This function was extracted from the original generateProjectFiles to improve modularity.
-func generateFullTemplateFiles(projectPath, projectName, database string) error {
+// The observabilityLevel parameter controls which observability files are generated.
+func generateFullTemplateFiles(projectPath, projectName, database, observabilityLevel string) error {
 	// Create templates instance with database support
 	templates := NewProjectTemplatesWithDatabase(projectName, database)
+
+	// Determine file contents based on observability level.
+	// When observability=advanced, key files are replaced with enriched versions that include
+	// Prometheus metrics, OpenTelemetry tracing, and Jaeger docker-compose configuration.
+	goModContent := templates.GoModTemplate()
+	mainGoContent := templates.UpdatedMainGoTemplate()
+	serverContent := templates.ServerTemplate()
+	loggerContent := templates.LoggerTemplate()
+	envContent := templates.EnvTemplate()
+	dockerComposeContent := templates.DockerComposeTemplate()
+	// Health handler: base version (no metrics) for all projects; overridden below for advanced.
+	healthHandlerContent := templates.AdvancedHealthHandlerTemplate()
+	obsTemplates := NewObservabilityTemplates(projectName)
+
+	if observabilityLevel == ObservabilityAdvanced {
+		goModContent = obsTemplates.GoModTemplateWithObservability(database)
+		mainGoContent = obsTemplates.MainGoTemplateWithObservability()
+		serverContent = obsTemplates.ServerTemplateWithObservability()
+		loggerContent = obsTemplates.LoggerWithTracingTemplate()
+		envContent = obsTemplates.EnvTemplateWithObservability(database)
+		dockerComposeContent = obsTemplates.DockerComposeTemplateWithObservability(database)
+		// Advanced health handler: includes Prometheus metrics instrumentation (AC4)
+		healthHandlerContent = obsTemplates.HealthHandlerWithMetricsTemplate()
+	}
 
 	// Define all files to generate
 	files := []FileGenerator{
 		{
 			Path:    filepath.Join(projectPath, "go.mod"),
-			Content: templates.GoModTemplate(),
+			Content: goModContent,
 		},
 		{
 			Path:    filepath.Join(projectPath, "cmd", "main.go"),
-			Content: templates.UpdatedMainGoTemplate(),
+			Content: mainGoContent,
 		},
 		{
 			Path:    filepath.Join(projectPath, "pkg", "config", "env.go"),
@@ -128,7 +155,7 @@ func generateFullTemplateFiles(projectPath, projectName, database string) error 
 		},
 		{
 			Path:    filepath.Join(projectPath, "pkg", "logger", "logger.go"),
-			Content: templates.LoggerTemplate(),
+			Content: loggerContent,
 		},
 		{
 			Path:    filepath.Join(projectPath, "pkg", "auth", "jwt.go"),
@@ -191,12 +218,19 @@ func generateFullTemplateFiles(projectPath, projectName, database string) error 
 			Content: templates.HandlerModuleTemplate(),
 		},
 		{
-			Path:    filepath.Join(projectPath, "internal", "adapters", "http", "health.go"),
-			Content: templates.HealthHandlerTemplate(),
+			// Advanced health handler with Liveness/Readiness K8s probes (Story 9.3)
+			// Replaces the simple health.go — provides /health, /health/liveness, /health/readiness
+			Path:    filepath.Join(projectPath, "internal", "adapters", "handlers", "health_handler.go"),
+			Content: healthHandlerContent,
 		},
 		{
 			Path:    filepath.Join(projectPath, "internal", "adapters", "http", "routes.go"),
 			Content: templates.RoutesTemplate(),
+		},
+		{
+			// K8s probe configuration reference (Story 9.3, AC6) — generated for all full projects
+			Path:    filepath.Join(projectPath, "deployments", "kubernetes", "probes.yaml"),
+			Content: obsTemplates.KubernetesProbesTemplate(),
 		},
 		{
 			Path:    filepath.Join(projectPath, "internal", "infrastructure", "database", "database.go"),
@@ -204,7 +238,7 @@ func generateFullTemplateFiles(projectPath, projectName, database string) error 
 		},
 		{
 			Path:    filepath.Join(projectPath, "internal", "infrastructure", "server", "server.go"),
-			Content: templates.ServerTemplate(),
+			Content: serverContent,
 		},
 		{
 			Path:    filepath.Join(projectPath, "Dockerfile"),
@@ -212,7 +246,7 @@ func generateFullTemplateFiles(projectPath, projectName, database string) error 
 		},
 		{
 			Path:    filepath.Join(projectPath, "docker-compose.yml"),
-			Content: templates.DockerComposeTemplate(),
+			Content: dockerComposeContent,
 		},
 		{
 			Path:    filepath.Join(projectPath, "Makefile"),
@@ -220,7 +254,7 @@ func generateFullTemplateFiles(projectPath, projectName, database string) error 
 		},
 		{
 			Path:    filepath.Join(projectPath, ".env.example"),
-			Content: templates.EnvTemplate(),
+			Content: envContent,
 		},
 		{
 			Path:    filepath.Join(projectPath, ".gitignore"),
@@ -272,6 +306,92 @@ func generateFullTemplateFiles(projectPath, projectName, database string) error 
 	setupPath := filepath.Join(projectPath, "setup.sh")
 	if err := os.Chmod(setupPath, 0755); err != nil {
 		return fmt.Errorf("failed to make setup.sh executable: %w", err)
+	}
+
+	// Generate observability files conditionally (AC: 2, 3, 4, 7)
+	if observabilityLevel == ObservabilityAdvanced {
+		if err := generateObservabilityFiles(projectPath, projectName, database); err != nil {
+			return fmt.Errorf("generating observability files: %w", err)
+		}
+	}
+
+	return nil
+}
+
+// generateObservabilityFiles generates all observability files for the advanced mode.
+// This includes Prometheus metrics files (Story 9.1), OpenTelemetry tracing files (Story 9.2),
+// and Grafana/Prometheus infrastructure files (Story 9.4):
+//   - pkg/metrics/prometheus.go
+//   - internal/adapters/middleware/metrics_middleware.go
+//   - internal/adapters/handlers/metrics_handler.go
+//   - pkg/tracing/tracer.go
+//   - pkg/tracing/db_tracing.go
+//   - internal/adapters/middleware/tracing_middleware.go
+//   - deployments/prometheus/prometheus.yml
+//   - deployments/prometheus/rules/api_alerts.yml
+//   - deployments/grafana/provisioning/datasources/prometheus.yaml
+//   - deployments/grafana/provisioning/dashboards/default.yaml
+//   - deployments/grafana/dashboards/api-dashboard.json
+func generateObservabilityFiles(projectPath, projectName, database string) error {
+	obsTemplates := NewObservabilityTemplates(projectName)
+
+	files := []FileGenerator{
+		// Prometheus metrics (Story 9.1)
+		{
+			Path:    filepath.Join(projectPath, "pkg", "metrics", "prometheus.go"),
+			Content: obsTemplates.PrometheusTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "adapters", "middleware", "metrics_middleware.go"),
+			Content: obsTemplates.MetricsMiddlewareTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "adapters", "handlers", "metrics_handler.go"),
+			Content: obsTemplates.MetricsHandlerTemplate(),
+		},
+		// OpenTelemetry distributed tracing (Story 9.2)
+		{
+			Path:    filepath.Join(projectPath, "pkg", "tracing", "tracer.go"),
+			Content: obsTemplates.TracerTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "pkg", "tracing", "db_tracing.go"),
+			Content: obsTemplates.GORMTracingTemplate(database),
+		},
+		{
+			Path:    filepath.Join(projectPath, "internal", "adapters", "middleware", "tracing_middleware.go"),
+			Content: obsTemplates.TracingMiddlewareTemplate(),
+		},
+		// Prometheus + Grafana infrastructure (Story 9.4)
+		{
+			Path:    filepath.Join(projectPath, "deployments", "prometheus", "prometheus.yml"),
+			Content: obsTemplates.PrometheusConfigTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "deployments", "prometheus", "rules", "api_alerts.yml"),
+			Content: obsTemplates.PrometheusAlertRulesTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "deployments", "grafana", "provisioning", "datasources", "prometheus.yaml"),
+			Content: obsTemplates.GrafanaDatasourceTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "deployments", "grafana", "provisioning", "dashboards", "default.yaml"),
+			Content: obsTemplates.GrafanaDashboardProvisionTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "deployments", "grafana", "dashboards", "api-dashboard.json"),
+			Content: obsTemplates.GrafanaDashboardJSONTemplate(),
+		},
+	}
+
+	for _, file := range files {
+		if err := os.MkdirAll(filepath.Dir(file.Path), 0755); err != nil {
+			return fmt.Errorf("failed to create directory for %s: %w", file.Path, err)
+		}
+		if err := os.WriteFile(file.Path, []byte(file.Content), 0644); err != nil {
+			return fmt.Errorf("failed to write file %s: %w", file.Path, err)
+		}
 	}
 
 	return nil

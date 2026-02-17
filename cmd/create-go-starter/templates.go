@@ -236,9 +236,9 @@ USER appuser
 EXPOSE 8080
 
 # Healthcheck to monitor application status (AC #4)
-# Check /health endpoint every 30s, timeout 3s, start after 5s, fail after 3 retries
+# Check /health/liveness endpoint every 30s, timeout 3s, start after 5s, fail after 3 retries
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health/liveness || exit 1
 
 # Run the binary
 CMD ["./` + t.projectName + `"]
@@ -636,7 +636,9 @@ Ce projet suit l'architecture hexagonale (Ports and Adapters):
 
 ### Health
 
-- ` + "`GET /health`" + ` - Health check
+- ` + "`GET /health`" + ` - Health check (alias liveness — rétrocompatibilité)
+- ` + "`GET /health/liveness`" + ` - Liveness probe (K8s)
+- ` + "`GET /health/readiness`" + ` - Readiness probe (K8s — vérifie la DB)
 
 ## Développement
 
@@ -1018,6 +1020,98 @@ func healthHandler(c *fiber.Ctx) error {
 `
 }
 
+// AdvancedHealthHandlerTemplate returns the internal/adapters/handlers/health_handler.go content.
+// This provides Kubernetes-compatible liveness and readiness probes for full-template projects.
+// The handler requires a *gorm.DB injection for readiness DB checks.
+func (t *ProjectTemplates) AdvancedHealthHandlerTemplate() string {
+	return `package handlers
+
+import (
+	"context"
+	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
+)
+
+// HealthHandler handles Kubernetes-compatible health check endpoints.
+// It provides liveness and readiness probes following K8s conventions.
+type HealthHandler struct {
+	db *gorm.DB
+}
+
+// NewHealthHandler creates a new HealthHandler with GORM database injection.
+// It is registered in the fx dependency injection container via handlers.Module.
+func NewHealthHandler(db *gorm.DB) *HealthHandler {
+	return &HealthHandler{db: db}
+}
+
+// HealthResponse represents the health check response body.
+// It follows Kubernetes probe conventions with status, service, timestamp, and optional checks.
+type HealthResponse struct {
+	Status    string            ` + "`json:\"status\"`" + `
+	Service   string            ` + "`json:\"service\"`" + `
+	Timestamp string            ` + "`json:\"timestamp\"`" + `
+	Checks    map[string]string ` + "`json:\"checks,omitempty\"`" + `
+	Error     string            ` + "`json:\"error,omitempty\"`" + `
+}
+
+// Liveness reports whether the application process is alive.
+// Always returns 200 as long as the app is running — used by K8s livenessProbe.
+// @Summary     Liveness probe
+// @Description Returns 200 if the application is running (K8s livenessProbe)
+// @Tags        health
+// @Produce     json
+// @Success     200 {object} HealthResponse
+// @Router      /health/liveness [get]
+func (h *HealthHandler) Liveness(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(HealthResponse{
+		Status:    "alive",
+		Service:   "` + t.projectName + `",
+		Timestamp: time.Now().UTC().Format(time.RFC3339),
+	})
+}
+
+// Readiness reports whether the application is ready to receive traffic.
+// Verifies database connectivity with a 2s timeout — used by K8s readinessProbe.
+// Returns 503 if any dependency is unavailable.
+// @Summary     Readiness probe
+// @Description Returns 200 if the application and its dependencies are ready (K8s readinessProbe)
+// @Tags        health
+// @Produce     json
+// @Success     200 {object} HealthResponse
+// @Failure     503 {object} HealthResponse
+// @Router      /health/readiness [get]
+func (h *HealthHandler) Readiness(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(c.UserContext(), 2*time.Second)
+	defer cancel()
+
+	checks := make(map[string]string)
+
+	sqlDB, err := h.db.DB()
+	if err != nil || sqlDB.PingContext(ctx) != nil {
+		checks["database"] = "error"
+		return c.Status(fiber.StatusServiceUnavailable).JSON(HealthResponse{
+			Status:    "not_ready",
+			Service:   "` + t.projectName + `",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+			Checks:    checks,
+			Error:     "database connection failed",
+		})
+	}
+
+	checks["database"] = "ok"
+
+	return c.Status(fiber.StatusOK).JSON(HealthResponse{
+		Status:    "ready",
+		Service:   "` + t.projectName + `",
+		Timestamp: time.Now().UTC().Format(time.RFC3339),
+		Checks:    checks,
+	})
+}
+`
+}
+
 // ConfigTemplate returns the pkg/config/env.go file content
 func (t *ProjectTemplates) ConfigTemplate() string {
 	return `// Package config provides configuration management utilities for the application.
@@ -1191,7 +1285,7 @@ Documentation complète pour le projet ` + t.projectName + `.
 
 - **Lancer le projet**: ` + "`make run`" + `
 - **Tests**: ` + "`make test`" + `
-- **API Health**: ` + "`http://localhost:8080/health`" + `
+- **API Health**: ` + "`http://localhost:8080/health`" + ` (liveness), ` + "`/health/readiness`" + ` (readiness)
 
 ## Ressources
 
@@ -1322,9 +1416,13 @@ L'API sera disponible sur ` + "`http://localhost:8080`" + `
 ### 5. Tester
 
 ` + "```bash" + `
-# Health check
+# Health check (liveness)
 curl http://localhost:8080/health
-# {"status":"ok"}
+# {"status":"alive","service":"` + t.projectName + `","timestamp":"..."}
+
+# Readiness probe (checks DB)
+curl http://localhost:8080/health/readiness
+# {"status":"ready","checks":{"database":"ok"},"timestamp":"..."}
 ` + "```" + `
 
 ## Premier utilisateur

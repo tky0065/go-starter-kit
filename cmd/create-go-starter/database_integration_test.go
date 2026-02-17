@@ -40,7 +40,7 @@ func testDatabaseGeneration(t *testing.T, database string) {
 		t.Fatalf("[%s] Failed to create project structure: %v", database, err)
 	}
 
-	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, database); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, database, DefaultObservabilityLevel); err != nil {
 		t.Fatalf("[%s] Failed to generate project files: %v", database, err)
 	}
 
@@ -267,12 +267,12 @@ func TestE2EDatabaseCrossCompatibility(t *testing.T) {
 			if err := createProjectStructure(projectPath, TemplateFull); err != nil {
 				t.Fatalf("Failed to create structure: %v", err)
 			}
-			if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, migration.from); err != nil {
+			if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, migration.from, DefaultObservabilityLevel); err != nil {
 				t.Fatalf("Failed to generate with %s: %v", migration.from, err)
 			}
 
 			// Regenerate with second database
-			if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, migration.to); err != nil {
+			if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, migration.to, DefaultObservabilityLevel); err != nil {
 				t.Fatalf("Failed to regenerate with %s: %v", migration.to, err)
 			}
 
@@ -306,7 +306,7 @@ func BenchmarkDatabaseGeneration(b *testing.B) {
 					b.Fatalf("Failed to create structure: %v", err)
 				}
 
-				if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, database); err != nil {
+				if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, database, DefaultObservabilityLevel); err != nil {
 					b.Fatalf("Failed to generate: %v", err)
 				}
 			}
@@ -336,7 +336,7 @@ func TestE2EAllDatabasesWithMinimalTemplate(t *testing.T) {
 				t.Fatalf("[%s] Failed to create minimal structure: %v", database, err)
 			}
 
-			if err := generateProjectFiles(projectPath, projectName, TemplateMinimal, database); err != nil {
+			if err := generateProjectFiles(projectPath, projectName, TemplateMinimal, database, DefaultObservabilityLevel); err != nil {
 				t.Fatalf("[%s] Failed to generate minimal project: %v", database, err)
 			}
 
@@ -394,7 +394,7 @@ func TestE2EDatabaseConnectionsWithDocker(t *testing.T) {
 				t.Fatalf("Failed to create structure: %v", err)
 			}
 
-			if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, tt.database); err != nil {
+			if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, tt.database, DefaultObservabilityLevel); err != nil {
 				t.Fatalf("Failed to generate project: %v", err)
 			}
 
@@ -472,7 +472,7 @@ func TestE2ERegressionAllDatabases(t *testing.T) {
 			t.Fatalf("[%s] Failed to create structure: %v", db, err)
 		}
 
-		if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, db); err != nil {
+		if err := generateProjectFiles(projectPath, projectName, DefaultTemplate, db, DefaultObservabilityLevel); err != nil {
 			t.Fatalf("[%s] Failed to generate project: %v", db, err)
 		}
 	}
@@ -515,7 +515,7 @@ func TestInvalidDatabaseInput(t *testing.T) {
 			// Empty string should default to postgres (valid)
 			if invalidDB == "" {
 				// Empty should work (defaults to postgres)
-				err := generateProjectFiles(projectPath, "test-project", DefaultTemplate, "postgres")
+				err := generateProjectFiles(projectPath, "test-project", DefaultTemplate, "postgres", DefaultObservabilityLevel)
 				if err != nil {
 					t.Errorf("Empty database should default to postgres, got error: %v", err)
 				}
@@ -524,7 +524,7 @@ func TestInvalidDatabaseInput(t *testing.T) {
 
 			// All other invalid names should either error or generate postgres as fallback
 			// The important thing is the generated files should use a valid driver
-			err := generateProjectFiles(projectPath, "test-project", DefaultTemplate, invalidDB)
+			err := generateProjectFiles(projectPath, "test-project", DefaultTemplate, invalidDB, DefaultObservabilityLevel)
 
 			// Check what driver was used if generation succeeded
 			if err == nil {

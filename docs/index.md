@@ -6,7 +6,7 @@ Un outil CLI puissant pour générer des projets Go prêts pour la production en
 
 **create-go-starter** est un générateur CLI stable et production-ready pour créer des applications Go modernes.
 
-- <i class="material-icons success">check</i> **Version stable** - v1.0.0 disponible
+- <i class="material-icons success">check</i> **Version stable** - v1.3.0 disponible
 - <i class="material-icons success">check</i> **3 templates** - minimal, full, GraphQL
 - <i class="material-icons success">check</i> **Testé et validé** - Utilisé en production
 - <i class="material-icons success">check</i> **Open source** - MIT License
@@ -62,6 +62,24 @@ create-go-starter add-model Comment --fields "author:string,content:string" --be
 **Résultat:** Blog complet (Category → Post → Comment) avec endpoints imbriqués et preloading.
 
 <i class="material-icons">arrow_forward</i> [Guide complet add-model](./usage.md#ajouter-des-modeles-add-model)
+
+### <i class="material-icons success">new_releases</i> Nouveau dans v1.3.0: Observabilité Avancée
+
+**Monitoring production-ready en une commande!** Le flag `--observability=advanced` génère une stack d'observabilité complète:
+
+```bash
+create-go-starter mon-app --template=full --observability=advanced
+```
+
+**Ce qui est généré automatiquement:**
+- <i class="material-icons success small">check</i> **Prometheus Metrics** — Endpoint `/metrics` avec métriques HTTP (latence, throughput, erreurs)
+- <i class="material-icons success small">check</i> **Distributed Tracing** — OpenTelemetry + Jaeger avec propagation W3C traceparent
+- <i class="material-icons success small">check</i> **Health Checks K8s** — `/health/liveness` et `/health/readiness` avec vérification DB
+- <i class="material-icons success small">check</i> **Grafana Dashboard** — Dashboard 7 panneaux pré-configuré avec alerting
+- <i class="material-icons success small">check</i> **Docker Compose** — Stack complète (Jaeger + Prometheus + Grafana)
+- <i class="material-icons success small">check</i> **Kubernetes Probes** — Fichier `probes.yaml` généré automatiquement
+
+<i class="material-icons">arrow_forward</i> [Guide complet observabilité](./usage.md#observabilité---observability)
 
 ## Installation rapide
 
@@ -388,16 +406,17 @@ Les contributions sont les bienvenues! Consultez le [guide de contribution](./do
 
 **Fonctionnalités complétées**:
 
-- [x] **Templates multiples** - Trois templates disponibles (minimal, full, graphql) pour différents cas d'usage
+- [x] **Templates multiples** - Trois templates disponibles (minimal, full, graphql)
+- [x] **Support Multi-Base de Données** - PostgreSQL, MySQL, SQLite (v1.1.0)
+- [x] **CRUD Scaffolding Generator** - Commande add-model pour générer des modèles complets (v1.2.0)
+- [x] **Observabilité Avancée** - Prometheus, Jaeger, Grafana, Health Checks K8s (v1.3.0)
 
 **Fonctionnalités prévues**:
 
-- [ ] Support pour d'autres bases de données (MySQL, SQLite, MongoDB)
 - [ ] Choix du framework web (Gin, Echo, Chi)
 - [ ] CLI interactif avec prompts
 - [ ] Génération de microservices
 - [ ] Templates de tests E2E
-- [ ] Configuration Kubernetes
 
 ## Licence
 

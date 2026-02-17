@@ -2,9 +2,9 @@
 
 Ce document présente la vision et les prochaines étapes pour l'évolution de `create-go-starter`.
 
-## :material-rocket-launch: Version Actuelle: v1.0.0
+## :material-rocket-launch: Version Actuelle: v1.3.0
 
-**Date de release**: 15 janvier 2026  
+**Date de release**: 17 février 2026  
 **Statut**: :material-check: Production Ready
 
 ### Fonctionnalités Disponibles
@@ -22,6 +22,9 @@ Ce document présente la vision et les prochaines étapes pour l'évolution de `
 - :material-check: Tests complets (unitaires + intégration)
 - :material-check: Initialisation Git automatique
 - :material-check: Installation dépendances automatique
+- :material-check: Support Multi-Base de Données (PostgreSQL, MySQL, SQLite)
+- :material-check: CRUD Scaffolding Generator (add-model command)
+- :material-check: Observabilité Avancée (Prometheus, Jaeger, Grafana, Health Checks K8s)
 
 ---
 
@@ -29,7 +32,7 @@ Ce document présente la vision et les prochaines étapes pour l'évolution de `
 
 Fonctionnalités planifiées pour les prochaines versions.
 
-### v1.1.0 - Support Multi-Base de Données :material-database:
+### ~~v1.1.0 - Support Multi-Base de Données~~ :material-check: Complété
 
 **Description**: Permettre aux utilisateurs de choisir leur base de données préférée.
 
@@ -58,14 +61,14 @@ Fonctionnalités planifiées pour les prochaines versions.
    - Documentation patterns NoSQL
 
 **Objectifs**:
-- [ ] Utilisateur peut spécifier `--database=postgres|mysql|sqlite`
-- [ ] Tous les templates fonctionnent avec chaque DB
-- [ ] Documentation complète pour chaque DB
-- [ ] Tests E2E passent pour toutes les DB
+- [x] Utilisateur peut spécifier `--database=postgres|mysql|sqlite`
+- [x] Tous les templates fonctionnent avec chaque DB
+- [x] Documentation complète pour chaque DB
+- [x] Tests E2E passent pour toutes les DB
 
 ---
 
-###  CRUD Scaffolding Generator :material-office-building:
+### ~~CRUD Scaffolding Generator~~ :material-check: Complété (v1.2.0)
 
 **Description**: Générer automatiquement du code CRUD pour de nouveaux modèles.
 
@@ -99,14 +102,14 @@ create-go-starter add-model Todo --fields "title:string,completed:bool,dueDate:t
 ```
 
 **Objectifs**:
-- [ ] Commande `add-model` fonctionne dans projet existant
-- [ ] Code généré compile et tests passent
-- [ ] Swagger mis à jour automatiquement
-- [ ] Support relations (one-to-many, many-to-many)
+- [x] Commande `add-model` fonctionne dans projet existant
+- [x] Code généré compile et tests passent
+- [x] Swagger mis à jour automatiquement
+- [x] Support relations (one-to-many, many-to-many)
 
 ---
 
-###  Observabilité Avancée :material-chart-bar:
+### ~~Observabilité Avancée~~ :material-check: Complété (v1.3.0)
 
 **Description**: Ajouter monitoring et observabilité pour projets production.
 
@@ -140,11 +143,11 @@ create-go-starter add-model Todo --fields "title:string,completed:bool,dueDate:t
    - Alerting rules
 
 **Objectifs**:
-- [ ] Flag `--observability=basic|advanced`
-- [ ] Metrics Prometheus exposés
-- [ ] Distributed tracing fonctionnel
-- [ ] Dashboard Grafana importable
-- [ ] Documentation complète
+- [x] Flag `--observability=basic|advanced`
+- [x] Metrics Prometheus exposés
+- [x] Distributed tracing fonctionnel
+- [x] Dashboard Grafana importable
+- [x] Documentation complète
 
 ---
 
@@ -340,5 +343,5 @@ Vous souhaitez contribuer à ces fonctionnalités? Consultez:
 
 ---
 
-**Dernière mise à jour**: 15 janvier 2026  
-**Version du document**: 1.0
+**Dernière mise à jour**: 17 février 2026  
+**Version du document**: 1.3

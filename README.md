@@ -8,10 +8,11 @@ Un outil CLI puissant pour générer des projets Go prêts pour la production en
 
 ## Version actuelle
 
-**v1.0.0** - Stable et prêt pour la production
+**v1.3.0** - Stable et prêt pour la production
 
  **Production ready** - Utilisé dans des projets réels
  **3 templates** - Minimal, Full (JWT), GraphQL
+ **Observabilité avancée** - Prometheus, Jaeger, Grafana, Health checks K8s
  **Bien testé** - Tests unitaires et E2E
  **Documentation complète** - Guides et exemples
  **Open source** - MIT License
@@ -34,6 +35,7 @@ Un outil CLI puissant pour générer des projets Go prêts pour la production en
 - **Logging structuré** - rs/zerolog pour des logs professionnels
 - **Validation** - go-playground/validator pour valider les entrées
 - **Makefile** - Commandes utiles pour dev, test, build et déploiement
+- **Observabilité avancée** - Prometheus `/metrics`, distributed tracing Jaeger/OpenTelemetry, health checks K8s (`/health/liveness`, `/health/readiness`), dashboard Grafana pré-configuré (`--observability=advanced`)
 
 ## Installation rapide
 
@@ -43,7 +45,7 @@ Installation globale en une seule commande, sans cloner le repository:
 
 ```bash
 # Version stable (recommandée)
-go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@v1.0.0
+go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@v1.3.0
 
 # Ou dernière version
 go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@latest
@@ -153,6 +155,39 @@ create-go-starter mon-app --database=sqlite
 - Avantages et limitations
 - Cas d'usage recommandés
 - Guide de migration entre databases
+
+### Activer l'observabilité avancée (Nouveau! v1.3.0)
+
+`create-go-starter` supporte **3 niveaux d'observabilité** avec le flag `--observability`:
+
+```bash
+# Pas d'observabilité (défaut) — comportement actuel
+create-go-starter mon-app
+
+# Observabilité avancée — Prometheus, Jaeger, Grafana, Health checks K8s
+create-go-starter mon-app --observability=advanced
+
+# Combinaison complète
+create-go-starter mon-app --template=full --database=postgres --observability=advanced
+```
+
+| Niveau | Description |
+|--------|-------------|
+| `none` | Aucune observabilité (défaut) |
+| `basic` | `/health` amélioré (sans Prometheus) |
+| `advanced` | Stack complète: Prometheus, Jaeger, Grafana, Health checks K8s |
+
+**Avec `--observability=advanced`, vous obtenez:**
+
+- **Prometheus Metrics** — Endpoint `/metrics` avec `http_requests_total`, `http_request_duration_seconds`, `http_requests_in_flight` via fiberprometheus
+- **Distributed Tracing** — OpenTelemetry avec export OTLP/gRPC vers Jaeger, propagation W3C traceparent, trace_id/span_id dans les logs zerolog
+- **Health Checks K8s** — `/health/liveness` (toujours 200), `/health/readiness` (vérifie DB avec timeout 2s, retourne 503 si down), `/health` alias rétrocompatible
+- **Grafana Dashboard** — Dashboard JSON 7 panneaux pré-configuré, auto-provisioning datasources + dashboards
+- **Docker Compose étendu** — Stack complète: PostgreSQL + Jaeger (1.56.0) + Prometheus (v2.51.0) + Grafana (10.4.0)
+- **Kubernetes Probes** — `deployments/kubernetes/probes.yaml` généré automatiquement
+- **Alerting Prometheus** — Règles d'alerte pré-configurées (latence, erreurs, saturation)
+
+Pour plus de détails, consultez le [guide d'observabilité](./docs/usage.md#observabilité---observability).
 
 #### FAQ - Choix de base de données
 
@@ -522,19 +557,21 @@ create-go-starter app --template=graphql --database=postgres
 
 ## Roadmap
 
-**Fonctionnalités complétées** (v1.0+):
+**Fonctionnalités complétées** (v1.0 — v1.3):
 
 - [x] **Templates multiples** - Trois templates disponibles (minimal, full, graphql)
 - [x] **Multi-database support** - PostgreSQL, MySQL, SQLite avec migration guides
+- [x] **CRUD Scaffolding** - Commande `add-model` avec relations BelongsTo/HasMany
+- [x] **Observabilité avancée** - Prometheus, Jaeger/OpenTelemetry, Grafana, Health checks K8s
 
-**Fonctionnalités prévues** (v1.1+):
+**Fonctionnalités prévues** (v1.4+):
 
 - [ ] Support NoSQL (MongoDB) - en attente de demande communautaire
 - [ ] Choix du framework web (Gin, Echo, Chi)
 - [ ] CLI interactif avec prompts
 - [ ] Génération de microservices
 - [ ] Templates de tests E2E avancés
-- [ ] Configuration Kubernetes
+- [ ] Configuration Kubernetes avancée
 
 ## Licence
 

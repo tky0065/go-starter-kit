@@ -10,8 +10,9 @@ Documentation technique pour contributeurs et développeurs avancés.
 create-go-starter (CLI)
 ├── main.go              # Entry point, validation, orchestration
 ├── generator.go         # File generation orchestrator
-├── templates.go         # Core templates (config, server, domain, setup.sh)
-├── templates_user.go    # User domain specific templates
+├── templates.go              # Core templates (config, server, domain, setup.sh)
+├── templates_user.go         # User domain specific templates
+├── templates_observability.go # Observability templates (Prometheus, Jaeger, Grafana, Health)
 ├── git.go               # Git repository initialization
 ├── smoke_test.go        # E2E smoke tests
 └── scripts/
@@ -19,9 +20,9 @@ create-go-starter (CLI)
 ```
 
 **Statistiques**:
-- Lignes de code: ~4,500+
-- Fichiers générés par projet: 46+
-- Templates: 31+ fonctions
+- Lignes de code: ~6,000+
+- Fichiers générés par projet: 46+ (60+ avec observability)
+- Templates: 45+ fonctions
 - Dépendances: Standard library uniquement
 
 ## Composants principaux
@@ -627,7 +628,95 @@ type AuthResponse struct {
 - **Centralisation**: Les entités sont définies en un seul endroit
 - **Réutilisabilité**: Tous les layers (domain, interfaces, adapters) peuvent importer models sans conflit
 
-### 5. git.go - Initialisation Git
+### 5. templates_observability.go - Templates d'Observabilité
+
+**Nouveau dans v1.3.0!** Ce fichier contient tous les templates pour la stack d'observabilité avancée (~1369 lignes).
+
+**Responsabilités**:
+- Templates pour Prometheus metrics (endpoint `/metrics`, middleware, registry)
+- Templates pour OpenTelemetry distributed tracing (Jaeger export, OTLP/gRPC)
+- Templates pour health checks avancés K8s (liveness/readiness)
+- Templates pour Grafana dashboard (JSON, provisioning, alerting)
+- Templates pour Docker Compose observabilité (Jaeger, Prometheus, Grafana)
+- Templates pour configuration Kubernetes probes
+
+**Condition d'activation**: Uniquement généré quand `--observability=advanced` ET `--template=full`.
+
+**Méthodes principales** (15+ templates):
+
+#### Prometheus Metrics
+
+```go
+func (t *ProjectTemplates) PrometheusTemplate() string           // pkg/metrics/prometheus.go
+func (t *ProjectTemplates) MetricsMiddlewareTemplate() string    // middleware/metrics_middleware.go
+func (t *ProjectTemplates) MetricsHandlerTemplate() string       // handlers/metrics_handler.go
+```
+
+#### Distributed Tracing (OpenTelemetry)
+
+```go
+func (t *ProjectTemplates) TracerTemplate() string               // pkg/tracing/tracer.go
+func (t *ProjectTemplates) TracingMiddlewareTemplate() string    // middleware/tracing_middleware.go
+func (t *ProjectTemplates) GORMTracingTemplate() string          // database/tracing.go
+func (t *ProjectTemplates) LoggerWithTracingTemplate() string    // logger/logger_tracing.go
+```
+
+#### Health Checks Avancés
+
+```go
+func (t *ProjectTemplates) AdvancedHealthHandlerTemplate() string // http/health.go (remplace le basique)
+```
+
+#### Grafana Dashboard & Configuration
+
+```go
+func (t *ProjectTemplates) GrafanaDashboardJSONTemplate() string       // monitoring/grafana/dashboards/app-dashboard.json
+func (t *ProjectTemplates) GrafanaDatasourceTemplate() string          // monitoring/grafana/provisioning/datasources/prometheus.yml
+func (t *ProjectTemplates) GrafanaDashboardProvisioningTemplate() string // monitoring/grafana/provisioning/dashboards/dashboard.yml
+```
+
+#### Prometheus & Alerting Configuration
+
+```go
+func (t *ProjectTemplates) PrometheusConfigTemplate() string     // monitoring/prometheus/prometheus.yml
+func (t *ProjectTemplates) PrometheusAlertRulesTemplate() string // monitoring/prometheus/alert_rules.yml
+```
+
+#### Kubernetes Probes
+
+```go
+func (t *ProjectTemplates) KubernetesProbesTemplate() string     // deployments/kubernetes/probes.yaml
+```
+
+#### Docker Compose Observabilité
+
+```go
+func (t *ProjectTemplates) DockerComposeObservabilityTemplate() string // docker-compose.yml (version étendue)
+```
+
+**Fichiers générés par l'observabilité avancée** (14+ fichiers supplémentaires):
+
+| Catégorie | Fichiers | Description |
+|-----------|----------|-------------|
+| Metrics | 3 | prometheus.go, metrics_middleware.go, metrics_handler.go |
+| Tracing | 4 | tracer.go, tracing_middleware.go, gorm_tracing.go, logger_tracing.go |
+| Health | 1 | health.go (version avancée avec liveness/readiness) |
+| Grafana | 3 | dashboard JSON, datasource YAML, provisioning YAML |
+| Prometheus | 2 | prometheus.yml, alert_rules.yml |
+| Kubernetes | 1 | probes.yaml |
+
+**Dépendances ajoutées au go.mod** (uniquement quand observability=advanced):
+
+```
+github.com/ansrivas/fiberprometheus/v2 v2.7.0
+go.opentelemetry.io/otel v1.24.0
+go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.24.0
+go.opentelemetry.io/otel/sdk v1.24.0
+go.opentelemetry.io/otel/trace v1.24.0
+go.opentelemetry.io/contrib/instrumentation/github.com/gofiber/fiber/otelfiber v0.49.0
+```
+
+### 6. git.go - Initialisation Git
 
 **Responsabilités**:
 - Vérification de la disponibilité de Git sur le système

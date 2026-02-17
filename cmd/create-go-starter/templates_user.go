@@ -988,6 +988,7 @@ import (
 
 // Module provides HTTP handler dependencies via fx dependency injection.
 // It creates handler instances with their required service dependencies.
+// NewHealthHandler is injected with *gorm.DB automatically by fx.
 var Module = fx.Module("handlers",
 	fx.Provide(func(s *user.Service) *AuthHandler {
 		return NewAuthHandler(s)
@@ -995,6 +996,7 @@ var Module = fx.Module("handlers",
 	fx.Provide(func(s *user.Service) *UserHandler {
 		return NewUserHandler(s)
 	}),
+	fx.Provide(NewHealthHandler),
 )
 `
 }
@@ -1444,7 +1446,7 @@ var Module = fx.Module("auth",
 
 // RoutesTemplate returns the internal/adapters/http/routes.go file content
 func (t *ProjectTemplates) RoutesTemplate() string {
-	return `// Package http provides HTTP route registration and health check endpoints.
+	return `// Package http provides HTTP route registration for the application.
 package http
 
 import (
@@ -1456,16 +1458,21 @@ import (
 
 // RegisterRoutes configures all application routes including authentication,
 // user management, health checks, and Swagger documentation endpoints.
-// It organizes routes into logical groups with appropriate middleware application.
+// Health routes are registered at root level (not under /api/v1 or auth middleware).
 // Public routes are accessible without authentication; protected routes require JWT.
 func RegisterRoutes(
 	app *fiber.App,
 	authHandler *handlers.AuthHandler,
 	userHandler *handlers.UserHandler,
+	healthHandler *handlers.HealthHandler,
 	authMiddleware fiber.Handler,
 ) {
-	// Health & Swagger
-	RegisterHealthRoutes(app)
+	// Health checks (not behind /api/v1 prefix or auth middleware — required by K8s)
+	app.Get("/health", healthHandler.Liveness)            // Backward compatibility alias
+	app.Get("/health/liveness", healthHandler.Liveness)
+	app.Get("/health/readiness", healthHandler.Readiness)
+
+	// Swagger documentation
 	app.Get("/swagger/*", swagger.WrapHandler)
 
 	// API v1

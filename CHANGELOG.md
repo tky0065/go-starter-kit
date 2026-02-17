@@ -5,6 +5,118 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [1.3.0] - 2026-02-17
+
+### <i class="material-icons success">new_releases</i> Observabilité Avancée (Epic 9)
+
+Stack d'observabilité complète pour les projets générés en production: métriques Prometheus, distributed tracing OpenTelemetry/Jaeger, health checks Kubernetes, et dashboard Grafana pré-configuré.
+
+### <i class="material-icons success">star</i> Fonctionnalités
+
+#### Story 9.1 — Endpoint Prometheus Metrics
+
+- **Flag `--observability`** avec 3 niveaux: `none` (défaut), `basic`, `advanced`
+- **Endpoint `/metrics`** compatible Prometheus via `fiberprometheus/v2 v2.7.0`
+- **Métriques HTTP exposées**:
+  - `http_requests_total` (Counter) — requêtes totales par méthode, route, status
+  - `http_request_duration_seconds` (Histogram) — latence HTTP par route
+  - `http_requests_in_flight` (Gauge) — requêtes actives en cours
+- **Middleware metrics** — capture automatique des métriques sur toutes les routes
+- **Validation CLI** — `--observability=advanced` requiert `--template=full`
+
+#### Story 9.2 — Distributed Tracing (OpenTelemetry + Jaeger)
+
+- **OpenTelemetry SDK** avec exporter OTLP/gRPC vers Jaeger
+- **Propagation W3C traceparent** — correlation entre services
+- **Middleware tracing** — span automatique par requête HTTP avec attributs (method, route, status)
+- **GORM tracing** — spans automatiques pour les requêtes SQL (query, table, rows_affected)
+- **Logger enrichi** — `trace_id` et `span_id` injectés dans chaque log zerolog
+- **Service Jaeger** — ajouté au Docker Compose (jaeger:1.56.0) avec UI sur port 16686
+- **Variable d'environnement** — `OTEL_EXPORTER_OTLP_ENDPOINT` dans `.env.example`
+
+#### Story 9.3 — Health Checks Avancés (Kubernetes-ready)
+
+- **Endpoints dédiés**:
+  - `GET /health/liveness` — toujours 200 si l'application tourne (K8s liveness probe)
+  - `GET /health/readiness` — vérifie la connexion DB avec timeout 2s, retourne 503 si down (K8s readiness probe)
+  - `GET /health` — alias vers liveness (rétrocompatibilité)
+- **HealthHandler** avec injection `*gorm.DB` via fx
+- **Kubernetes probes** — `deployments/kubernetes/probes.yaml` généré automatiquement
+- **Métriques health** — `health_check_status` exposé sur `/metrics` quand `--observability=advanced`
+
+#### Story 9.4 — Dashboard Grafana pré-configuré
+
+- **Dashboard JSON 7 panneaux** — Request Rate, Error Rate, Latency (p50/p95/p99), Active Requests, Health Status, DB Latency, Top Endpoints
+- **Auto-provisioning Grafana** — datasources + dashboards YAML configurés automatiquement
+- **Configuration Prometheus** — `prometheus.yml` avec scrape config et alert rules
+- **Règles d'alerte** — latence élevée (>500ms), taux d'erreur (>5%), saturation
+- **Docker Compose étendu** — stack complète:
+  - PostgreSQL (base de données)
+  - Jaeger 1.56.0 (tracing UI: port 16686)
+  - Prometheus v2.51.0 (métriques: port 9090)
+  - Grafana 10.4.0 (dashboards: port 3000)
+
+### <i class="material-icons">build</i> Architecture
+
+#### Nouveau fichier CLI
+
+- `cmd/create-go-starter/templates_observability.go` — **~1369 lignes**, 15+ fonctions de templates:
+  1. `PrometheusTemplate()` — Registry et métriques Prometheus
+  2. `MetricsMiddlewareTemplate()` — Middleware capture HTTP metrics
+  3. `MetricsHandlerTemplate()` — Handler GET /metrics
+  4. `TracerTemplate()` — Initialisation OpenTelemetry SDK
+  5. `TracingMiddlewareTemplate()` — Middleware spans HTTP
+  6. `GORMTracingTemplate()` — Plugin GORM pour spans SQL
+  7. `LoggerWithTracingTemplate()` — zerolog enrichi avec trace_id/span_id
+  8. `AdvancedHealthHandlerTemplate()` — Liveness + Readiness endpoints
+  9. `KubernetesProbesTemplate()` — probes.yaml pour K8s
+  10. `GrafanaDashboardJSONTemplate()` — Dashboard 7 panneaux
+  11. `PrometheusConfigTemplate()` — prometheus.yml
+  12. `PrometheusAlertRulesTemplate()` — alert.rules.yml
+  13. `GrafanaDatasourceTemplate()` — Provisioning datasources
+  14. `GrafanaDashboardProvisioningTemplate()` — Provisioning dashboards
+  15. `ObservabilityDockerComposeTemplate()` — Docker Compose étendu
+
+#### Fichiers modifiés
+
+- `main.go` — ajout flag `--observability`, validation (`advanced` requiert `full`)
+- `generator.go` — nouvelle fonction `generateObservabilityFiles()` orchestrant la génération
+- `templates.go` — `AdvancedHealthHandlerTemplate()`, Dockerfile mis à jour
+- `templates_user.go` — `HandlerModuleTemplate()` et `RoutesTemplate()` adaptés pour health checks avancés
+
+### <i class="material-icons success">check_circle</i> Tests
+
+- **Nouveaux tests** dans `templates_observability_test.go`
+- **Tests mis à jour**: main_test.go, generator_test.go, smoke_test.go, template_minimal_test.go
+- **Tests E2E** mis à jour: e2e_mysql_test.go, e2e_sqlite_test.go, database_integration_test.go
+- **Tous les tests passent** — `go test ./...` (36.672s, full suite)
+
+### <i class="material-icons">description</i> Documentation
+
+- Guide monitoring complet dans `docs/guide/monitoring.md`
+- Section observabilité dans `docs/usage.md`
+- Architecture templates_observability.go dans `docs/cli-architecture.md`
+- Exemples et configuration dans `docs/generated-project-guide.md`
+
+### <i class="material-icons info">info</i> Améliorations
+
+- **Production-ready** — Stack observabilité complète en une commande
+- **Zero configuration** — Docker Compose avec tous les services pré-configurés
+- **Kubernetes-native** — Probes et métriques compatibles K8s
+- **Rétrocompatibilité** — `/health` préservé comme alias, `--observability=none` par défaut
+
+### <i class="material-icons warning">warning</i> Limitations connues
+
+- **Template full uniquement** — `--observability=advanced` requiert `--template=full`
+- **Templates minimal et graphql** — Observabilité non supportée (sanity check CLI)
+- **Jaeger uniquement** — Export OTLP vers d'autres backends (Zipkin, Tempo) nécessite configuration manuelle
+- **Dashboard Grafana** — Pré-configuré pour Prometheus, personnalisation manuelle pour métriques custom
+
+### <i class="material-icons">link</i> Liens
+
+- **Documentation**: https://tky0065.github.io/go-starter-kit/guide/monitoring/
+- **Release**: [v1.3.0](https://github.com/tky0065/go-starter-kit/releases/tag/v1.3.0)
+
 ## [1.2.0] - 2026-02-12
 
 ### <i class="material-icons success">new_releases</i> Générateur CRUD Scaffolding
