@@ -7,13 +7,13 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [1.3.0] - 2026-02-17
 
-### <i class="material-icons success">new_releases</i> Observabilité Avancée (Epic 9)
+### <i class="material-icons success">new_releases</i> Observabilité Avancée
 
 Stack d'observabilité complète pour les projets générés en production: métriques Prometheus, distributed tracing OpenTelemetry/Jaeger, health checks Kubernetes, et dashboard Grafana pré-configuré.
 
 ### <i class="material-icons success">star</i> Fonctionnalités
 
-#### Story 9.1 — Endpoint Prometheus Metrics
+#### Endpoint Prometheus Metrics
 
 - **Flag `--observability`** avec 3 niveaux: `none` (défaut), `basic`, `advanced`
 - **Endpoint `/metrics`** compatible Prometheus via `fiberprometheus/v2 v2.7.0`
@@ -24,7 +24,7 @@ Stack d'observabilité complète pour les projets générés en production: mét
 - **Middleware metrics** — capture automatique des métriques sur toutes les routes
 - **Validation CLI** — `--observability=advanced` requiert `--template=full`
 
-#### Story 9.2 — Distributed Tracing (OpenTelemetry + Jaeger)
+#### Distributed Tracing (OpenTelemetry + Jaeger)
 
 - **OpenTelemetry SDK** avec exporter OTLP/gRPC vers Jaeger
 - **Propagation W3C traceparent** — correlation entre services
@@ -34,7 +34,7 @@ Stack d'observabilité complète pour les projets générés en production: mét
 - **Service Jaeger** — ajouté au Docker Compose (jaeger:1.56.0) avec UI sur port 16686
 - **Variable d'environnement** — `OTEL_EXPORTER_OTLP_ENDPOINT` dans `.env.example`
 
-#### Story 9.3 — Health Checks Avancés (Kubernetes-ready)
+#### Health Checks Avancés (Kubernetes-ready)
 
 - **Endpoints dédiés**:
   - `GET /health/liveness` — toujours 200 si l'application tourne (K8s liveness probe)
@@ -44,7 +44,7 @@ Stack d'observabilité complète pour les projets générés en production: mét
 - **Kubernetes probes** — `deployments/kubernetes/probes.yaml` généré automatiquement
 - **Métriques health** — `health_check_status` exposé sur `/metrics` quand `--observability=advanced`
 
-#### Story 9.4 — Dashboard Grafana pré-configuré
+#### Dashboard Grafana pré-configuré
 
 - **Dashboard JSON 7 panneaux** — Request Rate, Error Rate, Latency (p50/p95/p99), Active Requests, Health Status, DB Latency, Top Endpoints
 - **Auto-provisioning Grafana** — datasources + dashboards YAML configurés automatiquement
@@ -270,7 +270,7 @@ Chaque modèle généré inclut:
 
 - **Documentation**: https://tky0065.github.io/go-starter-kit/usage/#ajouter-des-modeles-add-model
 - **Release**: [v1.2.0](https://github.com/tky0065/go-starter-kit/releases/tag/v1.2.0)
-- **Changelog détaillé**: [Epic 8 Stories](https://github.com/tky0065/go-starter-kit/milestone/8?closed=1)
+- **Changelog détaillé**: [Milestone v1.2.0](https://github.com/tky0065/go-starter-kit/milestone/8?closed=1)
 
 ## [1.0.0] - 2026-01-15
 

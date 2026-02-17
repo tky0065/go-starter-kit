@@ -169,7 +169,7 @@ logger.Info().Str("password", password).Msg("Login")  // NEVER!
 
 ---
 
-## Prometheus Metrics (Story 9.1)
+## Prometheus Metrics
 
 ### Endpoint `/metrics`
 
@@ -234,7 +234,7 @@ curl http://localhost:8080/metrics
 
 ---
 
-## Distributed Tracing avec OpenTelemetry (Story 9.2)
+## Distributed Tracing avec OpenTelemetry
 
 ### Architecture
 
@@ -302,7 +302,7 @@ Cela permet le tracing distribué entre microservices.
 
 ---
 
-## Health Checks Avancés (Story 9.3)
+## Health Checks Avancés
 
 ### Endpoints Kubernetes-compatible
 
@@ -420,7 +420,7 @@ startupProbe:
 
 ---
 
-## Grafana Dashboard (Story 9.4)
+## Grafana Dashboard
 
 ### Dashboard pré-configuré
 
