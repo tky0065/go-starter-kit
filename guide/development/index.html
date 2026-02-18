@@ -2705,7 +2705,7 @@
 <p>Règles simples: <code>Todo→todos</code>, <code>Category→categories</code>, <code>Person→persons</code> (pas <code>people</code>)</p>
 <p><strong>Workaround:</strong> Éditez manuellement les fichiers pour pluriels irréguliers.</p>
 <h5 id="relations-many-to-many">Relations many-to-many<a class="headerlink" href="#relations-many-to-many" title="Permanent link">&para;</a></h5>
-<p>Pas encore supportées nativement (prévu v1.3.0).</p>
+<p>Pas encore supportées nativement (prévu dans une version future).</p>
 <p><strong>Workaround:</strong> Créez une table de jointure manuelle:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>create-go-starter<span class="w"> </span>add-model<span class="w"> </span>UserRole<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span>--fields<span class="w"> </span><span class="s2">&quot;user_id:uint:index,role_id:uint:index&quot;</span>
