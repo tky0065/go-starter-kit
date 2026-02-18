@@ -30,6 +30,7 @@ Thumbs.db
 
 # MkDocs build output
 site/
+site_en/
 
 # Environment files (keep .env.example)
 .env

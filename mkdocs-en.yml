@@ -1,0 +1,88 @@
+site_name: Go Starter Kit
+site_description: A powerful CLI tool to generate production-ready Go projects
+site_author: tky0065
+site_url: https://tky0065.github.io/go-starter-kit/en/
+
+repo_name: tky0065/go-starter-kit
+repo_url: https://github.com/tky0065/go-starter-kit
+
+docs_dir: docs_en
+
+theme:
+  name: material
+  language: en
+  custom_dir: docs/overrides
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search:
+      lang: en
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Usage: usage.md
+  - Generated Project: generated-project-guide.md
+  - Tutorial: tutorial-exemple-complet.md
+  - CLI Architecture: cli-architecture.md
+  - Contributing: contributing.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - tables
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/tky0065/go-starter-kit
+  alternate:
+    - name: Français
+      link: /go-starter-kit/
+      lang: fr
+    - name: English
+      link: /go-starter-kit/en/
+      lang: en
+
+extra_css:
+  - stylesheets/extra.css
+
+copyright: Copyright &copy; 2026 tky0065
