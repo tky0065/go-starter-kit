@@ -2,9 +2,6 @@
 
 This guide details all methods to install `create-go-starter` on your system.
 
-!!! note "Translation in progress"
-    This page is being translated from French. For the complete documentation, please refer to the [French version](../installation/).
-
 ## Prerequisites
 
 ### System Requirements
@@ -41,6 +38,12 @@ This command:
 
 ```bash
 create-go-starter --help
+```
+
+You can also run the `doctor` command to verify your environment is correctly set up:
+
+```bash
+create-go-starter doctor
 ```
 
 **Note**: Make sure `$GOPATH/bin` is in your `PATH`:

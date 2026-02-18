@@ -857,6 +857,98 @@ var requestCount = prometheus.NewCounterVec(
 
 ---
 
+## <i class="material-icons">terminal</i> CLI - Fonctionnalités v1.4.0
+
+### Comment utiliser le mode interactif?
+
+Le mode interactif lance un assistant pas-à-pas qui vous guide dans la configuration de votre projet:
+
+```bash
+create-go-starter --interactive
+# ou avec l'alias court
+create-go-starter -i
+```
+
+L'assistant vous pose des questions pour chaque option (nom du projet, template, base de données, observabilité) et valide vos réponses en temps réel.
+
+<i class="material-icons info">arrow_forward</i> **Détails:** [Guide d'utilisation - Mode Interactif](../usage.md#mode-interactif---interactive)
+
+---
+
+### Comment prévisualiser les fichiers sans les créer?
+
+Utilisez le mode **dry-run** pour voir la liste complète des fichiers qui seraient générés, sans écrire quoi que ce soit sur le disque:
+
+```bash
+create-go-starter mon-app --dry-run
+# ou avec l'alias court
+create-go-starter mon-app -n
+
+# Combiner avec d'autres options
+create-go-starter mon-app -t minimal -d sqlite -n
+```
+
+Le dry-run affiche le nombre de fichiers et répertoires qui seraient créés, avec un résumé de la configuration.
+
+<i class="material-icons info">arrow_forward</i> **Détails:** [Guide d'utilisation - Dry-Run](../usage.md#prévisualisation-dry-run---dry-run)
+
+---
+
+### Comment diagnostiquer mon environnement avec `doctor`?
+
+La commande `doctor` vérifie que votre environnement dispose de tous les outils nécessaires:
+
+```bash
+create-go-starter doctor
+```
+
+Elle vérifie:
+- <i class="material-icons success">check</i> **Go** (version >= 1.21 requise)
+- <i class="material-icons success">check</i> **Git** (détection de présence)
+- <i class="material-icons success">check</i> **Docker** (optionnel, pour PostgreSQL/MySQL)
+
+Chaque vérification affiche un statut clair (OK / WARNING / FAIL) avec des recommandations si un problème est détecté.
+
+<i class="material-icons info">arrow_forward</i> **Détails:** [Guide d'utilisation - Commande Doctor](../usage.md#commande-doctor)
+
+---
+
+### Quels sont les alias courts disponibles?
+
+Depuis la v1.4.0, toutes les options CLI ont des alias courts d'une lettre:
+
+| Alias | Option longue | Description |
+|-------|---------------|-------------|
+| `-h` | `--help` | Afficher l'aide |
+| `-i` | `--interactive` | Mode interactif |
+| `-n` | `--dry-run` | Prévisualisation sans écriture |
+| `-t` | `--template` | Template (minimal, full, graphql) |
+| `-d` | `--database` | Base de données (postgres, mysql, sqlite) |
+| `-o` | `--observability` | Observabilité (none, basic, advanced) |
+
+**Exemples de syntaxe flexible:**
+
+```bash
+# Toutes ces syntaxes sont valides
+create-go-starter mon-app -t minimal -d sqlite
+create-go-starter mon-app -t=minimal -d=sqlite
+create-go-starter mon-app --template minimal --database sqlite
+```
+
+---
+
+### La barre de progression ne s'affiche pas, est-ce normal?
+
+La barre de progression visuelle est automatiquement désactivée dans certains contextes:
+
+- **Terminaux non-interactifs** (CI/CD, pipes) - détection automatique via `os.Stdout.Fd()`
+- **Variable `NO_COLOR` définie** - respecte la convention [no-color.org](https://no-color.org)
+- **Redirection de sortie** (`> fichier`, `| grep`)
+
+Dans ces cas, la génération se fait silencieusement et les statistiques finales sont toujours affichées sous forme texte.
+
+---
+
 ## <i class="material-icons">help</i> Questions diverses
 
 ### Puis-je utiliser `create-go-starter` pour des projets commerciaux?
@@ -944,4 +1036,4 @@ Ouvrir une [Issue](https://github.com/tky0065/go-starter-kit/issues) ou [Pull Re
 
 ---
 
-**Dernière mise à jour:** 2026-02-12
+**Dernière mise à jour:** 2026-02-18

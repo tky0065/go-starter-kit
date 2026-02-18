@@ -297,8 +297,8 @@ type AuthResponse struct {
 
 **Pourquoi un package séparé?**
 
-- **Évite les cycles**: Avant, `interfaces` → `domain/user` → `interfaces` (❌ cycle!)
-- **Maintenant**: `interfaces` → `models` ← `domain/user` (:material-check-circle: pas de cycle)
+- **Évite les cycles**: Avant, `interfaces` → `domain/user` → `interfaces` (<i class="material-icons error">error</i> cycle!)
+- **Maintenant**: `interfaces` → `models` ← `domain/user` (<i class="material-icons success">check_circle</i> pas de cycle)
 - **Clarté**: Séparation entre entities (models) et business logic (domain)
 
 #### `/internal/domain`

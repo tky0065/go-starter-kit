@@ -83,7 +83,9 @@ type FileGenerator struct {
 // The database parameter specifies the database type (postgres, mysql, sqlite, mongodb).
 // The observabilityLevel parameter specifies the observability mode (none, basic, advanced).
 // Database-specific templates are used to generate the correct driver, DSN, and configurations.
-// This switch statement clarifies intent and returns an explicit error for unimplemented templates.
+//
+// Note: In production, run() in main.go calls getFilesForTemplate() + writeFiles() directly
+// to support progress bar reporting. This function is kept for direct API usage and tests.
 func generateProjectFiles(projectPath, projectName, template, database, observabilityLevel string) error {
 	// Validate that the project directory exists
 	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
@@ -91,7 +93,7 @@ func generateProjectFiles(projectPath, projectName, template, database, observab
 	}
 
 	// Validate the module name
-	if err := utils.ValidateGoModuleName(projectName); err != nil { // Updated call
+	if err := utils.ValidateGoModuleName(projectName); err != nil {
 		return err
 	}
 
@@ -108,10 +110,29 @@ func generateProjectFiles(projectPath, projectName, template, database, observab
 	}
 }
 
-// generateFullTemplateFiles generates all files for the "full" template.
-// This function was extracted from the original generateProjectFiles to improve modularity.
-// The observabilityLevel parameter controls which observability files are generated.
-func generateFullTemplateFiles(projectPath, projectName, database, observabilityLevel string) error {
+// writeFiles writes all FileGenerator entries to the filesystem.
+// It creates parent directories as needed.
+// onProgress is called after each file with (current, total); pass nil to skip progress reporting.
+func writeFiles(files []FileGenerator, onProgress func(current, total int)) error {
+	for i, file := range files {
+		if err := os.MkdirAll(filepath.Dir(file.Path), 0755); err != nil {
+			return fmt.Errorf("failed to create directory for %s: %w", file.Path, err)
+		}
+		if err := os.WriteFile(file.Path, []byte(file.Content), 0644); err != nil {
+			return fmt.Errorf("failed to write file %s: %w", file.Path, err)
+		}
+		if onProgress != nil {
+			onProgress(i+1, len(files))
+		}
+	}
+	return nil
+}
+
+// buildFullFileList constructs the complete list of files for the "full" template without writing them.
+// When observabilityLevel is "advanced", the list also includes all observability files.
+// This function is used both by generateFullTemplateFiles (for actual generation) and
+// by getFilesForTemplate (for dry-run preview).
+func buildFullFileList(projectPath, projectName, database, observabilityLevel string) []FileGenerator {
 	// Create templates instance with database support
 	templates := NewProjectTemplatesWithDatabase(projectName, database)
 
@@ -139,7 +160,7 @@ func generateFullTemplateFiles(projectPath, projectName, database, observability
 		healthHandlerContent = obsTemplates.HealthHandlerWithMetricsTemplate()
 	}
 
-	// Define all files to generate
+	// Define all base files to generate
 	files := []FileGenerator{
 		{
 			Path:    filepath.Join(projectPath, "go.mod"),
@@ -290,16 +311,21 @@ func generateFullTemplateFiles(projectPath, projectName, database, observability
 		},
 	}
 
-	// Write all files
-	for _, file := range files {
-		// Ensure the directory exists
-		if err := os.MkdirAll(filepath.Dir(file.Path), 0755); err != nil {
-			return fmt.Errorf("failed to create directory for %s: %w", file.Path, err)
-		}
+	// Include observability files when advanced level is selected (AC: 2, 3, 4, 7)
+	if observabilityLevel == ObservabilityAdvanced {
+		files = append(files, buildObservabilityFileList(projectPath, projectName, database)...)
+	}
 
-		if err := os.WriteFile(file.Path, []byte(file.Content), 0644); err != nil {
-			return fmt.Errorf("failed to write file %s: %w", file.Path, err)
-		}
+	return files
+}
+
+// generateFullTemplateFiles generates all files for the "full" template.
+// This function was extracted from the original generateProjectFiles to improve modularity.
+// The observabilityLevel parameter controls which observability files are generated.
+func generateFullTemplateFiles(projectPath, projectName, database, observabilityLevel string) error {
+	files := buildFullFileList(projectPath, projectName, database, observabilityLevel)
+	if err := writeFiles(files, nil); err != nil {
+		return err
 	}
 
 	// Make setup.sh executable
@@ -308,34 +334,16 @@ func generateFullTemplateFiles(projectPath, projectName, database, observability
 		return fmt.Errorf("failed to make setup.sh executable: %w", err)
 	}
 
-	// Generate observability files conditionally (AC: 2, 3, 4, 7)
-	if observabilityLevel == ObservabilityAdvanced {
-		if err := generateObservabilityFiles(projectPath, projectName, database); err != nil {
-			return fmt.Errorf("generating observability files: %w", err)
-		}
-	}
-
 	return nil
 }
 
-// generateObservabilityFiles generates all observability files for the advanced mode.
+// buildObservabilityFileList constructs the list of observability files for advanced mode.
 // This includes Prometheus metrics files (Story 9.1), OpenTelemetry tracing files (Story 9.2),
-// and Grafana/Prometheus infrastructure files (Story 9.4):
-//   - pkg/metrics/prometheus.go
-//   - internal/adapters/middleware/metrics_middleware.go
-//   - internal/adapters/handlers/metrics_handler.go
-//   - pkg/tracing/tracer.go
-//   - pkg/tracing/db_tracing.go
-//   - internal/adapters/middleware/tracing_middleware.go
-//   - deployments/prometheus/prometheus.yml
-//   - deployments/prometheus/rules/api_alerts.yml
-//   - deployments/grafana/provisioning/datasources/prometheus.yaml
-//   - deployments/grafana/provisioning/dashboards/default.yaml
-//   - deployments/grafana/dashboards/api-dashboard.json
-func generateObservabilityFiles(projectPath, projectName, database string) error {
+// and Grafana/Prometheus infrastructure files (Story 9.4).
+func buildObservabilityFileList(projectPath, projectName, database string) []FileGenerator {
 	obsTemplates := NewObservabilityTemplates(projectName)
 
-	files := []FileGenerator{
+	return []FileGenerator{
 		// Prometheus metrics (Story 9.1)
 		{
 			Path:    filepath.Join(projectPath, "pkg", "metrics", "prometheus.go"),
@@ -384,28 +392,33 @@ func generateObservabilityFiles(projectPath, projectName, database string) error
 			Content: obsTemplates.GrafanaDashboardJSONTemplate(),
 		},
 	}
-
-	for _, file := range files {
-		if err := os.MkdirAll(filepath.Dir(file.Path), 0755); err != nil {
-			return fmt.Errorf("failed to create directory for %s: %w", file.Path, err)
-		}
-		if err := os.WriteFile(file.Path, []byte(file.Content), 0644); err != nil {
-			return fmt.Errorf("failed to write file %s: %w", file.Path, err)
-		}
-	}
-
-	return nil
 }
 
-// generateMinimalTemplateFiles generates all files for the "minimal" template.
-// This template includes basic infrastructure without authentication.
-func generateMinimalTemplateFiles(projectPath, projectName, database string) error {
+// generateObservabilityFiles generates all observability files for the advanced mode.
+// This includes Prometheus metrics files (Story 9.1), OpenTelemetry tracing files (Story 9.2),
+// and Grafana/Prometheus infrastructure files (Story 9.4):
+//   - pkg/metrics/prometheus.go
+//   - internal/adapters/middleware/metrics_middleware.go
+//   - internal/adapters/handlers/metrics_handler.go
+//   - pkg/tracing/tracer.go
+//   - pkg/tracing/db_tracing.go
+//   - internal/adapters/middleware/tracing_middleware.go
+//   - deployments/prometheus/prometheus.yml
+//   - deployments/prometheus/rules/api_alerts.yml
+//   - deployments/grafana/provisioning/datasources/prometheus.yaml
+//   - deployments/grafana/provisioning/dashboards/default.yaml
+//   - deployments/grafana/dashboards/api-dashboard.json
+func generateObservabilityFiles(projectPath, projectName, database string) error {
+	return writeFiles(buildObservabilityFileList(projectPath, projectName, database), nil)
+}
+
+// buildMinimalFileList constructs the list of files for the "minimal" template without writing them.
+// Note: No auth-related files (pkg/auth, internal/domain/user, handlers, repository)
+func buildMinimalFileList(projectPath, projectName, database string) []FileGenerator {
 	// Create templates instance with database support
 	templates := NewProjectTemplatesWithDatabase(projectName, database)
 
-	// Define all files to generate for minimal template
-	// Note: No auth-related files (pkg/auth, internal/domain/user, handlers, repository)
-	files := []FileGenerator{
+	return []FileGenerator{
 		{
 			Path:    filepath.Join(projectPath, "go.mod"),
 			Content: templates.MinimalGoModTemplate(),
@@ -487,17 +500,14 @@ func generateMinimalTemplateFiles(projectPath, projectName, database string) err
 			Content: templates.MinimalSetupScriptTemplate(),
 		},
 	}
+}
 
-	// Write all files
-	for _, file := range files {
-		// Ensure the directory exists
-		if err := os.MkdirAll(filepath.Dir(file.Path), 0755); err != nil {
-			return fmt.Errorf("failed to create directory for %s: %w", file.Path, err)
-		}
-
-		if err := os.WriteFile(file.Path, []byte(file.Content), 0644); err != nil {
-			return fmt.Errorf("failed to write file %s: %w", file.Path, err)
-		}
+// generateMinimalTemplateFiles generates all files for the "minimal" template.
+// This template includes basic infrastructure without authentication.
+func generateMinimalTemplateFiles(projectPath, projectName, database string) error {
+	files := buildMinimalFileList(projectPath, projectName, database)
+	if err := writeFiles(files, nil); err != nil {
+		return err
 	}
 
 	// Make setup.sh executable
@@ -509,14 +519,13 @@ func generateMinimalTemplateFiles(projectPath, projectName, database string) err
 	return nil
 }
 
-// generateGraphQLTemplateFiles generates all files for the "graphql" template.
+// buildGraphQLFileList constructs the list of files for the "graphql" template without writing them.
 // This template includes GraphQL support with gqlgen, gofiber/adaptor, and GORM.
-func generateGraphQLTemplateFiles(projectPath, projectName, database string) error {
+func buildGraphQLFileList(projectPath, projectName, database string) []FileGenerator {
 	// Create templates instance with database support
 	templates := NewProjectTemplatesWithDatabase(projectName, database)
 
-	// Define all files to generate for GraphQL template
-	files := []FileGenerator{
+	return []FileGenerator{
 		// Core Go files
 		{
 			Path:    filepath.Join(projectPath, "go.mod"),
@@ -639,17 +648,14 @@ func generateGraphQLTemplateFiles(projectPath, projectName, database string) err
 			Content: templates.GraphQLSetupScriptTemplate(),
 		},
 	}
+}
 
-	// Write all files
-	for _, file := range files {
-		// Ensure the directory exists
-		if err := os.MkdirAll(filepath.Dir(file.Path), 0755); err != nil {
-			return fmt.Errorf("failed to create directory for %s: %w", file.Path, err)
-		}
-
-		if err := os.WriteFile(file.Path, []byte(file.Content), 0644); err != nil {
-			return fmt.Errorf("failed to write file %s: %w", file.Path, err)
-		}
+// generateGraphQLTemplateFiles generates all files for the "graphql" template.
+// This template includes GraphQL support with gqlgen, gofiber/adaptor, and GORM.
+func generateGraphQLTemplateFiles(projectPath, projectName, database string) error {
+	files := buildGraphQLFileList(projectPath, projectName, database)
+	if err := writeFiles(files, nil); err != nil {
+		return err
 	}
 
 	// Make setup.sh executable

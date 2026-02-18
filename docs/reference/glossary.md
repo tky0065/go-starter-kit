@@ -456,16 +456,15 @@ func (s *authService) Login(ctx context.Context, req models.LoginRequest) (*mode
 **Exemple** :
 ```go
 // Middleware d'autorisation
-func AuthMiddleware(tokenService interfaces.TokenService) gin.HandlerFunc {
-    return func(c *gin.Context) {
+func AuthMiddleware(tokenService interfaces.TokenService) fiber.Handler {
+    return func(c *fiber.Ctx) error {
         token := extractBearerToken(c)
         userID, err := tokenService.ValidateToken(token)
         if err != nil {
-            c.AbortWithStatusJSON(401, gin.H{"error": "non autorisé"})
-            return
+            return c.Status(401).JSON(fiber.Map{"error": "non autorisé"})
         }
-        c.Set("userID", userID)
-        c.Next()
+        c.Locals("userID", userID)
+        return c.Next()
     }
 }
 ```
@@ -515,8 +514,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ```go
 // Extraction du token Bearer
-func extractBearerToken(c *gin.Context) string {
-    authHeader := c.GetHeader("Authorization")
+func extractBearerToken(c *fiber.Ctx) string {
+    authHeader := c.Get("Authorization")
     if strings.HasPrefix(authHeader, "Bearer ") {
         return strings.TrimPrefix(authHeader, "Bearer ")
     }
@@ -626,50 +625,46 @@ func (s *authService) RefreshAccessToken(ctx context.Context, refreshToken strin
 **Exemple** :
 ```go
 // Définition des endpoints
-func SetupRoutes(router *gin.Engine, userHandler *UserHandler, authHandler *AuthHandler) {
-    api := router.Group("/api")
-    {
-        // Endpoints publics
-        api.POST("/auth/register", authHandler.Register)
-        api.POST("/auth/login", authHandler.Login)
+func SetupRoutes(app *fiber.App, userHandler *UserHandler, authHandler *AuthHandler) {
+    api := app.Group("/api")
 
-        // Endpoints protégés
-        protected := api.Group("")
-        protected.Use(AuthMiddleware(tokenService))
-        {
-            protected.GET("/users/me", userHandler.GetCurrentUser)
-            protected.PUT("/users/me", userHandler.UpdateCurrentUser)
-        }
-    }
+    // Endpoints publics
+    api.Post("/auth/register", authHandler.Register)
+    api.Post("/auth/login", authHandler.Login)
+
+    // Endpoints protégés
+    protected := api.Group("", AuthMiddleware(tokenService))
+    protected.Get("/users/me", userHandler.GetCurrentUser)
+    protected.Put("/users/me", userHandler.UpdateCurrentUser)
 }
 ```
 
 **Voir aussi** : Handler, Router, REST
 
-### Gin
+### Fiber
 
-**Définition** : Framework HTTP web léger et performant pour Go, offrant un routeur rapide et des fonctionnalités middleware.
+**Définition** : Framework HTTP web haute performance pour Go, construit sur fasthttp, offrant un routeur rapide et des fonctionnalités middleware avec une API inspirée d'Express.js.
 
 **Contexte** : Framework HTTP par défaut dans go-starter-kit. Utilisé pour définir les routes, handlers, et middlewares.
 
 **Exemple** :
 ```go
-import "github.com/gin-gonic/gin"
+import "github.com/gofiber/fiber/v2"
 
-router := gin.Default()
+app := fiber.New()
 
 // Route simple
-router.GET("/ping", func(c *gin.Context) {
-    c.JSON(200, gin.H{"message": "pong"})
+app.Get("/ping", func(c *fiber.Ctx) error {
+    return c.JSON(fiber.Map{"message": "pong"})
 })
 
 // Route avec paramètre
-router.GET("/users/:id", func(c *gin.Context) {
-    id := c.Param("id")
-    c.JSON(200, gin.H{"user_id": id})
+app.Get("/users/:id", func(c *fiber.Ctx) error {
+    id := c.Params("id")
+    return c.JSON(fiber.Map{"user_id": id})
 })
 
-router.Run(":8080")
+app.Listen(":8080")
 ```
 
 **Voir aussi** : Handler, Router, Middleware
@@ -687,20 +682,19 @@ type UserHandler struct {
     logger      *zap.Logger
 }
 
-func (h *UserHandler) GetCurrentUser(c *gin.Context) {
-    userID := c.GetUint("userID") // Extrait du middleware auth
+func (h *UserHandler) GetCurrentUser(c *fiber.Ctx) error {
+    userID := c.Locals("userID").(uint)
 
-    user, err := h.userService.GetUserByID(c.Request.Context(), userID)
+    user, err := h.userService.GetUserByID(c.Context(), userID)
     if err != nil {
-        c.JSON(500, gin.H{"error": "erreur serveur"})
-        return
+        return c.Status(500).JSON(fiber.Map{"error": "erreur serveur"})
     }
 
-    c.JSON(200, user)
+    return c.JSON(user)
 }
 ```
 
-**Voir aussi** : Endpoint, Gin, Middleware
+**Voir aussi** : Endpoint, Fiber, Middleware
 
 ### Middleware
 
@@ -711,26 +705,24 @@ func (h *UserHandler) GetCurrentUser(c *gin.Context) {
 **Exemple** :
 ```go
 // Middleware d'authentification
-func AuthMiddleware(tokenService interfaces.TokenService) gin.HandlerFunc {
-    return func(c *gin.Context) {
+func AuthMiddleware(tokenService interfaces.TokenService) fiber.Handler {
+    return func(c *fiber.Ctx) error {
         token := extractBearerToken(c)
         userID, err := tokenService.ValidateToken(token)
         if err != nil {
-            c.AbortWithStatusJSON(401, gin.H{"error": "non autorisé"})
-            return
+            return c.Status(401).JSON(fiber.Map{"error": "non autorisé"})
         }
-        c.Set("userID", userID)
-        c.Next() // Passe au handler suivant
+        c.Locals("userID", userID)
+        return c.Next() // Passe au handler suivant
     }
 }
 
 // Utilisation
-protected := router.Group("/api")
-protected.Use(AuthMiddleware(tokenService))
-protected.GET("/users/me", userHandler.GetCurrentUser)
+protected := app.Group("/api", AuthMiddleware(tokenService))
+protected.Get("/users/me", userHandler.GetCurrentUser)
 ```
 
-**Voir aussi** : Handler, Gin, Authorization
+**Voir aussi** : Handler, Fiber, Authorization
 
 ### REST
 
@@ -753,33 +745,27 @@ DELETE /api/users/:id   # Supprimer un utilisateur
 
 **Définition** : Composant qui mappe les URLs et méthodes HTTP aux handlers appropriés.
 
-**Contexte** : Gin Router est configuré dans `internal/adapters/http/routes.go`.
+**Contexte** : Fiber Router est configuré dans `internal/adapters/http/routes.go`.
 
 **Exemple** :
 ```go
-func SetupRoutes(router *gin.Engine, handlers *Handlers) {
+func SetupRoutes(app *fiber.App, handlers *Handlers) {
     // Groupe d'API
-    api := router.Group("/api")
-    {
-        // Sous-groupe authentification
-        auth := api.Group("/auth")
-        {
-            auth.POST("/register", handlers.Auth.Register)
-            auth.POST("/login", handlers.Auth.Login)
-        }
+    api := app.Group("/api")
 
-        // Sous-groupe utilisateurs (protégé)
-        users := api.Group("/users")
-        users.Use(AuthMiddleware(handlers.TokenService))
-        {
-            users.GET("/me", handlers.User.GetCurrentUser)
-            users.PUT("/me", handlers.User.UpdateCurrentUser)
-        }
-    }
+    // Sous-groupe authentification
+    auth := api.Group("/auth")
+    auth.Post("/register", handlers.Auth.Register)
+    auth.Post("/login", handlers.Auth.Login)
+
+    // Sous-groupe utilisateurs (protégé)
+    users := api.Group("/users", AuthMiddleware(handlers.TokenService))
+    users.Get("/me", handlers.User.GetCurrentUser)
+    users.Put("/me", handlers.User.UpdateCurrentUser)
 }
 ```
 
-**Voir aussi** : Gin, Endpoint, Handler
+**Voir aussi** : Fiber, Endpoint, Handler
 
 ---
 
@@ -792,7 +778,7 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers) {
 
 <i class="material-icons">menu_book</i> **Ressources externes** :
 - [Documentation Go](https://go.dev/doc/) - Documentation officielle Go
-- [Documentation Gin](https://gin-gonic.com/docs/) - Framework HTTP
+- [Documentation Fiber](https://docs.gofiber.io/) - Framework HTTP
 - [Documentation GORM](https://gorm.io/docs/) - ORM pour Go
 - [JWT RFC 7519](https://datatracker.ietf.org/doc/html/rfc7519) - Spécification JWT
 - [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/) - Article original par Alistair Cockburn

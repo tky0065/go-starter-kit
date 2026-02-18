@@ -6,7 +6,7 @@ Un outil CLI puissant pour générer des projets Go prêts pour la production en
 
 **create-go-starter** est un générateur CLI stable et production-ready pour créer des applications Go modernes.
 
-- <i class="material-icons success">check</i> **Version stable** - v1.3.0 disponible
+- <i class="material-icons success">check</i> **Version stable** - v1.4.0 disponible
 - <i class="material-icons success">check</i> **3 templates** - minimal, full, GraphQL
 - <i class="material-icons success">check</i> **Testé et validé** - Utilisé en production
 - <i class="material-icons success">check</i> **Open source** - MIT License
@@ -81,6 +81,33 @@ create-go-starter mon-app --template=full --observability=advanced
 
 <i class="material-icons">arrow_forward</i> [Guide complet observabilité](./usage.md#observabilité---observability)
 
+### <i class="material-icons success">new_releases</i> Nouveau dans v1.4.0: Améliorations CLI
+
+**Expérience développeur repensée!** Mode interactif guidé, prévisualisation dry-run, diagnostics environnement, et alias courts pour tous les flags.
+
+```bash
+# Mode interactif guidé
+create-go-starter -i
+
+# Prévisualiser sans créer
+create-go-starter mon-app --dry-run
+
+# Diagnostics environnement
+create-go-starter doctor
+
+# Alias courts pour tous les flags
+create-go-starter -t minimal -d sqlite -n mon-app
+```
+
+**Nouveautés v1.4.0:**
+- <i class="material-icons success small">check</i> **Mode Interactif** (`--interactive` / `-i`) — Assistant guidé étape par étape
+- <i class="material-icons success small">check</i> **Dry-Run** (`--dry-run` / `-n`) — Prévisualisation des fichiers sans écriture
+- <i class="material-icons success small">check</i> **Doctor** (`create-go-starter doctor`) — Diagnostics Go, Git, Docker
+- <i class="material-icons success small">check</i> **Barre de progression** — Feedback visuel pendant la génération
+- <i class="material-icons success small">check</i> **Alias courts** — `-t`, `-d`, `-o`, `-i`, `-n`, `-h`
+
+<i class="material-icons">arrow_forward</i> [Guide complet des améliorations CLI](./usage.md#mode-interactif---interactive)
+
 ## Installation rapide
 
 ### Méthode 1: Installation directe (Recommandée)
@@ -119,7 +146,7 @@ make build
 # Le binaire est disponible: ./create-go-starter
 ```
 
-Pour plus de détails, consultez le [guide d'installation complet](./docs/installation.md).
+Pour plus de détails, consultez le [guide d'installation complet](./installation.md).
 
 ## Utilisation de base
 
@@ -154,7 +181,7 @@ create-go-starter mon-projet --template graphql    # API GraphQL avec gqlgen
 | `full` | API complète avec JWT auth, gestion utilisateurs et Swagger | Applications backend complètes (défaut) |
 | `graphql` | API GraphQL avec gqlgen et GraphQL Playground | Applications nécessitant GraphQL |
 
-Pour plus de détails sur les différences entre templates, consultez le [guide d'utilisation](./docs/usage.md#templates-disponibles).
+Pour plus de détails sur les différences entre templates, consultez le [guide d'utilisation](./usage.md#templates-disponibles).
 
 ### Lancer le projet généré
 
@@ -252,7 +279,7 @@ mon-super-projet/
 └── README.md                      # Documentation du projet
 ```
 
-Pour une explication détaillée de chaque composant, consultez le [guide d'utilisation](./docs/usage.md).
+Pour une explication détaillée de chaque composant, consultez le [guide d'utilisation](./usage.md).
 
 ## Stack technique
 
@@ -273,14 +300,14 @@ Les projets générés utilisent les meilleures bibliothèques de l'écosystème
 
 ### Guides essentiels
 
-- **[Guide d'installation](./docs/installation.md)** - Installation détaillée avec toutes les méthodes
-- **[Guide d'utilisation](./docs/usage.md)** - Utilisation du CLI et structure complète générée
-- **[Guide des projets générés](./docs/generated-project-guide.md)** - Guide complet pour développer avec les projets créés (architecture, API, tests, déploiement)
+- **[Guide d'installation](./installation.md)** - Installation détaillée avec toutes les méthodes
+- **[Guide d'utilisation](./usage.md)** - Utilisation du CLI et structure complète générée
+- **[Guide des projets générés](./generated-project-guide.md)** - Guide complet pour développer avec les projets créés (architecture, API, tests, déploiement)
 
 ### Documentation avancée
 
-- **[Architecture du CLI](./docs/cli-architecture.md)** - Documentation technique pour contributeurs
-- **[Guide de contribution](./docs/contributing.md)** - Comment contribuer au projet
+- **[Architecture du CLI](./cli-architecture.md)** - Documentation technique pour contributeurs
+- **[Guide de contribution](./contributing.md)** - Comment contribuer au projet
 
 ## Démarrage rapide en 30 secondes
 
@@ -331,7 +358,7 @@ curl -X GET http://localhost:8080/api/v1/users \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-Pour plus d'exemples et la documentation complète de l'API, consultez le [guide des projets générés](./docs/generated-project-guide.md#api-reference).
+Pour plus d'exemples et la documentation complète de l'API, consultez le [guide des projets générés](./generated-project-guide.md#api-reference).
 
 ## Commandes Makefile disponibles
 
@@ -410,11 +437,11 @@ Les contributions sont les bienvenues! Consultez le [guide de contribution](./do
 - [x] **Support Multi-Base de Données** - PostgreSQL, MySQL, SQLite (v1.1.0)
 - [x] **CRUD Scaffolding Generator** - Commande add-model pour générer des modèles complets (v1.2.0)
 - [x] **Observabilité Avancée** - Prometheus, Jaeger, Grafana, Health Checks K8s (v1.3.0)
+- [x] **Améliorations CLI** - Mode interactif, dry-run, doctor, alias courts (v1.4.0)
 
 **Fonctionnalités prévues**:
 
 - [ ] Choix du framework web (Gin, Echo, Chi)
-- [ ] CLI interactif avec prompts
 - [ ] Génération de microservices
 - [ ] Templates de tests E2E
 
@@ -434,6 +461,6 @@ Construit avec les excellentes bibliothèques de la communauté Go. Merci aux ma
 
 ---
 
-**Fait avec ❤️ pour la communauté Go**
+**Fait avec <i class="material-icons small" style="color:#e25555">favorite</i> pour la communauté Go**
 
 Commencez à construire votre prochaine application backend en secondes, pas en jours!

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -200,11 +199,33 @@ func main() {
 		return
 	}
 
+	if len(os.Args) > 1 && os.Args[1] == "doctor" {
+		// Handle doctor --help
+		for _, arg := range os.Args[2:] {
+			if arg == "-help" || arg == "--help" || arg == "-h" {
+				fmt.Fprintf(os.Stderr, "Usage: create-go-starter doctor\n\n")
+				fmt.Fprintf(os.Stderr, "Run environment diagnostics to verify your development setup.\n\n")
+				fmt.Fprintf(os.Stderr, "Checks performed:\n")
+				fmt.Fprintf(os.Stderr, "  Go       Verifies Go is installed and meets minimum version (1.21+)\n")
+				fmt.Fprintf(os.Stderr, "  Git      Verifies Git is installed and available in PATH\n")
+				fmt.Fprintf(os.Stderr, "  Docker   Verifies Docker binary is installed and daemon is running\n\n")
+				fmt.Fprintf(os.Stderr, "Exit codes:\n")
+				fmt.Fprintf(os.Stderr, "  0   All checks passed\n")
+				fmt.Fprintf(os.Stderr, "  1   One or more checks failed\n")
+				os.Exit(0)
+			}
+		}
+		exitCode := runDoctor()
+		os.Exit(exitCode)
+	}
+
 	// Parse flags manually to allow flags in any position
 	// This is necessary because we want to support both:
 	// - create-go-starter -database sqlite my-project
 	// - create-go-starter my-project -database sqlite
 	help := false
+	interactive := false
+	dryRun := false
 	var template string = DefaultTemplate
 	var database string = DefaultDatabase
 	var observability string = DefaultObservabilityLevel
@@ -217,36 +238,44 @@ func main() {
 
 		if arg == "-help" || arg == "--help" || arg == "-h" {
 			help = true
-		} else if strings.HasPrefix(arg, "-template=") || strings.HasPrefix(arg, "--template=") {
-			// Handle -template=value syntax
+		} else if arg == "-interactive" || arg == "--interactive" || arg == "-i" {
+			interactive = true
+		} else if arg == "-dry-run" || arg == "--dry-run" || arg == "-n" {
+			dryRun = true
+		} else if strings.HasPrefix(arg, "-template=") || strings.HasPrefix(arg, "--template=") || strings.HasPrefix(arg, "-t=") {
+			// Handle -template=value, --template=value, -t=value syntax
 			parts := strings.SplitN(arg, "=", 2)
 			if len(parts) == 2 {
 				template = parts[1]
 			}
-		} else if strings.HasPrefix(arg, "-database=") || strings.HasPrefix(arg, "--database=") {
-			// Handle -database=value syntax
+		} else if strings.HasPrefix(arg, "-database=") || strings.HasPrefix(arg, "--database=") || strings.HasPrefix(arg, "-d=") {
+			// Handle -database=value, --database=value, -d=value syntax
 			parts := strings.SplitN(arg, "=", 2)
 			if len(parts) == 2 {
 				database = parts[1]
 			}
-		} else if strings.HasPrefix(arg, "-observability=") || strings.HasPrefix(arg, "--observability=") {
-			// Handle -observability=value syntax
+		} else if strings.HasPrefix(arg, "-observability=") || strings.HasPrefix(arg, "--observability=") || strings.HasPrefix(arg, "-o=") {
+			// Handle -observability=value, --observability=value, -o=value syntax
 			parts := strings.SplitN(arg, "=", 2)
 			if len(parts) == 2 {
 				observability = parts[1]
 			}
-		} else if (arg == "-template" || arg == "--template") && i+1 < len(args) {
+		} else if (arg == "-template" || arg == "--template" || arg == "-t") && i+1 < len(args) {
 			template = args[i+1]
 			i++ // Skip next arg since we consumed it
-		} else if (arg == "-database" || arg == "--database") && i+1 < len(args) {
+		} else if (arg == "-database" || arg == "--database" || arg == "-d") && i+1 < len(args) {
 			database = args[i+1]
 			i++ // Skip next arg since we consumed it
-		} else if (arg == "-observability" || arg == "--observability") && i+1 < len(args) {
+		} else if (arg == "-observability" || arg == "--observability" || arg == "-o") && i+1 < len(args) {
 			observability = args[i+1]
 			i++ // Skip next arg since we consumed it
 		} else if !strings.HasPrefix(arg, "-") && projectName == "" {
 			// First non-flag argument is the project name
 			projectName = arg
+		} else if strings.HasPrefix(arg, "-") {
+			// Unknown flag — print clear error message (AC: #9)
+			fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("unknown flag: %s", arg)))
+			os.Exit(1)
 		}
 	}
 
@@ -254,14 +283,21 @@ func main() {
 	usage := func() {
 		fmt.Fprintf(os.Stderr, "Usage: create-go-starter [options] <project-name>\n")
 		fmt.Fprintf(os.Stderr, "       Flags can be placed before or after the project name\n\n")
+		fmt.Fprintf(os.Stderr, "Subcommands:\n")
+		fmt.Fprintf(os.Stderr, "  doctor\n")
+		fmt.Fprintf(os.Stderr, "        Check your development environment (Go, Git, Docker)\n\n")
 		fmt.Fprintf(os.Stderr, "Options:\n")
-		fmt.Fprintf(os.Stderr, "  -database string\n")
+		fmt.Fprintf(os.Stderr, "  -i, --interactive\n")
+		fmt.Fprintf(os.Stderr, "        Launch interactive mode (guided step-by-step configuration)\n")
+		fmt.Fprintf(os.Stderr, "  -n, --dry-run\n")
+		fmt.Fprintf(os.Stderr, "        Preview files that would be created without generating them\n")
+		fmt.Fprintf(os.Stderr, "  -d, --database string\n")
 		fmt.Fprintf(os.Stderr, "        Database type to use (default \"postgres\")\n")
-		fmt.Fprintf(os.Stderr, "  -template string\n")
+		fmt.Fprintf(os.Stderr, "  -t, --template string\n")
 		fmt.Fprintf(os.Stderr, "        Template type to generate (default \"full\")\n")
-		fmt.Fprintf(os.Stderr, "  -observability string\n")
+		fmt.Fprintf(os.Stderr, "  -o, --observability string\n")
 		fmt.Fprintf(os.Stderr, "        Observability level: none|basic|advanced (default \"none\")\n")
-		fmt.Fprintf(os.Stderr, "  -h, -help\n")
+		fmt.Fprintf(os.Stderr, "  -h, --help\n")
 		fmt.Fprintf(os.Stderr, "        Show help message\n")
 		fmt.Fprintf(os.Stderr, "\nTemplates:\n")
 		fmt.Fprintf(os.Stderr, "  %-9s %s\n", TemplateMinimal, TemplateMinimalDesc)
@@ -278,15 +314,40 @@ func main() {
 		fmt.Fprintf(os.Stderr, "  %-9s Full Prometheus metrics endpoint + HTTP metrics middleware\n", ObservabilityAdvanced)
 		fmt.Fprintf(os.Stderr, "\nExamples:\n")
 		fmt.Fprintf(os.Stderr, "  create-go-starter my-project\n")
-		fmt.Fprintf(os.Stderr, "  create-go-starter -database sqlite my-project\n")
-		fmt.Fprintf(os.Stderr, "  create-go-starter my-project -template minimal\n")
-		fmt.Fprintf(os.Stderr, "  create-go-starter -database mysql -template minimal my-project\n")
+		fmt.Fprintf(os.Stderr, "  create-go-starter -d sqlite my-project\n")
+		fmt.Fprintf(os.Stderr, "  create-go-starter my-project -t minimal\n")
+		fmt.Fprintf(os.Stderr, "  create-go-starter -d mysql -t minimal my-project\n")
 		fmt.Fprintf(os.Stderr, "  create-go-starter my-project --observability=advanced\n")
+		fmt.Fprintf(os.Stderr, "  create-go-starter -d sqlite -t minimal -o none my-project\n")
+		fmt.Fprintf(os.Stderr, "  create-go-starter --database=mysql --template=full my-project\n")
+		fmt.Fprintf(os.Stderr, "  create-go-starter -i\n")
+		fmt.Fprintf(os.Stderr, "  create-go-starter -n my-project\n")
+		fmt.Fprintf(os.Stderr, "  create-go-starter doctor\n")
 	}
 
 	if help {
 		usage()
 		os.Exit(0)
+	}
+
+	// Reject conflicting flags: --interactive and --dry-run cannot be used together
+	if interactive && dryRun {
+		fmt.Fprintln(os.Stderr, Red("--interactive and --dry-run cannot be used together"))
+		os.Exit(1)
+	}
+
+	if interactive {
+		defaults := InteractiveDefaults{
+			ProjectName:   projectName,
+			Template:      template,
+			Database:      database,
+			Observability: observability,
+		}
+		if err := runInteractiveMode(defaults); err != nil {
+			fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("%v", err)))
+			os.Exit(1)
+		}
+		return
 	}
 
 	if projectName == "" {
@@ -299,7 +360,7 @@ func main() {
 	// Validate project name using the shared utility
 	if err := utils.ValidateGoModuleName(projectName); err != nil {
 		fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("%v", err)))
-		flag.Usage() // Display usage on invalid project name
+		usage() // Display usage on invalid project name
 		os.Exit(1)
 	}
 
@@ -328,6 +389,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	// If dry-run flag is set, preview files without creating them (AC: #1-#6)
+	if dryRun {
+		if err := runDryRun(projectName, template, database, observability); err != nil {
+			fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("%v", err)))
+			os.Exit(1)
+		}
+		return
+	}
+
 	// Run the project creation logic
 	if err := run(projectName, template, database, observability); err != nil {
 		// Changed to not include "Error: " prefix as Red() function will color the message itself.
@@ -341,6 +411,8 @@ func main() {
 // generates files, and initializes git.
 // Returns an error if any step fails (except git initialization which is non-fatal).
 func run(projectName, template, database, observabilityLevel string) error {
+	stats := NewGenerationStats()
+
 	// Display start message with template info
 	fmt.Println(Green(fmt.Sprintf("Creating project: %s (template: %s, database: %s, observability: %s)", projectName, template, database, observabilityLevel)))
 
@@ -353,43 +425,71 @@ func run(projectName, template, database, observabilityLevel string) error {
 	projectPath := projectName
 
 	// Display progress message
-	fmt.Println("📁 Creating directories...") // Changed to English
+	fmt.Println("📁 Creating directories...")
 
 	// Create the project structure
+	stats.StartStep("Creating directories")
 	if err := createProjectStructure(projectPath, template); err != nil {
 		return err
 	}
+	stats.EndStep("Creating directories")
 
-	fmt.Println(Green("✅ Structure created")) // Changed to English
+	fmt.Println(Green("✅ Structure created"))
 
-	// Generate project files with dynamic context injection
-	fmt.Println("📝 Generating core files...") // Changed to English
+	// Get the full file list before generating (needed for progress bar total count)
+	files := getFilesForTemplate(projectPath, projectName, template, database, observabilityLevel)
+	pb := NewProgressBar(len(files), 30)
 
-	if err := generateProjectFiles(projectPath, projectName, template, database, observabilityLevel); err != nil {
+	// Generate project files with progress reporting
+	fmt.Println("📝 Generating core files...")
+	stats.StartStep("Generating files")
+	if err := writeFiles(files, func(current, total int) {
+		pb.Update(current)
+	}); err != nil {
 		return err
 	}
+	pb.Complete()
+
+	// Make setup.sh executable (handled previously inside template-specific functions)
+	setupPath := filepath.Join(projectPath, "setup.sh")
+	if _, statErr := os.Stat(setupPath); statErr == nil {
+		if err := os.Chmod(setupPath, 0755); err != nil {
+			return fmt.Errorf("failed to make setup.sh executable: %w", err)
+		}
+	}
+
+	// Accumulate file stats (size from disk after writing)
+	for _, f := range files {
+		stats.AddFile(f.Path)
+	}
+	stats.EndStep("Generating files")
 
 	// Display success message
-	fmt.Println(Green("✅ Files generated successfully")) // Changed to English
+	fmt.Println(Green("✅ Files generated successfully"))
 
 	// Copy .env.example to .env
-	fmt.Println("🔑 Configuring environment...") // Changed to English
+	fmt.Println("🔑 Configuring environment...")
 	if err := copyEnvFile(projectPath); err != nil {
 		return err
 	}
 
 	// Initialize Git repository (AC: 1, 2, 3, 4, 5)
-	fmt.Println("🔧 Initializing Git repository...") // Changed to English
+	fmt.Println("🔧 Initializing Git repository...")
+	stats.StartStep("Git initialization")
 	if err := initGitRepo(projectPath); err != nil {
 		// Non-fatal: warn user but continue
-		fmt.Println(Red(fmt.Sprintf("⚠️  Git warning: %v", err)))           // Changed to English
-		fmt.Println("   You can initialize the repository manually later.") // Changed to English
+		fmt.Println(Red(fmt.Sprintf("⚠️  Git warning: %v", err)))
+		fmt.Println("   You can initialize the repository manually later.")
 	} else if isGitAvailable() {
-		fmt.Println(Green("✅ Git repository initialized with initial commit")) // Changed to English
+		fmt.Println(Green("✅ Git repository initialized with initial commit"))
 	}
+	stats.EndStep("Git initialization")
 
 	// Display success message with detailed setup instructions
 	printSuccessMessage(projectName, database)
+
+	// Display generation statistics (AC: #2, #3)
+	stats.Display()
 
 	return nil
 }

@@ -1,59 +1,140 @@
-# Go Starter Kit
+# create-go-starter
 
 A powerful CLI tool to generate production-ready Go projects in seconds.
 
----
+## <i class="material-icons info">info</i> About
 
-## :material-rocket-launch: Quick Start
+**create-go-starter** is a stable, production-ready CLI generator for modern Go applications.
 
-<div class="grid" markdown>
-
-:material-rocket-launch: **[Installation](installation.md)** - Install and create your first project in 30 seconds
-
-:material-puzzle: **[Usage Guide](usage.md)** - Project structure with clear separation of concerns
-
-:material-cog: **[Generated Project](generated-project-guide.md)** - JWT, Docker, CI/CD, tests and more included by default
-
-:material-heart: **[Contributing](contributing.md)** - Contribute to the project and improve the Go ecosystem
-
-</div>
-
----
+- <i class="material-icons success">check</i> **Stable version** - v1.4.0 available
+- <i class="material-icons success">check</i> **3 templates** - minimal, full, GraphQL
+- <i class="material-icons success">check</i> **Tested and validated** - Used in production
+- <i class="material-icons success">check</i> **Open source** - MIT License
+- <i class="material-icons success">check</i> **Actively maintained** - Regular updates
 
 ## Overview
 
 `create-go-starter` is a Go project generator that creates a complete hexagonal architecture with all the essential features of a modern backend application. With a single command, get a structured project with JWT authentication, REST API, database, tests, and Docker configuration ready for deployment.
 
-## Included Features
+### Included Features
 
-| Feature | Description |
-|---------|-------------|
-| :material-hexagon-outline: **Hexagonal Architecture** | Ports & Adapters - Clear separation of concerns |
-| :material-key: **JWT Authentication** | Access tokens + Refresh tokens with secure rotation |
-| :material-api: **REST API** | High-performance Fiber v2 framework |
-| :material-database: **Database** | GORM with PostgreSQL and automatic migrations |
-| :material-needle: **Dependency Injection** | uber-go/fx for modular architecture |
-| :material-test-tube: **Complete Tests** | Unit and integration tests included |
-| :material-file-document: **Swagger Documentation** | Automatically documented API with OpenAPI |
-| :material-docker: **Docker** | Optimized multi-stage build and docker-compose |
-| :material-git: **CI/CD** | Pre-configured GitHub Actions pipeline |
-| :material-format-list-bulleted: **Structured Logging** | rs/zerolog for professional logs |
+- **Hexagonal Architecture** (Ports & Adapters) - Clear separation of concerns
+- **JWT Authentication** - Access tokens + Refresh tokens with secure rotation
+- **REST API** with Fiber v2 - High-performance web framework
+- **Database** - GORM with PostgreSQL and automatic migrations
+- **Dependency Injection** - uber-go/fx for modular architecture
+- **Complete Tests** - Unit and integration tests included
+- **Swagger Documentation** - Automatically documented API with OpenAPI
+- **Docker** - Optimized multi-stage build and docker-compose
+- **CI/CD** - Pre-configured GitHub Actions pipeline
+- **Structured Logging** - rs/zerolog for professional logs
+- **Validation** - go-playground/validator for input validation
+- **Makefile** - Useful commands for dev, test, build and deployment
+
+### <i class="material-icons success">new_releases</i> New in v1.2.0: CRUD Generator
+
+**Add new models in 2 seconds!** The `add-model` command automatically generates all the necessary CRUD code:
+
+```bash
+cd my-project
+create-go-starter add-model Todo --fields "title:string,completed:bool"
+```
+
+**What is automatically generated:**
+- <i class="material-icons success small">check</i> Model with GORM tags
+- <i class="material-icons success small">check</i> Repository (interface + implementation)
+- <i class="material-icons success small">check</i> Service (business logic)
+- <i class="material-icons success small">check</i> HTTP Handlers (REST endpoints)
+- <i class="material-icons success small">check</i> Tests (unit + integration)
+- <i class="material-icons success small">check</i> Routes, migrations, fx modules
+
+**Supported relations:**
+- `--belongs-to Parent` - N:1 relation (child → parent)
+- `--has-many Child` - 1:N relation (parent → children)
+
+**Example with relations:**
+```bash
+create-go-starter add-model Category --fields "name:string:unique"
+create-go-starter add-model Post --fields "title:string,content:string" --belongs-to Category
+create-go-starter add-model Comment --fields "author:string,content:string" --belongs-to Post
+```
+
+**Result:** Complete blog (Category → Post → Comment) with nested endpoints and preloading.
+
+<i class="material-icons">arrow_forward</i> [Full add-model guide](./usage.md#adding-models-add-model)
+
+### <i class="material-icons success">new_releases</i> New in v1.3.0: Advanced Observability
+
+**Production-ready monitoring in one command!** The `--observability=advanced` flag generates a complete observability stack:
+
+```bash
+create-go-starter my-app --template=full --observability=advanced
+```
+
+**What is automatically generated:**
+- <i class="material-icons success small">check</i> **Prometheus Metrics** — `/metrics` endpoint with HTTP metrics (latency, throughput, errors)
+- <i class="material-icons success small">check</i> **Distributed Tracing** — OpenTelemetry + Jaeger with W3C traceparent propagation
+- <i class="material-icons success small">check</i> **K8s Health Checks** — `/health/liveness` and `/health/readiness` with DB verification
+- <i class="material-icons success small">check</i> **Grafana Dashboard** — Pre-configured 7-panel dashboard with alerting
+- <i class="material-icons success small">check</i> **Docker Compose** — Complete stack (Jaeger + Prometheus + Grafana)
+- <i class="material-icons success small">check</i> **Kubernetes Probes** — Auto-generated `probes.yaml` file
+
+<i class="material-icons">arrow_forward</i> [Full observability guide](./usage.md#observability---observability)
+
+### <i class="material-icons success">new_releases</i> New in v1.4.0: CLI Enhancements
+
+**Redesigned developer experience!** Guided interactive mode, dry-run preview, environment diagnostics, and short aliases for all flags.
+
+```bash
+# Guided interactive mode
+create-go-starter -i
+
+# Preview without creating
+create-go-starter my-app --dry-run
+
+# Environment diagnostics
+create-go-starter doctor
+
+# Short aliases for all flags
+create-go-starter -t minimal -d sqlite -n my-app
+```
+
+**v1.4.0 New features:**
+- <i class="material-icons success small">check</i> **Interactive Mode** (`--interactive` / `-i`) — Step-by-step guided assistant
+- <i class="material-icons success small">check</i> **Dry-Run** (`--dry-run` / `-n`) — File preview without writing
+- <i class="material-icons success small">check</i> **Doctor** (`create-go-starter doctor`) — Go, Git, Docker diagnostics
+- <i class="material-icons success small">check</i> **Progress Bar** — Visual feedback during generation
+- <i class="material-icons success small">check</i> **Short Aliases** — `-t`, `-d`, `-o`, `-i`, `-n`, `-h`
+
+<i class="material-icons">arrow_forward</i> [Full CLI enhancements guide](./usage.md#interactive-mode---interactive)
 
 ## Quick Installation
 
-=== "go install (Recommended)"
+### Method 1: Direct Installation (Recommended)
 
-    ```bash
-    go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@latest
-    ```
+Global installation with a single command, without cloning the repository:
 
-=== "Build from source"
+```bash
+go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@latest
+```
 
-    ```bash
-    git clone https://github.com/tky0065/go-starter-kit.git
-    cd go-starter-kit
-    go build -o create-go-starter ./cmd/create-go-starter
-    ```
+The binary will be installed in `$GOPATH/bin` (usually `~/go/bin`). Make sure this directory is in your PATH.
+
+**Note**: If `create-go-starter` is not recognized after installation, add `$GOPATH/bin` to your PATH:
+
+```bash
+export PATH=$PATH:$(go env GOPATH)/bin
+```
+
+### Method 2: Build from Sources
+
+Recommended for contributors or customization:
+
+```bash
+git clone https://github.com/tky0065/go-starter-kit.git
+cd go-starter-kit
+go build -o create-go-starter ./cmd/create-go-starter
+```
 
 ## Get Started in 30 Seconds
 
@@ -61,17 +142,20 @@ A powerful CLI tool to generate production-ready Go projects in seconds.
 # 1. Install the tool
 go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@latest
 
-# 2. Create a project
+# 2. Check your environment
+create-go-starter doctor
+
+# 3. Create a project
 create-go-starter my-project
 
-# 3. Automatic setup
+# 4. Automatic setup
 cd my-project
 ./setup.sh
 
-# 4. Run
+# 5. Run
 make run
 
-# 5. Test
+# 6. Test
 curl http://localhost:8080/health
 ```
 
@@ -141,11 +225,11 @@ graph TB
 
 ## Next Steps
 
-- :material-download: **[Installation](installation.md)** - Detailed installation guide
-- :material-book-open: **[Usage](usage.md)** - Learn to use the CLI
-- :material-wrench: **[Architecture](cli-architecture.md)** - Understand internals
-- :material-school: **[Tutorial](tutorial-exemple-complet.md)** - Complete step-by-step example
+- <i class="material-icons">download</i> **[Installation](installation.md)** - Detailed installation guide
+- <i class="material-icons">menu_book</i> **[Usage](usage.md)** - Learn to use the CLI
+- <i class="material-icons">build</i> **[Architecture](cli-architecture.md)** - Understand internals
+- <i class="material-icons">school</i> **[Tutorial](tutorial-exemple-complet.md)** - Complete step-by-step example
 
 ---
 
-**Made with :material-heart: for the Go community**
+**Made with <i class="material-icons error small">favorite</i> for the Go community**

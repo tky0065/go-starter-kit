@@ -1811,67 +1811,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Roadmap">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#v11-templates-multiples" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v1.1 - Templates multiples
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#v12-choix-de-base-de-donnees" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v1.2 - Choix de base de données
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#v13-choix-de-framework-web" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v1.3 - Choix de framework web
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#v14-features-avancees" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v1.4 - Features avancées
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#v20-plugin-system" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v2.0 - Plugin system
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -2329,67 +2268,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Roadmap">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#v11-templates-multiples" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v1.1 - Templates multiples
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#v12-choix-de-base-de-donnees" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v1.2 - Choix de base de données
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#v13-choix-de-framework-web" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v1.3 - Choix de framework web
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#v14-features-avancees" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v1.4 - Features avancées
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#v20-plugin-system" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        v2.0 - Plugin system
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -2865,42 +2743,20 @@
 - Proposez des alternatives
 - Utilisez des suggestions de code GitHub</p>
 <h2 id="roadmap">Roadmap<a class="headerlink" href="#roadmap" title="Permanent link">&para;</a></h2>
-<p>Fonctionnalités prévues pour les prochaines versions:</p>
-<h3 id="v11-templates-multiples">v1.1 - Templates multiples<a class="headerlink" href="#v11-templates-multiples" title="Permanent link">&para;</a></h3>
+<p><strong>Fonctionnalités complétées</strong> (v1.0 -- v1.4):</p>
 <ul>
-<li>[ ] Template "minimal" (API seulement, sans auth)</li>
-<li>[ ] Template "full" (tout inclus, actuel)</li>
-<li>[ ] Template "microservice" (avec gRPC)</li>
-<li>[ ] Flag <code>--template=&lt;type&gt;</code></li>
+<li>[x] <strong>Templates multiples</strong> - Trois templates (minimal, full, graphql)</li>
+<li>[x] <strong>Multi-database</strong> - PostgreSQL, MySQL, SQLite</li>
+<li>[x] <strong>CRUD Scaffolding</strong> - Commande <code>add-model</code> avec relations BelongsTo/HasMany</li>
+<li>[x] <strong>Observabilité</strong> - Prometheus, Jaeger, Grafana, Health Checks K8s</li>
+<li>[x] <strong>CLI interactif</strong> - Mode guidé (<code>--interactive</code>), dry-run, doctor, alias courts</li>
 </ul>
-<h3 id="v12-choix-de-base-de-donnees">v1.2 - Choix de base de données<a class="headerlink" href="#v12-choix-de-base-de-donnees" title="Permanent link">&para;</a></h3>
+<p><strong>Fonctionnalités prévues</strong> (v1.5+):</p>
 <ul>
-<li>[ ] Support MySQL</li>
-<li>[ ] Support SQLite</li>
-<li>[ ] Support MongoDB</li>
-<li>[ ] Flag <code>--database=&lt;type&gt;</code></li>
-</ul>
-<h3 id="v13-choix-de-framework-web">v1.3 - Choix de framework web<a class="headerlink" href="#v13-choix-de-framework-web" title="Permanent link">&para;</a></h3>
-<ul>
-<li>[ ] Support Gin</li>
-<li>[ ] Support Echo</li>
-<li>[ ] Support Chi</li>
-<li>[ ] Flag <code>--framework=&lt;type&gt;</code></li>
-</ul>
-<h3 id="v14-features-avancees">v1.4 - Features avancées<a class="headerlink" href="#v14-features-avancees" title="Permanent link">&para;</a></h3>
-<ul>
-<li>[ ] CLI interactif (prompts)</li>
-<li>[ ] GraphQL template</li>
-<li>[ ] gRPC template</li>
-<li>[ ] WebSocket support</li>
-<li>[ ] Event sourcing template</li>
-</ul>
-<h3 id="v20-plugin-system">v2.0 - Plugin system<a class="headerlink" href="#v20-plugin-system" title="Permanent link">&para;</a></h3>
-<ul>
-<li>[ ] Plugin API pour templates custom</li>
-<li>[ ] Template marketplace</li>
-<li>[ ] Hot-reload des templates</li>
-<li>[ ] GUI pour génération</li>
+<li>[ ] Choix du framework web (Gin, Echo, Chi)</li>
+<li>[ ] Génération de microservices</li>
+<li>[ ] Templates de tests E2E</li>
+<li>[ ] Plugin system pour templates custom</li>
 </ul>
 <p><strong>Comment contribuer au roadmap</strong>:
 - Votez pour les features dans Discussions
@@ -2915,7 +2771,7 @@
 </ul>
 <h2 id="remerciements">Remerciements<a class="headerlink" href="#remerciements" title="Permanent link">&para;</a></h2>
 <p>Merci à tous les contributeurs qui aident à améliorer <code>create-go-starter</code>!</p>
-<p>Chaque contribution, grande ou petite, fait une différence. 🙏</p>
+<p>Chaque contribution, grande ou petite, fait une différence. <i class="material-icons small" style="color:#e25555">favorite</i></p>
 <hr />
 <p><strong>Bon coding et merci de contribuer!</strong> <i class="material-icons">rocket_launch</i></p>
 

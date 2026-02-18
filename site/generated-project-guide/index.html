@@ -4188,8 +4188,8 @@
 </ul>
 <p><strong>Pourquoi un package séparé?</strong></p>
 <ul>
-<li><strong>Évite les cycles</strong>: Avant, <code>interfaces</code> → <code>domain/user</code> → <code>interfaces</code> (❌ cycle!)</li>
-<li><strong>Maintenant</strong>: <code>interfaces</code> → <code>models</code> ← <code>domain/user</code> (<span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg></span> pas de cycle)</li>
+<li><strong>Évite les cycles</strong>: Avant, <code>interfaces</code> → <code>domain/user</code> → <code>interfaces</code> (<i class="material-icons error">error</i> cycle!)</li>
+<li><strong>Maintenant</strong>: <code>interfaces</code> → <code>models</code> ← <code>domain/user</code> (<i class="material-icons success">check_circle</i> pas de cycle)</li>
 <li><strong>Clarté</strong>: Séparation entre entities (models) et business logic (domain)</li>
 </ul>
 <h4 id="internaldomain"><code>/internal/domain</code><a class="headerlink" href="#internaldomain" title="Permanent link">&para;</a></h4>

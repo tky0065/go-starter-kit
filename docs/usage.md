@@ -40,12 +40,12 @@ create-go-starter mon-projet --template graphql    # API GraphQL
 
 | Fonctionnalité | minimal | full | graphql |
 |----------------|---------|------|---------|
-| **API REST** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | ❌ |
-| **API GraphQL** | ❌ | ❌ | <i class="material-icons success">check_circle</i> |
-| **Authentification JWT** | ❌ | <i class="material-icons success">check_circle</i> | ❌ |
-| **Gestion utilisateurs** | ❌ | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> |
-| **Documentation Swagger** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | ❌ |
-| **GraphQL Playground** | ❌ | ❌ | <i class="material-icons success">check_circle</i> |
+| **API REST** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | <i class="material-icons error">cancel</i> |
+| **API GraphQL** | <i class="material-icons error">cancel</i> | <i class="material-icons error">cancel</i> | <i class="material-icons success">check_circle</i> |
+| **Authentification JWT** | <i class="material-icons error">cancel</i> | <i class="material-icons success">check_circle</i> | <i class="material-icons error">cancel</i> |
+| **Gestion utilisateurs** | <i class="material-icons error">cancel</i> | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> |
+| **Documentation Swagger** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | <i class="material-icons error">cancel</i> |
+| **GraphQL Playground** | <i class="material-icons error">cancel</i> | <i class="material-icons error">cancel</i> | <i class="material-icons success">check_circle</i> |
 | **Base de données (GORM)** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> |
 | **PostgreSQL** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> |
 | **Dependency Injection (fx)** | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> | <i class="material-icons success">check_circle</i> |
@@ -227,10 +227,10 @@ create-go-starter mon-app --database=postgres
 ```
 
 **Avantages**:
-- ✅ Features SQL avancées (JSON, arrays, full-text search)
-- ✅ Excellente performance et fiabilité
-- ✅ ACID compliant, forte intégrité des données
-- ✅ Idéal pour production
+- <i class="material-icons success small">check</i> Features SQL avancées (JSON, arrays, full-text search)
+- <i class="material-icons success small">check</i> Excellente performance et fiabilité
+- <i class="material-icons success small">check</i> ACID compliant, forte intégrité des données
+- <i class="material-icons success small">check</i> Idéal pour production
 
 **Quand l'utiliser**: Applications production, données complexes, besoin de fiabilité
 
@@ -241,9 +241,9 @@ create-go-starter mon-app --database=mysql
 ```
 
 **Avantages**:
-- ✅ Compatibilité large avec hébergeurs
-- ✅ Excellent pour workloads read-heavy
-- ✅ Écosystème mature et bien documenté
+- <i class="material-icons success small">check</i> Compatibilité large avec hébergeurs
+- <i class="material-icons success small">check</i> Excellent pour workloads read-heavy
+- <i class="material-icons success small">check</i> Écosystème mature et bien documenté
 
 **Quand l'utiliser**: Shared hosting, équipes MySQL, compatibilité large
 
@@ -254,14 +254,14 @@ create-go-starter mon-app --database=sqlite
 ```
 
 **Avantages**:
-- ✅ Zéro configuration (pas de serveur)
-- ✅ Parfait pour prototypage rapide
-- ✅ Base de données dans un seul fichier
-- ✅ Très rapide pour petits datasets
+- <i class="material-icons success small">check</i> Zéro configuration (pas de serveur)
+- <i class="material-icons success small">check</i> Parfait pour prototypage rapide
+- <i class="material-icons success small">check</i> Base de données dans un seul fichier
+- <i class="material-icons success small">check</i> Très rapide pour petits datasets
 
 **Limitations**:
-- ⚠️ Écritures concurrentes limitées
-- ⚠️ Pas adapté pour production à grande échelle
+- <i class="material-icons warning small">warning</i> Écritures concurrentes limitées
+- <i class="material-icons warning small">warning</i> Pas adapté pour production à grande échelle
 
 **Quand l'utiliser**: Prototypage, MVPs, développement, apps embarquées, petite production (<100 utilisateurs)
 
@@ -453,21 +453,41 @@ Comportement standard préservé — aucune régression.
 
 ## Options disponibles
 
-### Flags actuels
+### Flags et alias
 
+Tous les flags disposent d'alias courts pour une saisie plus rapide.
+
+| Flag | Alias | Défaut | Description |
+|------|-------|--------|-------------|
+| `--help` | `-h` | | Afficher l'aide |
+| `--interactive` | `-i` | `false` | Lancer le mode interactif guidé |
+| `--dry-run` | `-n` | `false` | Prévisualiser les fichiers sans les créer |
+| `--template` | `-t` | `full` | Template: `minimal`, `full`, `graphql` |
+| `--database` | `-d` | `postgres` | Base de données: `postgres`, `mysql`, `sqlite` |
+| `--observability` | `-o` | `none` | Observabilité: `none`, `basic`, `advanced` |
+
+**Sous-commandes:**
+
+| Commande | Description |
+|----------|-------------|
+| `doctor` | Diagnostics environnement (Go, Git, Docker) |
+| `add-model` | Générer un modèle CRUD dans un projet existant |
+
+**Syntaxe flexible:** Les flags acceptent `=` ou espace comme séparateur:
 ```bash
-create-go-starter --help                      # Afficher l'aide
-create-go-starter -h                          # Alias pour --help
-create-go-starter --template <type>           # Choisir le template (minimal, full, graphql)
-create-go-starter --database <type>           # Choisir la base de données (postgres, mysql, sqlite)
-create-go-starter --observability <niveau>    # Niveau d'observabilité (none, basic, advanced)
+# Ces syntaxes sont équivalentes:
+create-go-starter -t=minimal mon-app
+create-go-starter -t minimal mon-app
+create-go-starter --template=minimal mon-app
+create-go-starter --template minimal mon-app
 ```
 
-**Exemples**:
+### Exemples
 
 ```bash
 # Template minimal
 create-go-starter mon-projet --template minimal
+create-go-starter mon-projet -t minimal
 
 # Template full (défaut)
 create-go-starter mon-projet --template full
@@ -475,20 +495,171 @@ create-go-starter mon-projet  # Même résultat
 
 # Template GraphQL
 create-go-starter mon-projet --template graphql
+create-go-starter mon-projet -t graphql
 
 # Choisir MySQL comme base de données
 create-go-starter mon-projet --database=mysql
+create-go-starter mon-projet -d mysql
 
 # Choisir SQLite (idéal pour prototypage)
 create-go-starter mon-projet --database=sqlite
+create-go-starter mon-projet -d sqlite
 
 # Combiner template et database
 create-go-starter mon-projet --template=minimal --database=sqlite
+create-go-starter mon-projet -t minimal -d sqlite
+
+# Dry-run : prévisualiser sans créer de fichiers
+create-go-starter mon-projet --dry-run
+create-go-starter mon-projet -n
+
+# Dry-run avec options spécifiques
+create-go-starter mon-projet -t minimal -d sqlite -n
+
+# Mode interactif guidé
+create-go-starter --interactive
+create-go-starter -i
+
+# Combinaison complète avec observabilité
+create-go-starter mon-projet -t full -d postgres -o advanced
 ```
 
 > **Notes**:
 > - Le flag `--template` est optionnel. Si non spécifié, le template **full** est utilisé par défaut.
 > - Le flag `--database` est optionnel. Si non spécifié, **PostgreSQL** est utilisé par défaut.
+> - Le flag `--dry-run` est optionnel. Il affiche la liste des fichiers qui seraient générés sans les créer.
+> - Le flag `--interactive` lance un assistant guidé et ignore les autres flags de configuration.
+
+## Mode Interactif (--interactive) <i class="material-icons success">new_releases</i>
+
+**Nouveau dans v1.4.0!** Le mode interactif guide l'utilisateur étape par étape pour configurer un nouveau projet.
+
+### Utilisation
+
+```bash
+create-go-starter --interactive
+create-go-starter -i
+```
+
+### Fonctionnement
+
+Le mode interactif demande successivement:
+
+1. **Nom du projet** -- Avec validation en temps réel
+2. **Template** -- Choix entre minimal, full (défaut), graphql
+3. **Base de données** -- Choix entre postgres (défaut), mysql, sqlite
+4. **Observabilité** -- Choix entre none (défaut), basic, advanced (si template full)
+5. **Résumé** -- Affichage de la configuration choisie avec confirmation
+
+```
+create-go-starter - Interactive Mode
+
+Enter project name: mon-app
+Select template (minimal/full/graphql) [full]: full
+Select database (postgres/mysql/sqlite) [postgres]: postgres
+Select observability (none/basic/advanced) [none]: advanced
+
+Configuration Summary:
+  Project:       mon-app
+  Template:      full
+  Database:      postgres
+  Observability: advanced
+
+Proceed with generation? (y/n) [y]: y
+```
+
+### Notes
+
+- <i class="material-icons info">info</i> Le mode interactif nécessite un terminal interactif (pas de pipe stdin)
+- <i class="material-icons warning">warning</i> `--interactive` et `--dry-run` ne peuvent pas être utilisés ensemble
+- <i class="material-icons info">info</i> Zéro dépendance externe -- utilise uniquement `bufio.NewReader` de la stdlib
+
+## Prévisualisation Dry-Run (--dry-run) <i class="material-icons success">new_releases</i>
+
+**Nouveau dans v1.4.0!** Le mode dry-run affiche les fichiers qui seraient générés sans les créer.
+
+### Utilisation
+
+```bash
+create-go-starter mon-app --dry-run
+create-go-starter -n -t minimal -d sqlite mon-app
+```
+
+### Fonctionnement
+
+Le dry-run affiche:
+- La configuration utilisée (template, database, observabilité)
+- La liste complète des fichiers qui seraient créés
+- Le nombre de fichiers et répertoires
+- Un avertissement si le répertoire cible existe déjà
+
+```
+Dry-run mode: no files will be created
+
+Configuration:
+  Project:       mon-app
+  Template:      minimal
+  Database:      sqlite
+  Observability: none
+
+Files that would be generated (23 files):
+  mon-app/cmd/main.go
+  mon-app/internal/models/user.go
+  mon-app/internal/domain/user/service.go
+  ...
+
+Summary: 23 files in 12 directories
+```
+
+### Compatible avec tous les flags
+
+```bash
+create-go-starter -n -t full -d postgres -o advanced mon-app
+```
+
+## Commande Doctor <i class="material-icons success">new_releases</i>
+
+**Nouveau dans v1.4.0!** La commande `doctor` vérifie que votre environnement est correctement configuré.
+
+### Utilisation
+
+```bash
+create-go-starter doctor
+```
+
+### Fonctionnement
+
+La commande vérifie:
+
+| Outil | Vérification | Requis |
+|-------|-------------|--------|
+| **Go** | Version >= 1.21 installée | <i class="material-icons success small">check</i> Oui |
+| **Git** | Binaire disponible | <i class="material-icons success small">check</i> Recommandé |
+| **Docker** | Binaire + daemon actif | <i class="material-icons info small">info</i> Optionnel |
+
+### Exemple de sortie
+
+```
+create-go-starter doctor v1.4.0
+
+Checking environment...
+
+  [OK] Go 1.25.5 (minimum: 1.21)
+  [OK] Git 2.43.0
+  [OK] Docker 24.0.7 (daemon running)
+
+All checks passed!
+```
+
+### Code de sortie
+
+- `0` -- Tout est OK
+- `1` -- Un ou plusieurs problèmes détectés
+
+Utile pour les scripts CI/CD:
+```bash
+create-go-starter doctor && echo "Ready!" || echo "Fix issues first"
+```
 
 ## Ajouter des modèles (add-model) <i class="material-icons success">new_releases</i>
 
@@ -874,7 +1045,7 @@ La commande `add-model` utilise des règles de pluralisation simples:
 |----------|--------|-------------|
 | **BelongsTo** (N:1) | <i class="material-icons success">check_circle</i> Supporté | Enfant appartient à un parent |
 | **HasMany** (1:N) | <i class="material-icons success">check_circle</i> Supporté | Parent a plusieurs enfants |
-| **Many-to-Many** | <i class="material-icons warning">error</i> Pas encore | Prévue pour v1.3.0 |
+| **Many-to-Many** | <i class="material-icons warning">error</i> Pas encore | Prévue pour une version future |
 
 **Workaround Many-to-Many:**
 
@@ -1021,11 +1192,11 @@ create-go-starter MonProjet            # ✅ Valide
 ### Exemples invalides
 
 ```bash
-create-go-starter mon projet           ❌ (contient un espace)
-create-go-starter mon-projet!          ❌ (caractère spécial)
-create-go-starter my.project           ❌ (contient un point)
-create-go-starter -mon-projet          ❌ (commence par un tiret)
-create-go-starter mon/projet           ❌ (contient un slash)
+create-go-starter mon projet           # contient un espace
+create-go-starter mon-projet!          # caractère spécial
+create-go-starter my.project           # contient un point
+create-go-starter -mon-projet          # commence par un tiret
+create-go-starter mon/projet           # contient un slash
 ```
 
 ## Structure générée

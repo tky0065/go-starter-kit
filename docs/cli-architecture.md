@@ -737,7 +737,7 @@ func initGitRepo(projectPath string) error  // Initialise le repo et crée le co
 
 **Intégration**:
 - Appelé dans `main.go` après `copyEnvFile()` et avant `printSuccessMessage()`
-- Messages: ":material-wrench: Setting up Git repository..." et ":material-check-circle: Git repository initialized"
+- Messages: "<i class="material-icons">build</i> Setting up Git repository..." et "<i class="material-icons success">check_circle</i> Git repository initialized"
 
 ## Patterns et conventions
 
@@ -1182,17 +1182,24 @@ Pour contribuer au CLI:
 
 ## Roadmap technique
 
+**Complété**:
+- [x] Dry-run mode (`--dry-run`)
+- [x] Templates multiples (minimal, full, graphql)
+- [x] Choix de DB (PostgreSQL, MySQL, SQLite)
+- [x] CLI interactif (`--interactive`)
+- [x] Alias courts (`-t`, `-d`, `-o`, `-i`, `-n`, `-h`)
+- [x] Commande `doctor` pour diagnostics
+- [x] Barre de progression et statistiques
+- [x] Observabilité avancée (Prometheus, Jaeger, Grafana)
+
 **Court terme**:
 - [ ] Version flag (`--version`)
 - [ ] Verbose mode (`--verbose`)
-- [ ] Dry-run mode (`--dry-run`)
 - [ ] Force overwrite (`--force`)
 
 **Moyen terme**:
-- [ ] Templates multiples (minimal, full, api-only)
-- [ ] Choix de DB (PostgreSQL, MySQL, SQLite, MongoDB)
 - [ ] Choix de framework (Fiber, Gin, Echo)
-- [ ] CLI interactif (prompts)
+- [ ] Colored diff pour `--dry-run`
 
 **Long terme**:
 - [ ] Plugin system pour templates custom

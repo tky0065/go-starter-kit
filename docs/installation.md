@@ -267,15 +267,13 @@ cp create-go-starter $(go env GOPATH)/bin/
 
 ### Vérifier la version
 
-> **Note**: La commande `--version` n'est pas encore implémentée dans la version actuelle.
-
-Une fois implémentée:
-
 ```bash
-create-go-starter --version
+create-go-starter doctor
 ```
 
-Pour l'instant, vérifiez le commit Git:
+La commande `doctor` affiche la version du CLI et vérifie votre environnement (Go, Git, Docker).
+
+Pour vérifier le commit Git du repository:
 
 ```bash
 cd /path/to/go-starter-kit

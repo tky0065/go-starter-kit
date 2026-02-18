@@ -424,7 +424,7 @@ Règles simples: `Todo→todos`, `Category→categories`, `Person→persons` (pa
 
 ##### Relations many-to-many
 
-Pas encore supportées nativement (prévu v1.3.0).
+Pas encore supportées nativement (prévu dans une version future).
 
 **Workaround:** Créez une table de jointure manuelle:
 

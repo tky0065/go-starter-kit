@@ -5,6 +5,129 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [1.4.0] - 2026-02-18
+
+### <i class="material-icons success">new_releases</i> Améliorations CLI et Expérience Développeur
+
+Refonte complète de l'expérience utilisateur du CLI: mode interactif guidé, prévisualisation dry-run, diagnostics environnement, barre de progression visuelle, et alias courts pour tous les flags.
+
+### <i class="material-icons success">star</i> Fonctionnalités
+
+#### Mode Interactif (`--interactive` / `-i`)
+
+- **Mode guidé étape par étape** pour configurer un nouveau projet sans mémoriser les flags
+- **Sélection interactive** du template (minimal, full, graphql), base de données (postgres, mysql, sqlite) et niveau d'observabilité (none, basic, advanced)
+- **Résumé de configuration** affiché avant génération avec confirmation
+- **Validation en temps réel** des choix (ex: `advanced` requiert `full`)
+- **Zéro dépendance externe** — utilise uniquement `bufio.NewReader` de la stdlib
+
+```bash
+create-go-starter -i
+# Lance le mode interactif guidé
+```
+
+#### Prévisualisation Dry-Run (`--dry-run` / `-n`)
+
+- **Preview complet** de tous les fichiers qui seraient générés sans écrire sur le disque
+- **Affichage structuré** avec compteur de fichiers et répertoires
+- **Configuration affichée** (template, database, observabilité)
+- **Avertissement** si le répertoire cible existe déjà
+- **Compatible** avec tous les flags (`-t`, `-d`, `-o`)
+
+```bash
+create-go-starter mon-app --dry-run
+create-go-starter -n -t minimal -d sqlite mon-app
+```
+
+#### Commande Doctor (`doctor`)
+
+- **Diagnostics environnement** complets: version de Go (>= 1.21), Git, Docker (binaire + daemon)
+- **Affichage version** du CLI dans le rapport
+- **Code de sortie** 0 (tout OK) ou 1 (problème détecté)
+- **Aide au diagnostic** avant la première utilisation
+
+```bash
+create-go-starter doctor
+```
+
+#### Barre de Progression et Statistiques
+
+- **Barre de progression visuelle** pendant la génération (`[██████░░░░] 18/34 files`)
+- **Statistiques post-génération**: nombre de fichiers, taille totale, temps de génération, détail par étape
+- **Désactivation automatique** sur les terminaux non-TTY ou quand `NO_COLOR` est défini
+
+#### Alias Courts pour tous les Flags
+
+- `-i` pour `--interactive`
+- `-t` pour `--template`
+- `-d` pour `--database`
+- `-o` pour `--observability`
+- `-n` pour `--dry-run`
+- `-h` pour `--help`
+- **Syntaxe flexible**: `-t=minimal`, `-t minimal`, `--template=full`, `--template full`
+- **Détection des flags inconnus** avec message d'erreur clair
+
+### <i class="material-icons">build</i> Architecture
+
+#### Nouveaux fichiers CLI
+
+- `cmd/create-go-starter/interactive.go` — **272 lignes**, mode interactif guidé avec `bufio.NewReader`
+- `cmd/create-go-starter/dryrun.go` — **92 lignes**, prévisualisation des fichiers sans écriture
+- `cmd/create-go-starter/doctor.go` — **229 lignes**, diagnostics environnement (Go, Git, Docker)
+- `cmd/create-go-starter/progress.go` — **63 lignes**, barre de progression terminal
+- `cmd/create-go-starter/stats.go` — **85 lignes**, statistiques de génération
+- `cmd/create-go-starter/version.go` — **4 lignes**, constante de version
+
+#### Refactoring du générateur
+
+- **Séparation build/write**: Les fonctions `generate*Files()` ont été refactorisées en `build*FileList()` (données pures) + `writeFiles()` (I/O avec callback de progression)
+- **Pattern builder**: `getFilesForTemplate()` dispatche vers `buildFullFileList()`, `buildMinimalFileList()`, `buildGraphQLFileList()`
+- **Callback progression**: `writeFiles(files, onProgress)` permet la barre de progression
+
+#### Remplacement du package `flag`
+
+- Le package `flag` de la stdlib a été **entièrement remplacé** par un parsing manuel
+- Support des alias courts (`-t`, `-d`, `-o`, `-i`, `-n`)
+- Support syntaxe `=` (`-t=minimal`) et espace (`-t minimal`)
+- Détection des flags inconnus avec message d'erreur explicite
+
+### <i class="material-icons success">check_circle</i> Tests
+
+- **10 nouveaux fichiers de tests** couvrant les 5 fonctionnalités
+- `interactive_test.go` — 318 lignes de tests pour le mode interactif
+- `dryrun_test.go` — 341 lignes de tests pour le dry-run
+- `doctor_test.go` — 295 lignes de tests pour la commande doctor
+- `progress_test.go` — 232 lignes de tests pour la barre de progression
+- `main_test.go` — +324 lignes: 16 nouveaux tests pour les alias courts
+- **Tous les tests passent** — `go test ./...`
+
+### <i class="material-icons">description</i> Documentation
+
+- Documentation complète mise à jour pour v1.4.0
+- Sections dédiées dans `docs/usage.md` pour chaque nouvelle fonctionnalité
+- Architecture des nouveaux composants dans `docs/cli-architecture.md`
+- FAQ enrichie avec les questions sur les nouvelles fonctionnalités
+- ROADMAP mis à jour avec v1.4.0 complété
+
+### <i class="material-icons info">info</i> Améliorations
+
+- **Expérience débutant** — Le mode interactif guide les nouveaux utilisateurs pas à pas
+- **Productivité** — Les alias courts réduisent la saisie (`-t minimal` au lieu de `--template=minimal`)
+- **Confiance** — Le dry-run permet de vérifier avant de générer
+- **Diagnostic** — La commande doctor aide à résoudre les problèmes d'environnement
+- **Feedback visuel** — La barre de progression et les statistiques informent l'utilisateur
+
+### <i class="material-icons warning">warning</i> Limitations connues
+
+- **`--interactive` et `--dry-run`** ne peuvent pas être utilisés ensemble
+- **Mode interactif** nécessite un terminal interactif (pas de pipe stdin)
+- **Barre de progression** désactivée automatiquement sur terminaux non-TTY
+
+### <i class="material-icons">link</i> Liens
+
+- **Documentation**: https://tky0065.github.io/go-starter-kit/
+- **Release**: [v1.4.0](https://github.com/tky0065/go-starter-kit/releases/tag/v1.4.0)
+
 ## [1.3.0] - 2026-02-17
 
 ### <i class="material-icons success">new_releases</i> Observabilité Avancée
@@ -397,7 +520,7 @@ Le projet a été développé avec les meilleures pratiques de développement lo
 - Documentation complète pour faciliter l'utilisation
 - Code propre et bien structuré
 
-### 🙏 Remerciements
+### <i class="material-icons">favorite</i> Remerciements
 
 Merci à tous les contributeurs et aux projets open-source utilisés :
 - [Fiber](https://github.com/gofiber/fiber) - Framework web
@@ -415,4 +538,7 @@ Merci à tous les contributeurs et aux projets open-source utilisés :
 - **MINOR** (1.X.0): Ajout de fonctionnalités rétro-compatibles
 - **PATCH** (1.0.X): Corrections de bugs rétro-compatibles
 
+[1.4.0]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.4.0
+[1.3.0]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.3.0
+[1.2.0]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.2.0
 [1.0.0]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.0.0

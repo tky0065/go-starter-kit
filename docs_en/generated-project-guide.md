@@ -2,9 +2,6 @@
 
 Complete guide for developing with projects created by `create-go-starter`.
 
-!!! note "Translation in progress"
-    This page is being translated from French. For the complete documentation, please refer to the [French version](../generated-project-guide/).
-
 ## Hexagonal Architecture
 
 Generated projects follow the hexagonal architecture (Ports & Adapters) pattern:

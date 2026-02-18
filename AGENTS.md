@@ -229,6 +229,10 @@ mkdocs gh-deploy              # Deploy to GitHub Pages
 - `docs/stylesheets/extra.css` - Material Icons font + custom styles
 - `mkdocs.yml` - Must include `extra_css: - stylesheets/extra.css`
 
+## Commit Messages
+- Use present tense ("Add feature" not "Added feature")
+- NOT Co-Authored-By lines in commit messages .
+
 ## Quick Reference
 
 | Task | Command |

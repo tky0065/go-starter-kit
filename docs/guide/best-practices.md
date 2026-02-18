@@ -279,7 +279,7 @@ Ce guide couvre tous les aspects du développement avec les projets générés p
   - [fx](https://uber-go.github.io/fx/)
   - [zerolog](https://github.com/rs/zerolog)
 
-**Bon développement!** :material-rocket-launch:
+**Bon développement!** <i class="material-icons info">rocket_launch</i>
 
 Si vous rencontrez des problèmes ou avez des questions, consultez:
 - [Issues GitHub](https://github.com/tky0065/go-starter-kit/issues)

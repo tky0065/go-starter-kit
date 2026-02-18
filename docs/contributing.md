@@ -540,38 +540,20 @@ import (
 
 ## Roadmap
 
-Fonctionnalités prévues pour les prochaines versions:
+**Fonctionnalités complétées** (v1.0 -- v1.4):
 
-### v1.1 - Templates multiples
-- [ ] Template "minimal" (API seulement, sans auth)
-- [ ] Template "full" (tout inclus, actuel)
-- [ ] Template "microservice" (avec gRPC)
-- [ ] Flag `--template=<type>`
+- [x] **Templates multiples** - Trois templates (minimal, full, graphql)
+- [x] **Multi-database** - PostgreSQL, MySQL, SQLite
+- [x] **CRUD Scaffolding** - Commande `add-model` avec relations BelongsTo/HasMany
+- [x] **Observabilité** - Prometheus, Jaeger, Grafana, Health Checks K8s
+- [x] **CLI interactif** - Mode guidé (`--interactive`), dry-run, doctor, alias courts
 
-### v1.2 - Choix de base de données
-- [ ] Support MySQL
-- [ ] Support SQLite
-- [ ] Support MongoDB
-- [ ] Flag `--database=<type>`
+**Fonctionnalités prévues** (v1.5+):
 
-### v1.3 - Choix de framework web
-- [ ] Support Gin
-- [ ] Support Echo
-- [ ] Support Chi
-- [ ] Flag `--framework=<type>`
-
-### v1.4 - Features avancées
-- [ ] CLI interactif (prompts)
-- [ ] GraphQL template
-- [ ] gRPC template
-- [ ] WebSocket support
-- [ ] Event sourcing template
-
-### v2.0 - Plugin system
-- [ ] Plugin API pour templates custom
-- [ ] Template marketplace
-- [ ] Hot-reload des templates
-- [ ] GUI pour génération
+- [ ] Choix du framework web (Gin, Echo, Chi)
+- [ ] Génération de microservices
+- [ ] Templates de tests E2E
+- [ ] Plugin system pour templates custom
 
 **Comment contribuer au roadmap**:
 - Votez pour les features dans Discussions
@@ -590,7 +572,7 @@ Si vous avez des questions:
 
 Merci à tous les contributeurs qui aident à améliorer `create-go-starter`!
 
-Chaque contribution, grande ou petite, fait une différence. 🙏
+Chaque contribution, grande ou petite, fait une différence. <i class="material-icons small" style="color:#e25555">favorite</i>
 
 ---
 

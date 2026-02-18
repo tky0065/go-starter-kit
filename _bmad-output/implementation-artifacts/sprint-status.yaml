@@ -85,12 +85,13 @@ development_status:
   9-4-grafana-dashboard-template: done
   epic-9-retrospective: optional
 
-  # Epic 10 - CLI Enhancements & Developer Experience (ROADMAP)
-  epic-10: backlog
-  10-1-interactive-mode: backlog
-  10-2-dry-run-preview: backlog
-  10-3-doctor-command: backlog
-  10-4-visual-feedback-progress: backlog
+  # Epic 10 - CLI Enhancements & Developer Experience (v1.4.0 - EN COURS)
+  epic-10: in-progress
+  10-1-interactive-mode: done
+  10-2-dry-run-preview: done
+  10-3-doctor-command: done
+  10-4-visual-feedback-progress: done
+  10-5-fait-aliases-pour-les-options: done
   epic-10-retrospective: optional
 
   # Epic 11 - Multi-Framework Support (v2.0.0 - ROADMAP)

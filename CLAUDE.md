@@ -321,6 +321,8 @@ extra_css:
   - stylesheets/extra.css
 ```
 
+
+
 #### Using Material Icons in Markdown
 
 **IMPORTANT**: Do NOT use the `:material-icon-name:` syntax as it renders as emoji. Instead, use HTML with the Material Icons web font:
@@ -417,3 +419,7 @@ When adding or modifying documentation:
 - Use admonitions for important notes (warning, info, danger)
 - Keep line length reasonable (80-120 characters)
 - Use Material Icons consistently throughout docs
+
+## Commit Messages
+- Use present tense ("Add feature" not "Added feature")
+- NOT Co-Authored-By lines in commit messages .

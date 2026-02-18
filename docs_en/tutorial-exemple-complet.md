@@ -2,9 +2,6 @@
 
 A step-by-step tutorial to create and develop a complete project.
 
-!!! note "Translation in progress"
-    This page is being translated from French. For the complete documentation, please refer to the [French version](../tutorial-exemple-complet/).
-
 ## Overview
 
 In this tutorial, we will:

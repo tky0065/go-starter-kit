@@ -12,7 +12,7 @@ go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@latest
 
 **Vérification**:
 ```bash
-create-go-starter --help
+create-go-starter doctor
 ```
 
 ---
@@ -25,6 +25,8 @@ cd my-api
 ```
 
 <i class="material-icons success small">check</i> **Généré**: ~45 fichiers avec architecture hexagonale complète
+
+> **Astuce**: Utilisez `create-go-starter -n my-api` pour prévisualiser les fichiers avant de les créer, ou `create-go-starter -i` pour le mode interactif guidé.
 
 ---
 

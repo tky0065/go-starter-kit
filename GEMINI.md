@@ -379,6 +379,10 @@ extra_css:
 4. **Build** - Run `mkdocs build --clean` to verify
 5. **Deploy** - Run `mkdocs gh-deploy` or push to trigger CI/CD
 
+## Commit Messages
+- Use present tense ("Add feature" not "Added feature")
+- NOT Co-Authored-By lines in commit messages .
+
 ### Best Practices
 
 - ✅ Use Material Icons HTML syntax consistently throughout documentation
@@ -386,5 +390,5 @@ extra_css:
 - ✅ Test documentation locally before deploying
 - ✅ Keep line length reasonable (80-120 chars) for readability
 - ✅ Use French language for all content
-- ❌ Don't use emoji syntax (`:material-icon:`) - it won't render correctly
+- ❌ Don't use emoji syntax (`:material-icon:`) - it won't render correctl
 - ❌ Don't forget to activate venv before running mkdocs commands

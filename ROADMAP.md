@@ -2,37 +2,42 @@
 
 Ce document présente la vision et les prochaines étapes pour l'évolution de `create-go-starter`.
 
-## :material-rocket-launch: Version Actuelle: v1.3.0
+## <i class="material-icons">rocket_launch</i> Version Actuelle: v1.4.0
 
-**Date de release**: 17 février 2026  
-**Statut**: :material-check: Production Ready
+**Date de release**: 18 février 2026  
+**Statut**: <i class="material-icons success">check</i> Production Ready
 
 ### Fonctionnalités Disponibles
 
-- :material-check: 3 templates de projet (minimal, full, graphql)
-- :material-check: Architecture hexagonale
-- :material-check: JWT Authentication (access + refresh tokens)
-- :material-check: User CRUD complet
-- :material-check: API REST avec Fiber v2
-- :material-check: API GraphQL avec gqlgen
-- :material-check: PostgreSQL + GORM
-- :material-check: Swagger/OpenAPI docs
-- :material-check: Docker multi-stage optimisé
-- :material-check: GitHub Actions CI/CD
-- :material-check: Tests complets (unitaires + intégration)
-- :material-check: Initialisation Git automatique
-- :material-check: Installation dépendances automatique
-- :material-check: Support Multi-Base de Données (PostgreSQL, MySQL, SQLite)
-- :material-check: CRUD Scaffolding Generator (add-model command)
-- :material-check: Observabilité Avancée (Prometheus, Jaeger, Grafana, Health Checks K8s)
+- <i class="material-icons success">check</i> 3 templates de projet (minimal, full, graphql)
+- <i class="material-icons success">check</i> Architecture hexagonale
+- <i class="material-icons success">check</i> JWT Authentication (access + refresh tokens)
+- <i class="material-icons success">check</i> User CRUD complet
+- <i class="material-icons success">check</i> API REST avec Fiber v2
+- <i class="material-icons success">check</i> API GraphQL avec gqlgen
+- <i class="material-icons success">check</i> PostgreSQL + GORM
+- <i class="material-icons success">check</i> Swagger/OpenAPI docs
+- <i class="material-icons success">check</i> Docker multi-stage optimisé
+- <i class="material-icons success">check</i> GitHub Actions CI/CD
+- <i class="material-icons success">check</i> Tests complets (unitaires + intégration)
+- <i class="material-icons success">check</i> Initialisation Git automatique
+- <i class="material-icons success">check</i> Installation dépendances automatique
+- <i class="material-icons success">check</i> Support Multi-Base de Données (PostgreSQL, MySQL, SQLite)
+- <i class="material-icons success">check</i> CRUD Scaffolding Generator (add-model command)
+- <i class="material-icons success">check</i> Observabilité Avancée (Prometheus, Jaeger, Grafana, Health Checks K8s)
+- <i class="material-icons success">check</i> Mode Interactif guidé (`--interactive` / `-i`)
+- <i class="material-icons success">check</i> Prévisualisation Dry-Run (`--dry-run` / `-n`)
+- <i class="material-icons success">check</i> Commande Doctor (diagnostics environnement)
+- <i class="material-icons success">check</i> Barre de progression et statistiques de génération
+- <i class="material-icons success">check</i> Alias courts pour tous les flags (`-t`, `-d`, `-o`, `-i`, `-n`, `-h`)
 
 ---
 
-## :material-trending-up: Prochaines Fonctionnalités
+## <i class="material-icons">trending_up</i> Prochaines Fonctionnalités
 
 Fonctionnalités planifiées pour les prochaines versions.
 
-### ~~v1.1.0 - Support Multi-Base de Données~~ :material-check: Complété
+### ~~v1.1.0 - Support Multi-Base de Données~~ <i class="material-icons success">check</i> Complété
 
 **Description**: Permettre aux utilisateurs de choisir leur base de données préférée.
 
@@ -68,7 +73,7 @@ Fonctionnalités planifiées pour les prochaines versions.
 
 ---
 
-### ~~CRUD Scaffolding Generator~~ :material-check: Complété (v1.2.0)
+### ~~CRUD Scaffolding Generator~~ <i class="material-icons success">check</i> Complété (v1.2.0)
 
 **Description**: Générer automatiquement du code CRUD pour de nouveaux modèles.
 
@@ -109,7 +114,7 @@ create-go-starter add-model Todo --fields "title:string,completed:bool,dueDate:t
 
 ---
 
-### ~~Observabilité Avancée~~ :material-check: Complété (v1.3.0)
+### ~~Observabilité Avancée~~ <i class="material-icons success">check</i> Complété (v1.3.0)
 
 **Description**: Ajouter monitoring et observabilité pour projets production.
 
@@ -151,7 +156,53 @@ create-go-starter add-model Todo --fields "title:string,completed:bool,dueDate:t
 
 ---
 
-###  Support Multi-Framework 🎭
+### ~~Améliorations CLI et Expérience Développeur~~ <i class="material-icons success">check</i> Complété (v1.4.0)
+
+**Description**: Refonte complète de l'expérience utilisateur du CLI.
+
+**Priorité**: Haute  
+**Temps estimé**: 2-3 semaines  
+**Version cible**: v1.4.0
+
+#### Ce qui a été ajouté
+
+1. **Mode Interactif (`--interactive` / `-i`)**
+   - Assistant guidé étape par étape
+   - Sélection interactive du template, database, observabilité
+   - Résumé de configuration avec confirmation
+   - Zéro dépendance externe (stdlib uniquement)
+
+2. **Prévisualisation Dry-Run (`--dry-run` / `-n`)**
+   - Preview des fichiers sans écriture sur disque
+   - Compteur fichiers/répertoires
+   - Compatible avec tous les flags
+
+3. **Commande Doctor**
+   - Diagnostics Go (>= 1.21), Git, Docker
+   - Rapport clair avec statut de chaque outil
+   - Code de sortie pour scripts CI
+
+4. **Feedback Visuel**
+   - Barre de progression pendant la génération
+   - Statistiques post-génération (fichiers, taille, temps)
+   - Désactivation automatique sur non-TTY / NO_COLOR
+
+5. **Alias Courts**
+   - `-t`, `-d`, `-o`, `-i`, `-n`, `-h`
+   - Syntaxe flexible: `-t=minimal`, `-t minimal`
+   - Détection des flags inconnus
+
+**Objectifs**:
+- [x] Mode interactif fonctionnel
+- [x] Dry-run avec affichage structuré
+- [x] Doctor vérifie Go, Git, Docker
+- [x] Barre de progression et statistiques
+- [x] Alias courts pour tous les flags
+- [x] Tests complets pour les 5 fonctionnalités
+
+---
+
+### Support Multi-Framework
 
 **Description**: Supporter d'autres frameworks Go populaires (Gin, Echo).
 
@@ -182,11 +233,11 @@ create-go-starter add-model Todo --fields "title:string,completed:bool,dueDate:t
 
 ---
 
-## :material-crystal-ball: Vision Long-Terme (Future)
+## <i class="material-icons">auto_awesome</i> Vision Long-Terme (Future)
 
 Transformation en plateforme écosystémique communautaire.
 
-###  Plugin System & Marketplace
+### Plugin System & Marketplace
 
 **Description**: Permettre à la communauté de créer et partager des plugins.
 
@@ -204,7 +255,7 @@ Transformation en plateforme écosystémique communautaire.
 
 ---
 
-###  Interface Web/Dashboard
+### Interface Web/Dashboard
 
 **Description**: Interface graphique pour créer et gérer projets.
 
@@ -219,7 +270,7 @@ Transformation en plateforme écosystémique communautaire.
 
 ---
 
-###  Cloud Deployment Automation
+### Cloud Deployment Automation
 
 **Description**: Déploiement one-click vers cloud providers.
 
@@ -236,9 +287,9 @@ Transformation en plateforme écosystémique communautaire.
 
 ---
 
-## :material-clipboard-list: Backlog d'Améliorations Mineures
+## <i class="material-icons">assignment</i> Backlog d'Améliorations Mineures
 
-Améliorations continues pour versions patch (v1.0.x, v1.1.x, etc.).
+Améliorations continues pour versions patch.
 
 ### Templates & Code Generation
 
@@ -253,13 +304,13 @@ Améliorations continues pour versions patch (v1.0.x, v1.1.x, etc.).
 
 ### CLI Improvements
 
-- [ ] Mode interactif pour sélection template (`create-go-starter --interactive`)
-- [ ] Flag `--dry-run` pour preview sans génération
+- [x] Mode interactif pour sélection template (`create-go-starter --interactive`)
+- [x] Flag `--dry-run` pour preview sans génération
 - [ ] Flag `--update` pour mettre à jour projet existant
-- [ ] Commande `create-go-starter doctor` pour diagnostics
+- [x] Commande `create-go-starter doctor` pour diagnostics
 - [ ] Colored diff pour `--dry-run`
-- [ ] Progress bar pendant génération
-- [ ] Statistiques post-génération (fichiers créés, taille, etc.)
+- [x] Progress bar pendant génération
+- [x] Statistiques post-génération (fichiers créés, taille, etc.)
 
 ### Documentation
 
@@ -269,7 +320,7 @@ Améliorations continues pour versions patch (v1.0.x, v1.1.x, etc.).
 - [ ] Best practices guide
 - [ ] Migration guides (from scratch, from other starters)
 - [ ] Troubleshooting guide
-- [ ] FAQ section
+- [x] FAQ section
 - [ ] Architecture Decision Records (ADRs)
 
 ### Testing & Quality
@@ -304,7 +355,7 @@ Améliorations continues pour versions patch (v1.0.x, v1.1.x, etc.).
 
 ---
 
-## :material-vote: Community Feedback
+## <i class="material-icons">how_to_vote</i> Community Feedback
 
 Nous écoutons activement la communauté! Si vous avez des idées ou suggestions:
 
@@ -314,16 +365,16 @@ Nous écoutons activement la communauté! Si vous avez des idées ou suggestions
 
 ---
 
-## :material-chart-bar: Métriques de Succès
+## <i class="material-icons">bar_chart</i> Métriques de Succès
 
-### Objectifs 3 Mois (Avril 2026)
+### Objectifs 3 Mois (Mai 2026)
 
 - [ ] 1,000+ installations du CLI
 - [ ] 500+ étoiles GitHub
 - [ ] 10+ contributors
 - [ ] 50+ projets créés en production
 
-### Objectifs 12 Mois (Janvier 2027)
+### Objectifs 12 Mois (Février 2027)
 
 - [ ] 5,000+ étoiles GitHub (Top 5 Go starters)
 - [ ] 60% des utilisateurs créent 2+ projets
@@ -333,7 +384,7 @@ Nous écoutons activement la communauté! Si vous avez des idées ou suggestions
 
 ---
 
-## :material-handshake: Comment Contribuer
+## <i class="material-icons">handshake</i> Comment Contribuer
 
 Vous souhaitez contribuer à ces fonctionnalités? Consultez:
 
@@ -343,5 +394,5 @@ Vous souhaitez contribuer à ces fonctionnalités? Consultez:
 
 ---
 
-**Dernière mise à jour**: 17 février 2026  
-**Version du document**: 1.3
+**Dernière mise à jour**: 18 février 2026  
+**Version du document**: 1.4

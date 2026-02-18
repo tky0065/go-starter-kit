@@ -2,9 +2,6 @@
 
 Thank you for your interest in contributing to Go Starter Kit!
 
-!!! note "Translation in progress"
-    This page is being translated from French. For the complete documentation, please refer to the [French version](../contributing/).
-
 ## How to Contribute
 
 ### Reporting Bugs

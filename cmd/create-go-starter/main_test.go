@@ -565,3 +565,327 @@ func TestTemplateFlagBothSyntaxes(t *testing.T) {
 		})
 	}
 }
+
+// ============================================================================
+// Story 10.5: Short Flag Aliases Tests (AC: #1-#9)
+// ============================================================================
+
+// TestShortFlagInteractive tests that -i is equivalent to --interactive (AC: #1)
+func TestShortFlagInteractive(t *testing.T) {
+	cmd := exec.Command(binaryPath, "-i")
+	// Pipe empty stdin to make interactive mode exit quickly (EOF triggers exit)
+	cmd.Stdin = strings.NewReader("")
+	output, _ := cmd.CombinedOutput()
+	// -i should launch interactive mode - verify the flag is recognized (no "unknown flag" error)
+	outputStr := string(output)
+	if strings.Contains(outputStr, "unknown flag: -i") {
+		t.Errorf("Expected -i to be recognized as --interactive, got: %s", outputStr)
+	}
+	// Should not show "Project name is required" (which would mean interactive flag was not set)
+	if strings.Contains(outputStr, "Project name is required") {
+		t.Errorf("Expected -i to trigger interactive mode, not require project name: %s", outputStr)
+	}
+	// Verify the output mentions interactive mode or prompts the user
+	// (The mode should output something indicating interactive behavior)
+	if strings.Contains(outputStr, "Usage:") {
+		t.Errorf("Expected -i to enter interactive mode, not show usage: %s", outputStr)
+	}
+}
+
+// TestShortFlagTemplate tests that -t minimal is equivalent to --template=minimal (AC: #2)
+func TestShortFlagTemplate(t *testing.T) {
+	testProjectName := "test-short-template"
+	defer os.RemoveAll(testProjectName)
+
+	cmd := exec.Command(binaryPath, "-t", "minimal", testProjectName)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Expected success with -t minimal, got error: %v\nOutput: %s", err, string(output))
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "template: minimal") {
+		t.Errorf("Expected 'template: minimal' in output with -t flag, got: %s", outputStr)
+	}
+}
+
+// TestShortFlagTemplateWithEquals tests that -t=minimal works (AC: #2)
+func TestShortFlagTemplateWithEquals(t *testing.T) {
+	testProjectName := "test-short-template-eq"
+	defer os.RemoveAll(testProjectName)
+
+	cmd := exec.Command(binaryPath, "-t=minimal", testProjectName)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Expected success with -t=minimal, got error: %v\nOutput: %s", err, string(output))
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "template: minimal") {
+		t.Errorf("Expected 'template: minimal' in output with -t= flag, got: %s", outputStr)
+	}
+}
+
+// TestShortFlagDatabase tests that -d sqlite is equivalent to --database=sqlite (AC: #3)
+func TestShortFlagDatabase(t *testing.T) {
+	testProjectName := "test-short-database"
+	defer os.RemoveAll(testProjectName)
+
+	cmd := exec.Command(binaryPath, "-d", "sqlite", testProjectName)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Expected success with -d sqlite, got error: %v\nOutput: %s", err, string(output))
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "database: sqlite") {
+		t.Errorf("Expected 'database: sqlite' in output with -d flag, got: %s", outputStr)
+	}
+}
+
+// TestShortFlagDatabaseWithEquals tests that -d=sqlite works (AC: #3)
+func TestShortFlagDatabaseWithEquals(t *testing.T) {
+	testProjectName := "test-short-database-eq"
+	defer os.RemoveAll(testProjectName)
+
+	cmd := exec.Command(binaryPath, "-d=sqlite", testProjectName)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Expected success with -d=sqlite, got error: %v\nOutput: %s", err, string(output))
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "database: sqlite") {
+		t.Errorf("Expected 'database: sqlite' in output with -d= flag, got: %s", outputStr)
+	}
+}
+
+// TestShortFlagObservability tests that -o basic is equivalent to --observability=basic (AC: #4)
+func TestShortFlagObservability(t *testing.T) {
+	testProjectName := "test-short-obs"
+	defer os.RemoveAll(testProjectName)
+
+	cmd := exec.Command(binaryPath, "-o", "basic", testProjectName)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Expected success with -o basic, got error: %v\nOutput: %s", err, string(output))
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "observability: basic") {
+		t.Errorf("Expected 'observability: basic' in output with -o flag, got: %s", outputStr)
+	}
+}
+
+// TestShortFlagObservabilityWithEquals tests that -o=basic works (AC: #4)
+func TestShortFlagObservabilityWithEquals(t *testing.T) {
+	testProjectName := "test-short-obs-eq"
+	defer os.RemoveAll(testProjectName)
+
+	cmd := exec.Command(binaryPath, "-o=basic", testProjectName)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Expected success with -o=basic, got error: %v\nOutput: %s", err, string(output))
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "observability: basic") {
+		t.Errorf("Expected 'observability: basic' in output with -o= flag, got: %s", outputStr)
+	}
+}
+
+// TestShortFlagDryRun tests that -n is equivalent to --dry-run (AC: #5)
+func TestShortFlagDryRun(t *testing.T) {
+	testProjectName := "test-short-dryrun"
+
+	cmd := exec.Command(binaryPath, "-n", testProjectName)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Expected success with -n (dry-run), got error: %v\nOutput: %s", err, string(output))
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "DRY RUN") && !strings.Contains(outputStr, "dry-run") && !strings.Contains(outputStr, "dry run") {
+		t.Errorf("Expected dry-run output with -n flag, got: %s", outputStr)
+	}
+	// Verify no directory was created
+	if _, err := os.Stat(testProjectName); !os.IsNotExist(err) {
+		os.RemoveAll(testProjectName)
+		t.Errorf("Dry-run should not create directory, but %s was created", testProjectName)
+	}
+}
+
+// TestShortFlagHelpStillWorks tests that -h still works (AC: #6)
+func TestShortFlagHelpStillWorks(t *testing.T) {
+	cmd := exec.Command(binaryPath, "-h")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Errorf("Expected exit code 0 for -h, but got error: %v", err)
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "Usage:") {
+		t.Errorf("Expected usage message for -h, got: %s", outputStr)
+	}
+}
+
+// TestHelpShowsShortAliases tests that --help displays short flag aliases (AC: #7)
+func TestHelpShowsShortAliases(t *testing.T) {
+	cmd := exec.Command(binaryPath, "--help")
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Expected exit code 0 for --help, but got error: %v", err)
+	}
+
+	outputStr := string(output)
+
+	// Verify short aliases are shown in help
+	if !strings.Contains(outputStr, "-d,") {
+		t.Errorf("Expected -d, alias for --database in help, got: %s", outputStr)
+	}
+	if !strings.Contains(outputStr, "-t,") {
+		t.Errorf("Expected -t, alias for --template in help, got: %s", outputStr)
+	}
+	if !strings.Contains(outputStr, "-o,") {
+		t.Errorf("Expected -o, alias for --observability in help, got: %s", outputStr)
+	}
+	if !strings.Contains(outputStr, "-i,") {
+		t.Errorf("Expected -i, alias for --interactive in help, got: %s", outputStr)
+	}
+	if !strings.Contains(outputStr, "-n,") {
+		t.Errorf("Expected -n, alias for --dry-run in help, got: %s", outputStr)
+	}
+}
+
+// TestCombinedShortFlags tests that multiple short flags work together (AC: #8)
+func TestCombinedShortFlags(t *testing.T) {
+	testProjectName := "test-combined-short"
+	defer os.RemoveAll(testProjectName)
+
+	cmd := exec.Command(binaryPath, "-d", "sqlite", "-t", "minimal", testProjectName)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Expected success with combined short flags, got error: %v\nOutput: %s", err, string(output))
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "database: sqlite") {
+		t.Errorf("Expected 'database: sqlite' in combined short flags output, got: %s", outputStr)
+	}
+	if !strings.Contains(outputStr, "template: minimal") {
+		t.Errorf("Expected 'template: minimal' in combined short flags output, got: %s", outputStr)
+	}
+}
+
+// TestMixedShortAndLongFlags tests that short and long flags can be combined (AC: #8)
+func TestMixedShortAndLongFlags(t *testing.T) {
+	testProjectName := "test-mixed-flags"
+	defer os.RemoveAll(testProjectName)
+
+	cmd := exec.Command(binaryPath, "-d", "sqlite", "--template=full", testProjectName)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Expected success with mixed flags, got error: %v\nOutput: %s", err, string(output))
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "database: sqlite") {
+		t.Errorf("Expected 'database: sqlite' in mixed flags output, got: %s", outputStr)
+	}
+	if !strings.Contains(outputStr, "template: full") {
+		t.Errorf("Expected 'template: full' in mixed flags output, got: %s", outputStr)
+	}
+}
+
+// TestUnknownFlagError tests that unknown flags show a clear error message (AC: #9)
+func TestUnknownFlagError(t *testing.T) {
+	cmd := exec.Command(binaryPath, "-x", "my-project")
+	output, err := cmd.CombinedOutput()
+
+	if err == nil {
+		t.Error("Expected non-zero exit code for unknown flag -x")
+		os.RemoveAll("my-project")
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "unknown flag: -x") {
+		t.Errorf("Expected 'unknown flag: -x' in error output, got: %s", outputStr)
+	}
+}
+
+// TestUnknownLongFlagError tests that unknown long flags also show a clear error (AC: #9)
+func TestUnknownLongFlagError(t *testing.T) {
+	cmd := exec.Command(binaryPath, "--unknown-flag", "my-project")
+	output, err := cmd.CombinedOutput()
+
+	if err == nil {
+		t.Error("Expected non-zero exit code for unknown flag --unknown-flag")
+		os.RemoveAll("my-project")
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "unknown flag: --unknown-flag") {
+		t.Errorf("Expected 'unknown flag: --unknown-flag' in error output, got: %s", outputStr)
+	}
+}
+
+// TestUnknownFlagWithValueDoesNotConsume tests that unknown flag -x followed by a value
+// does not silently consume the value as projectName (AC: #9)
+func TestUnknownFlagWithValueDoesNotConsume(t *testing.T) {
+	cmd := exec.Command(binaryPath, "-x", "sqlite", "my-project")
+	output, err := cmd.CombinedOutput()
+
+	if err == nil {
+		t.Error("Expected non-zero exit code for unknown flag -x followed by value")
+		os.RemoveAll("my-project")
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "unknown flag: -x") {
+		t.Errorf("Expected 'unknown flag: -x' in error output, got: %s", outputStr)
+	}
+}
+
+// TestLongFlagsBackwardCompatibility tests that long flags still work after adding short aliases (AC: #8)
+func TestLongFlagsBackwardCompatibility(t *testing.T) {
+	testProjectName := "test-backward-compat"
+	defer os.RemoveAll(testProjectName)
+
+	cmd := exec.Command(binaryPath, "--database=postgres", "--template=full", testProjectName)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Expected success with long flags (backward compat), got error: %v\nOutput: %s", err, string(output))
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "database: postgres") {
+		t.Errorf("Expected 'database: postgres' with long flags, got: %s", outputStr)
+	}
+	if !strings.Contains(outputStr, "template: full") {
+		t.Errorf("Expected 'template: full' with long flags, got: %s", outputStr)
+	}
+}

@@ -579,8 +579,8 @@ type AuthResponse struct {
 
 **Pourquoi un package séparé?**
 
-- **Évite les cycles**: Avant, `interfaces` → `domain/user` → `interfaces` (❌ cycle!)
-- **Maintenant**: `interfaces` → `models` ← `domain/user` (:material-check-circle: pas de cycle)
+- **Évite les cycles**: Avant, `interfaces` → `domain/user` → `interfaces` (<i class="material-icons error">error</i> cycle!)
+- **Maintenant**: `interfaces` → `models` ← `domain/user` (<i class="material-icons success">check_circle</i> pas de cycle)
 - **Clarté**: Séparation entre entities (models) et business logic (domain)
 
 #### `/internal/domain`
@@ -4111,7 +4111,7 @@ logger.Fatal().
 
 #### Best practices
 
-**:material-check-circle: BON - Structured logging**:
+**<i class="material-icons success">check_circle</i> BON - Structured logging**:
 
 ```go
 logger.Info().
@@ -4127,7 +4127,7 @@ logger.Info().
 logger.Info().Msgf("User %s logged in after %v", userID, elapsed)
 ```
 
-**:material-check-circle: BON - Pas de secrets**:
+**<i class="material-icons success">check_circle</i> BON - Pas de secrets**:
 
 ```go
 logger.Info().Str("email", email).Msg("User login attempt")
@@ -4617,7 +4617,7 @@ Ce guide couvre tous les aspects du développement avec les projets générés p
   - [fx](https://uber-go.github.io/fx/)
   - [zerolog](https://github.com/rs/zerolog)
 
-**Bon développement!** :material-rocket-launch:
+**Bon développement!** <i class="material-icons info">rocket_launch</i>
 
 Si vous rencontrez des problèmes ou avez des questions, consultez:
 - [Issues GitHub](https://github.com/tky0065/go-starter-kit/issues)

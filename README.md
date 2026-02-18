@@ -8,11 +8,12 @@ Un outil CLI puissant pour générer des projets Go prêts pour la production en
 
 ## Version actuelle
 
-**v1.3.0** - Stable et prêt pour la production
+**v1.4.0** - Stable et prêt pour la production
 
  **Production ready** - Utilisé dans des projets réels
  **3 templates** - Minimal, Full (JWT), GraphQL
  **Observabilité avancée** - Prometheus, Jaeger, Grafana, Health checks K8s
+ **CLI interactif** - Mode guidé, dry-run, diagnostics, alias courts
  **Bien testé** - Tests unitaires et E2E
  **Documentation complète** - Guides et exemples
  **Open source** - MIT License
@@ -45,7 +46,7 @@ Installation globale en une seule commande, sans cloner le repository:
 
 ```bash
 # Version stable (recommandée)
-go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@v1.3.0
+go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@v1.4.0
 
 # Ou dernière version
 go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@latest
@@ -189,6 +190,59 @@ create-go-starter mon-app --template=full --database=postgres --observability=ad
 
 Pour plus de détails, consultez le [guide d'observabilité](./docs/usage.md#observabilité---observability).
 
+### Améliorations CLI (Nouveau! v1.4.0)
+
+La v1.4.0 apporte des améliorations majeures à l'expérience utilisateur du CLI: mode interactif guidé, prévisualisation dry-run, diagnostics environnement, et alias courts pour tous les flags.
+
+#### Mode interactif
+
+```bash
+# Lancer le mode interactif guidé
+create-go-starter --interactive
+create-go-starter -i
+```
+
+Le mode interactif guide l'utilisateur étape par étape pour configurer un nouveau projet: nom du projet, choix du template, base de données, et niveau d'observabilité. Un résumé est affiché avant la génération avec confirmation.
+
+#### Prévisualisation dry-run
+
+```bash
+# Voir les fichiers qui seraient générés sans les créer
+create-go-starter mon-app --dry-run
+create-go-starter -n -t minimal -d sqlite mon-app
+```
+
+Le mode dry-run affiche la liste complète des fichiers et répertoires qui seraient créés, avec compteur et configuration, sans écrire sur le disque.
+
+#### Diagnostics environnement
+
+```bash
+# Vérifier que l'environnement est prêt
+create-go-starter doctor
+```
+
+La commande `doctor` vérifie la version de Go (>= 1.21), Git, et Docker (binaire + daemon), et affiche un rapport clair avec le statut de chaque outil.
+
+#### Alias courts
+
+Tous les flags disposent maintenant d'alias courts pour une saisie plus rapide:
+
+| Flag | Alias | Exemple |
+|------|-------|---------|
+| `--template` | `-t` | `-t minimal` |
+| `--database` | `-d` | `-d sqlite` |
+| `--observability` | `-o` | `-o advanced` |
+| `--interactive` | `-i` | `-i` |
+| `--dry-run` | `-n` | `-n` |
+| `--help` | `-h` | `-h` |
+
+```bash
+# Exemples avec alias courts
+create-go-starter -t graphql -d postgres mon-app
+create-go-starter -n -t minimal -d sqlite mon-app
+create-go-starter -t full -d postgres -o advanced mon-app
+```
+
 #### FAQ - Choix de base de données
 
 **Quelle base de données dois-je choisir?**  
@@ -265,13 +319,13 @@ create-go-starter add-model Category --fields "name:string:unique" --has-many Pr
 ```
 
 **Fonctionnalités générées automatiquement:**
-- ✅ Model avec tags GORM (`internal/models/`)
-- ✅ Repository interface et implémentation
-- ✅ Service avec logique métier
-- ✅ Handlers HTTP avec endpoints CRUD complets
-- ✅ Tests unitaires (service + handler)
-- ✅ Routes automatiquement ajoutées
-- ✅ Support des relations (foreign keys, preloading)
+- <i class="material-icons success small">check</i> Model avec tags GORM (`internal/models/`)
+- <i class="material-icons success small">check</i> Repository interface et implémentation
+- <i class="material-icons success small">check</i> Service avec logique métier
+- <i class="material-icons success small">check</i> Handlers HTTP avec endpoints CRUD complets
+- <i class="material-icons success small">check</i> Tests unitaires (service + handler)
+- <i class="material-icons success small">check</i> Routes automatiquement ajoutées
+- <i class="material-icons success small">check</i> Support des relations (foreign keys, preloading)
 
 **Relations supportées:**
 - `--belongs-to <Parent>` - Ajoute foreign key + champ relation (ex: `Comment` belongs to `Todo`)
@@ -557,18 +611,22 @@ create-go-starter app --template=graphql --database=postgres
 
 ## Roadmap
 
-**Fonctionnalités complétées** (v1.0 — v1.3):
+**Fonctionnalités complétées** (v1.0 -- v1.4):
 
 - [x] **Templates multiples** - Trois templates disponibles (minimal, full, graphql)
 - [x] **Multi-database support** - PostgreSQL, MySQL, SQLite avec migration guides
 - [x] **CRUD Scaffolding** - Commande `add-model` avec relations BelongsTo/HasMany
 - [x] **Observabilité avancée** - Prometheus, Jaeger/OpenTelemetry, Grafana, Health checks K8s
+- [x] **CLI interactif** - Mode guidé étape par étape (`--interactive`)
+- [x] **Dry-run** - Prévisualisation des fichiers sans génération (`--dry-run`)
+- [x] **Diagnostics** - Commande `doctor` pour vérifier l'environnement
+- [x] **Alias courts** - `-t`, `-d`, `-o`, `-i`, `-n`, `-h` pour tous les flags
+- [x] **Feedback visuel** - Barre de progression et statistiques post-génération
 
-**Fonctionnalités prévues** (v1.4+):
+**Fonctionnalités prévues** (v1.5+):
 
 - [ ] Support NoSQL (MongoDB) - en attente de demande communautaire
 - [ ] Choix du framework web (Gin, Echo, Chi)
-- [ ] CLI interactif avec prompts
 - [ ] Génération de microservices
 - [ ] Templates de tests E2E avancés
 - [ ] Configuration Kubernetes avancée
@@ -589,6 +647,6 @@ Construit avec les excellentes bibliothèques de la communauté Go. Merci aux ma
 
 ---
 
-**Fait avec ❤️ pour la communauté Go**
+**Fait avec <i class="material-icons small" style="color:#e25555">favorite</i> pour la communauté Go**
 
 Commencez à construire votre prochaine application backend en secondes, pas en jours!
