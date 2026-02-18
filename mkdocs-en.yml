@@ -28,6 +28,7 @@ theme:
   features:
     - navigation.sections
     - navigation.top
+    - navigation.indexes
     - toc.follow
     - search.suggest
     - search.highlight
@@ -40,13 +41,50 @@ plugins:
       lang: en
 
 nav:
+  # Getting Started
   - Home: index.md
   - Installation: installation.md
+  - Quick Start: quick-start.md
   - Usage: usage.md
-  - Generated Project: generated-project-guide.md
-  - Tutorial: tutorial-exemple-complet.md
-  - CLI Architecture: cli-architecture.md
-  - Contributing: contributing.md
+
+  # Databases
+  - Databases:
+      - Selection Guide: databases.md
+      - Migration Guide: database-migration.md
+
+  # Tutorial
+  - Tutorial:
+      - tutorial/index.md
+      - Part 1 - Setup: tutorial/01-setup.md
+      - Part 2 - First Domain: tutorial/02-first-domain.md
+      - Part 3 - HTTP API: tutorial/03-api-integration.md
+      - Part 4 - Testing & Deployment: tutorial/04-testing-deployment.md
+
+  # Complete Guide
+  - Complete Guide:
+      - guide/index.md
+      - Architecture: guide/architecture.md
+      - Project Structure: guide/structure.md
+      - Configuration: guide/configuration.md
+      - Development: guide/development.md
+      - Practical Examples: guide/examples.md
+      - API Reference: guide/api-reference.md
+      - Testing: guide/testing.md
+      - Database: guide/database.md
+      - Security: guide/security.md
+      - Deployment: guide/deployment.md
+      - Monitoring: guide/monitoring.md
+      - Best Practices: guide/best-practices.md
+
+  # Reference
+  - Reference:
+      - Glossary: reference/glossary.md
+      - FAQ: reference/faq.md
+
+  # Development
+  - Development:
+      - CLI Architecture: cli-architecture.md
+      - Contributing: contributing.md
 
 markdown_extensions:
   - admonition
