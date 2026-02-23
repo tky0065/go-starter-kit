@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/tky0065/go-starter-kit/cmd/create-go-starter/tui"
 	"github.com/tky0065/go-starter-kit/pkg/utils"
 )
 
@@ -87,6 +88,33 @@ func Red(msg string) string {
 // Yellow returns the string wrapped in yellow ANSI code
 func Yellow(msg string) string {
 	return ColorYellow + msg + ColorReset
+}
+
+// isTTY checks if stdout is connected to a terminal (TTY).
+// Returns false in CI/CD environments, piped output, or redirected output.
+func isTTY() bool {
+	return tui.IsTTY()
+}
+
+// runInteractiveTUI launches the Bubble Tea interactive mode.
+// Converts main package InteractiveDefaults to tui.InteractiveDefaults.
+func runInteractiveTUI(defaults InteractiveDefaults) error {
+	// Convert main package defaults to tui package defaults
+	tuiDefaults := tui.InteractiveDefaults{
+		ProjectName:   defaults.ProjectName,
+		Template:      defaults.Template,
+		Database:      defaults.Database,
+		Observability: defaults.Observability,
+	}
+
+	// Create a generator function that wraps the existing run() function
+	// This allows the TUI to call the generation logic without circular imports
+	generatorFunc := func(projectName, template, database, observability string, progressCallback func(current, total int)) error {
+		// Call runWithCallback to enable real-time progress updates (Story 10.7 AC#3)
+		return runWithCallback(projectName, template, database, observability, progressCallback)
+	}
+
+	return tui.RunInteractiveTUI(tuiDefaults, generatorFunc)
 }
 
 // validateTemplate checks if the template type is valid.
@@ -343,9 +371,21 @@ func main() {
 			Database:      database,
 			Observability: observability,
 		}
-		if err := runInteractiveMode(defaults); err != nil {
-			fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("%v", err)))
-			os.Exit(1)
+
+		// Use Bubble Tea TUI if TTY is available and NO_COLOR is not set
+		// Falls back to text mode for CI/CD, piped output, or when NO_COLOR is set
+		if isTTY() && os.Getenv("NO_COLOR") == "" {
+			// Modern Bubble Tea TUI experience
+			if err := runInteractiveTUI(defaults); err != nil {
+				fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("%v", err)))
+				os.Exit(1)
+			}
+		} else {
+			// Fallback to text-based prompts (CI/CD compatible)
+			if err := runInteractiveMode(defaults); err != nil {
+				fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("%v", err)))
+				os.Exit(1)
+			}
 		}
 		return
 	}
@@ -406,11 +446,19 @@ func main() {
 	}
 }
 
-// run executes the main project creation logic.
+// run executes the main project creation logic without progress callback.
+// This is the legacy function for CLI usage (non-interactive mode).
+// For interactive TUI mode with progress updates, use runWithCallback() instead.
+func run(projectName, template, database, observabilityLevel string) error {
+	return runWithCallback(projectName, template, database, observabilityLevel, nil)
+}
+
+// runWithCallback executes the main project creation logic with optional progress callback.
 // It validates the project name, creates the directory structure,
 // generates files, and initializes git.
+// The progressCallback is called for each file generated with (current, total).
 // Returns an error if any step fails (except git initialization which is non-fatal).
-func run(projectName, template, database, observabilityLevel string) error {
+func runWithCallback(projectName, template, database, observabilityLevel string, progressCallback func(current, total int)) error {
 	stats := NewGenerationStats()
 
 	// Display start message with template info
@@ -444,7 +492,12 @@ func run(projectName, template, database, observabilityLevel string) error {
 	fmt.Println("📝 Generating core files...")
 	stats.StartStep("Generating files")
 	if err := writeFiles(files, func(current, total int) {
+		// Update CLI progress bar
 		pb.Update(current)
+		// Forward progress to TUI callback if provided (Story 10.7 AC#3)
+		if progressCallback != nil {
+			progressCallback(current, total)
+		}
 	}); err != nil {
 		return err
 	}
