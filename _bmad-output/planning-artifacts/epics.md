@@ -557,6 +557,78 @@ So que je sache ce qui se passe.
 
 ---
 
+### Story 10.5: Aliases pour les Options
+
+As a développeur,
+I want utiliser des raccourcis pour les options fréquentes,
+So que je gagne du temps en ligne de commande.
+
+**Acceptance Criteria:**
+
+**Given** j'utilise le CLI
+**When** je tape des commandes
+**Then** les aliases courts fonctionnent (-d pour --database, -f pour --framework)
+**And** l'aide affiche les aliases disponibles
+**And** les aliases sont documentés
+
+---
+
+### Story 10.6: Migration vers Bubble Tea TUI Framework
+
+As a développeur CLI,
+I want migrer l'interface utilisateur vers Bubble Tea (https://github.com/charmbracelet/bubbletea),
+So that le CLI offre une expérience moderne, professionnelle et intuitive avec des composants interactifs riches.
+
+**Acceptance Criteria:**
+
+**Given** l'utilisateur lance une commande CLI interactive
+**When** Bubble Tea est initialisé
+**Then** l'interface utilise le framework Bubble Tea avec le pattern Elm Architecture
+**And** les composants de base (input, select, confirm) utilisent Bubble Tea
+**And** le rendu est fluide et responsive
+**And** les raccourcis clavier sont intuitifs (↑↓ navigation, Enter validation, Ctrl+C exit)
+**And** l'interface s'adapte à la taille du terminal
+**And** le code est structuré avec des Models, Messages et Updates clairs
+
+**Technical Requirements:**
+- Bibliothèque: `github.com/charmbracelet/bubbletea` (latest stable)
+- Composants Charm: `github.com/charmbracelet/bubbles` pour input, list, spinner, progress
+- Lipgloss: `github.com/charmbracelet/lipgloss` pour le styling
+- Architecture: Elm Architecture (Model-Update-View)
+- Compatibilité: Maintenir la compatibilité avec les flags existants (mode non-interactif)
+
+---
+
+### Story 10.7: Interface Interactive Avancée avec Bubble Tea
+
+As a développeur,
+I want une interface interactive avancée avec menus, formulaires multi-étapes et feedback visuel riche,
+So that l'expérience CLI soit fluide, moderne et agréable à utiliser.
+
+**Acceptance Criteria:**
+
+**Given** le mode interactif est lancé avec `--interactive`
+**When** l'utilisateur navigue dans l'interface
+**Then** un menu principal stylé présente les options (template, database, framework, observability)
+**And** les formulaires multi-étapes guident l'utilisateur progressivement
+**And** une progress bar animée affiche l'avancement de la génération
+**And** des spinners indiquent les opérations en cours
+**And** les confirmations utilisent des composants visuels clairs (✓/✗)
+**And** les erreurs sont affichées avec des messages colorés et des icônes
+**And** le diff de preview utilise la coloration syntaxique
+**And** l'interface est cohérente avec les couleurs du branding go-starter-kit
+
+**Technical Requirements:**
+- Composants avancés: multi-select, paginated lists, viewport scrolling
+- Animations: smooth transitions, loading indicators
+- Thème personnalisé: palette de couleurs cohérente (vert/bleu/gris)
+- Help screens: raccourcis clavier contextuels (? pour aide)
+- État persistant: navigation back/forward dans les formulaires
+- Tests: tests unitaires pour les Models et Updates
+- Documentation: guide d'utilisation de l'interface interactive
+
+---
+
 ## Epic 11: Multi-Framework Support (v2.0.0)
 
 Supporter d'autres frameworks web Go (Gin, Echo) en plus de Fiber pour donner plus de choix aux utilisateurs.
