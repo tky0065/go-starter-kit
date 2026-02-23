@@ -48,13 +48,13 @@ func (i MultiSelectItem) IsSelected() bool { return i.selected }
 // Story 10.7 Task 9: Advanced components (AC #2, #7)
 type MultiSelectModel struct {
 	list          list.Model
-	items         []MultiSelectItem         // Track selected state separately
-	delegate      multiSelectItemDelegate   // Keep reference to delegate
+	items         []MultiSelectItem       // Track selected state separately
+	delegate      multiSelectItemDelegate // Keep reference to delegate
 	width         int
 	height        int
 	title         string
-	minSelected   int  // Minimum number of selections (0 = optional)
-	maxSelected   int  // Maximum number of selections (0 = unlimited)
+	minSelected   int // Minimum number of selections (0 = optional)
+	maxSelected   int // Maximum number of selections (0 = unlimited)
 	confirmAction bool
 }
 

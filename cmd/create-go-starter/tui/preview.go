@@ -13,13 +13,13 @@ import (
 // PreviewModel represents the dry-run preview screen state.
 // It displays a scrollable preview of files that will be created with syntax highlighting.
 type PreviewModel struct {
-	viewport       viewport.Model
-	projectName    string
-	files          []PreviewFile
-	totalSize      int64
-	ready          bool
-	width          int
-	height         int
+	viewport    viewport.Model
+	projectName string
+	files       []PreviewFile
+	totalSize   int64
+	ready       bool
+	width       int
+	height      int
 }
 
 // PreviewFile represents a file that will be created, with content preview.
@@ -332,9 +332,9 @@ func (m PreviewModel) renderCodePreview(code string) string {
 // highlightGoCode applies basic syntax highlighting to Go code.
 func highlightGoCode(line string) string {
 	// Color styles for syntax highlighting
-	keywordStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#00b0ff")) // Blue
-	stringStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#00c853"))  // Green
-	commentStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#666666")) // Gray
+	keywordStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#00b0ff"))  // Blue
+	stringStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#00c853"))   // Green
+	commentStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#666666"))  // Gray
 	functionStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#ff6d00")) // Orange
 
 	// Handle comments first (everything after // is a comment)

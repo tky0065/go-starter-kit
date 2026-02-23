@@ -98,6 +98,8 @@ func isTTY() bool {
 
 // runInteractiveTUI launches the Bubble Tea interactive mode.
 // Converts main package InteractiveDefaults to tui.InteractiveDefaults.
+// After the TUI exits (and the alt screen buffer is restored), it prints
+// the detailed success message and generation stats on the normal terminal.
 func runInteractiveTUI(defaults InteractiveDefaults) error {
 	// Convert main package defaults to tui package defaults
 	tuiDefaults := tui.InteractiveDefaults{
@@ -110,11 +112,22 @@ func runInteractiveTUI(defaults InteractiveDefaults) error {
 	// Create a generator function that wraps the existing run() function
 	// This allows the TUI to call the generation logic without circular imports
 	generatorFunc := func(projectName, template, database, observability string, progressCallback func(current, total int)) error {
-		// Call runWithCallback to enable real-time progress updates (Story 10.7 AC#3)
-		return runWithCallback(projectName, template, database, observability, progressCallback)
+		// Call runWithCallback with quiet=true to suppress stdout output during TUI mode
+		// The TUI has its own rendering via viewGenerating() and viewDone()
+		return runWithCallback(projectName, template, database, observability, progressCallback, true)
 	}
 
-	return tui.RunInteractiveTUI(tuiDefaults, generatorFunc)
+	result, err := tui.RunInteractiveTUI(tuiDefaults, generatorFunc)
+	if err != nil {
+		return err
+	}
+
+	// After TUI exits, the alternate screen buffer is restored.
+	// Now print the detailed success message on the normal terminal
+	// so users get the same post-generation instructions as CLI mode.
+	printSuccessMessage(result.ProjectName, result.Database)
+
+	return nil
 }
 
 // validateTemplate checks if the template type is valid.
@@ -450,19 +463,23 @@ func main() {
 // This is the legacy function for CLI usage (non-interactive mode).
 // For interactive TUI mode with progress updates, use runWithCallback() instead.
 func run(projectName, template, database, observabilityLevel string) error {
-	return runWithCallback(projectName, template, database, observabilityLevel, nil)
+	return runWithCallback(projectName, template, database, observabilityLevel, nil, false)
 }
 
 // runWithCallback executes the main project creation logic with optional progress callback.
 // It validates the project name, creates the directory structure,
 // generates files, and initializes git.
 // The progressCallback is called for each file generated with (current, total).
+// When quiet is true, all stdout output (progress messages, success message, stats) is suppressed.
+// This is used when the TUI is active since it has its own rendering.
 // Returns an error if any step fails (except git initialization which is non-fatal).
-func runWithCallback(projectName, template, database, observabilityLevel string, progressCallback func(current, total int)) error {
+func runWithCallback(projectName, template, database, observabilityLevel string, progressCallback func(current, total int), quiet bool) error {
 	stats := NewGenerationStats()
 
 	// Display start message with template info
-	fmt.Println(Green(fmt.Sprintf("Creating project: %s (template: %s, database: %s, observability: %s)", projectName, template, database, observabilityLevel)))
+	if !quiet {
+		fmt.Println(Green(fmt.Sprintf("Creating project: %s (template: %s, database: %s, observability: %s)", projectName, template, database, observabilityLevel)))
+	}
 
 	// Validate project name again to ensure safety when run() is called directly (e.g. in tests)
 	if err := utils.ValidateGoModuleName(projectName); err != nil {
@@ -473,7 +490,9 @@ func runWithCallback(projectName, template, database, observabilityLevel string,
 	projectPath := projectName
 
 	// Display progress message
-	fmt.Println("📁 Creating directories...")
+	if !quiet {
+		fmt.Println("📁 Creating directories...")
+	}
 
 	// Create the project structure
 	stats.StartStep("Creating directories")
@@ -482,18 +501,27 @@ func runWithCallback(projectName, template, database, observabilityLevel string,
 	}
 	stats.EndStep("Creating directories")
 
-	fmt.Println(Green("✅ Structure created"))
+	if !quiet {
+		fmt.Println(Green("✅ Structure created"))
+	}
 
 	// Get the full file list before generating (needed for progress bar total count)
 	files := getFilesForTemplate(projectPath, projectName, template, database, observabilityLevel)
-	pb := NewProgressBar(len(files), 30)
+	var pb *ProgressBar
+	if !quiet {
+		pb = NewProgressBar(len(files), 30)
+	}
 
 	// Generate project files with progress reporting
-	fmt.Println("📝 Generating core files...")
+	if !quiet {
+		fmt.Println("📝 Generating core files...")
+	}
 	stats.StartStep("Generating files")
 	if err := writeFiles(files, func(current, total int) {
-		// Update CLI progress bar
-		pb.Update(current)
+		// Update CLI progress bar (only when not in quiet/TUI mode)
+		if pb != nil {
+			pb.Update(current)
+		}
 		// Forward progress to TUI callback if provided (Story 10.7 AC#3)
 		if progressCallback != nil {
 			progressCallback(current, total)
@@ -501,7 +529,9 @@ func runWithCallback(projectName, template, database, observabilityLevel string,
 	}); err != nil {
 		return err
 	}
-	pb.Complete()
+	if pb != nil {
+		pb.Complete()
+	}
 
 	// Make setup.sh executable (handled previously inside template-specific functions)
 	setupPath := filepath.Join(projectPath, "setup.sh")
@@ -518,31 +548,43 @@ func runWithCallback(projectName, template, database, observabilityLevel string,
 	stats.EndStep("Generating files")
 
 	// Display success message
-	fmt.Println(Green("✅ Files generated successfully"))
+	if !quiet {
+		fmt.Println(Green("✅ Files generated successfully"))
+	}
 
 	// Copy .env.example to .env
-	fmt.Println("🔑 Configuring environment...")
+	if !quiet {
+		fmt.Println("🔑 Configuring environment...")
+	}
 	if err := copyEnvFile(projectPath); err != nil {
 		return err
 	}
 
 	// Initialize Git repository (AC: 1, 2, 3, 4, 5)
-	fmt.Println("🔧 Initializing Git repository...")
+	if !quiet {
+		fmt.Println("🔧 Initializing Git repository...")
+	}
 	stats.StartStep("Git initialization")
 	if err := initGitRepo(projectPath); err != nil {
 		// Non-fatal: warn user but continue
-		fmt.Println(Red(fmt.Sprintf("⚠️  Git warning: %v", err)))
-		fmt.Println("   You can initialize the repository manually later.")
-	} else if isGitAvailable() {
+		if !quiet {
+			fmt.Println(Red(fmt.Sprintf("⚠️  Git warning: %v", err)))
+			fmt.Println("   You can initialize the repository manually later.")
+		}
+	} else if !quiet && isGitAvailable() {
 		fmt.Println(Green("✅ Git repository initialized with initial commit"))
 	}
 	stats.EndStep("Git initialization")
 
 	// Display success message with detailed setup instructions
-	printSuccessMessage(projectName, database)
+	if !quiet {
+		printSuccessMessage(projectName, database)
+	}
 
 	// Display generation statistics (AC: #2, #3)
-	stats.Display()
+	if !quiet {
+		stats.Display()
+	}
 
 	return nil
 }

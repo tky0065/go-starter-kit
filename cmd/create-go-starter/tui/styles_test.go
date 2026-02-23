@@ -184,7 +184,7 @@ func TestRenderProgressBar(t *testing.T) {
 		{"Empty Progress", 0.0, 20},
 		{"Half Progress", 0.5, 20},
 		{"Full Progress", 1.0, 20},
-		{"Overflow Progress", 1.5, 20}, // Should cap at 100%
+		{"Overflow Progress", 1.5, 20},  // Should cap at 100%
 		{"Negative Progress", -0.5, 20}, // Should floor at 0%
 	}
 

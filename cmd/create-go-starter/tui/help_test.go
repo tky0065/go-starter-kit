@@ -281,45 +281,45 @@ func TestViewHelp_DisplaysFooter(t *testing.T) {
 // TestViewHelp_ContextualHelp verifies that help adapts to different screens.
 func TestViewHelp_ContextualHelp(t *testing.T) {
 	tests := []struct {
-		name          string
-		previousState AppState
-		wantContain   []string
+		name           string
+		previousState  AppState
+		wantContain    []string
 		wantNotContain []string
 	}{
 		{
-			name:          "Welcome Screen Context",
-			previousState: StateWelcome,
-			wantContain:   []string{"Welcome Screen", "Navigate menu items"},
+			name:           "Welcome Screen Context",
+			previousState:  StateWelcome,
+			wantContain:    []string{"Welcome Screen", "Navigate menu items"},
 			wantNotContain: []string{"Submit project name", "Select highlighted item"},
 		},
 		{
-			name:          "Project Name Context",
-			previousState: StateProjectName,
-			wantContain:   []string{"Project Name Entry", "Submit project name", "Enter your project name"},
+			name:           "Project Name Context",
+			previousState:  StateProjectName,
+			wantContain:    []string{"Project Name Entry", "Submit project name", "Enter your project name"},
 			wantNotContain: []string{"Navigate list items", "Confirm and start generation"},
 		},
 		{
-			name:          "Template Selection Context",
-			previousState: StateTemplateSelect,
-			wantContain:   []string{"Template Selection", "Navigate list items", "Select highlighted item"},
+			name:           "Template Selection Context",
+			previousState:  StateTemplateSelect,
+			wantContain:    []string{"Template Selection", "Navigate list items", "Select highlighted item"},
 			wantNotContain: []string{"Submit project name", "Confirm and start generation"},
 		},
 		{
-			name:          "Summary Context",
-			previousState: StateSummary,
-			wantContain:   []string{"Configuration Summary", "Confirm and start generation", "Go back to edit configuration"},
+			name:           "Summary Context",
+			previousState:  StateSummary,
+			wantContain:    []string{"Configuration Summary", "Confirm and start generation", "Go back to edit configuration"},
 			wantNotContain: []string{"Submit project name", "Navigate list items"},
 		},
 		{
-			name:          "Generating Context",
-			previousState: StateGenerating,
-			wantContain:   []string{"Generation Progress", "No shortcuts available during generation"},
+			name:           "Generating Context",
+			previousState:  StateGenerating,
+			wantContain:    []string{"Generation Progress", "No shortcuts available during generation"},
 			wantNotContain: []string{"Submit project name", "Navigate list items"},
 		},
 		{
-			name:          "Done Context",
-			previousState: StateDone,
-			wantContain:   []string{"Completion Screen", "Exit application"},
+			name:           "Done Context",
+			previousState:  StateDone,
+			wantContain:    []string{"Completion Screen", "Exit application"},
 			wantNotContain: []string{"Submit project name", "Navigate list items", "Confirm and start generation"},
 		},
 	}

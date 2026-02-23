@@ -34,7 +34,7 @@ const (
 // The spinner starts with a blue color (info) to indicate in-progress state.
 func NewLoadingModel(text string) LoadingModel {
 	s := spinner.New()
-	s.Spinner = spinner.Dot // Default to Dot spinner (elegant and minimal)
+	s.Spinner = spinner.Dot                                             // Default to Dot spinner (elegant and minimal)
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color(ColorInfo)) // Blue during operation
 
 	return LoadingModel{
@@ -128,17 +128,17 @@ func (m LoadingModel) View() string {
 // Common loading messages for typical operations.
 // These can be used as predefined text for common tasks.
 const (
-	LoadingInitializingGit      = "Initializing Git repository..."
-	LoadingInstallingDeps       = "Installing Go dependencies..."
-	LoadingRunningGoModTidy     = "Running go mod tidy..."
-	LoadingGeneratingFiles      = "Generating project files..."
-	LoadingCreatingDirectories  = "Creating directories..."
-	LoadingWritingConfig        = "Writing configuration files..."
-	LoadingSettingUpDatabase    = "Setting up database schema..."
-	LoadingConfiguringDocker    = "Configuring Docker containers..."
-	LoadingRunningTests         = "Running tests..."
-	LoadingBuildingProject      = "Building project..."
-	LoadingVerifyingInstall     = "Verifying installation..."
+	LoadingInitializingGit     = "Initializing Git repository..."
+	LoadingInstallingDeps      = "Installing Go dependencies..."
+	LoadingRunningGoModTidy    = "Running go mod tidy..."
+	LoadingGeneratingFiles     = "Generating project files..."
+	LoadingCreatingDirectories = "Creating directories..."
+	LoadingWritingConfig       = "Writing configuration files..."
+	LoadingSettingUpDatabase   = "Setting up database schema..."
+	LoadingConfiguringDocker   = "Configuring Docker containers..."
+	LoadingRunningTests        = "Running tests..."
+	LoadingBuildingProject     = "Building project..."
+	LoadingVerifyingInstall    = "Verifying installation..."
 )
 
 // LoadingOperation represents a single loading operation with its text and state.
@@ -151,10 +151,10 @@ type LoadingOperation struct {
 // MultiLoadingModel manages multiple loading operations sequentially.
 // Story 10.7 Task 4: Display contextual text for different operations.
 type MultiLoadingModel struct {
-	operations     []LoadingOperation
-	currentIndex   int
-	spinner        spinner.Model
-	showCompleted  bool // Whether to show completed operations
+	operations    []LoadingOperation
+	currentIndex  int
+	spinner       spinner.Model
+	showCompleted bool // Whether to show completed operations
 }
 
 // NewMultiLoadingModel creates a model for managing multiple sequential operations.

@@ -12,11 +12,11 @@ import (
 
 // GenerationStats holds real-time statistics during project generation.
 type GenerationStats struct {
-	FilesCreated  int       // Number of files created so far
-	TotalSize     int64     // Total size of generated files in bytes
-	StartTime     time.Time // When generation started
-	CurrentFile   string    // Path of the file currently being generated
-	CurrentStep   string    // Current step description (e.g., "Creating directories...")
+	FilesCreated int       // Number of files created so far
+	TotalSize    int64     // Total size of generated files in bytes
+	StartTime    time.Time // When generation started
+	CurrentFile  string    // Path of the file currently being generated
+	CurrentStep  string    // Current step description (e.g., "Creating directories...")
 }
 
 // NewGenerationModel creates a new Model configured for file generation.
@@ -42,8 +42,8 @@ func NewGenerationModel(totalFiles int) Model {
 		progressBar:    prog,
 		loadSpinner:    s,
 		progressPulse:  progressPulse,
-		width:          80,  // Default width
-		height:         24,  // Default height
+		width:          80, // Default width
+		height:         24, // Default height
 	}
 
 	return m

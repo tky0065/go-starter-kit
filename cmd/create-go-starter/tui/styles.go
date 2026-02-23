@@ -122,12 +122,12 @@ var (
 
 	// InfoBox style for info messages with border
 	InfoBox = lipgloss.NewStyle().
-			Border(lipgloss.RoundedBorder()).
-			BorderForeground(lipgloss.Color(ColorInfo)).
-			Foreground(lipgloss.Color(ColorInfo)).
-			Padding(1, 2).
-			MarginTop(1).
-			MarginBottom(1)
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color(ColorInfo)).
+		Foreground(lipgloss.Color(ColorInfo)).
+		Padding(1, 2).
+		MarginTop(1).
+		MarginBottom(1)
 
 	// GradientHeaderStyle for headers with visual emphasis
 	GradientHeaderStyle = lipgloss.NewStyle().

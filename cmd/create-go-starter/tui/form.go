@@ -123,7 +123,8 @@ func (f FormModel) RenderProgressIndicator() string {
 //
 // Example output:
 // [1/4] Project Name → [2/4] Template → [3/4] Database → [4/4] Observability
-//   ●                     ●                  ○                  ○
+//
+//	●                     ●                  ○                  ○
 func (f FormModel) RenderBreadcrumb() string {
 	var b strings.Builder
 

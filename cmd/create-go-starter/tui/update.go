@@ -205,6 +205,10 @@ func (m Model) handleKeyMsg(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case tea.KeyEnter:
 		// Handle Enter key based on current state
 		switch m.state {
+		case StateDone:
+			// "Press any key to exit" — Enter also quits
+			return m, tea.Quit
+
 		case StateWelcome:
 			// Get selected item from welcome menu list (Story 10.7 Task 1.3)
 			selectedItem := m.welcomeList.SelectedItem()
@@ -255,6 +259,11 @@ func (m Model) handleKeyMsg(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			// Confirm generation
 			return m.Update(ConfirmGenerationMsg{})
 		}
+	}
+
+	// In StateDone, any key press should quit (matches "Press any key to exit" prompt)
+	if m.state == StateDone {
+		return m, tea.Quit
 	}
 
 	// Delegate to component-specific key handling

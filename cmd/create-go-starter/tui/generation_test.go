@@ -329,13 +329,13 @@ func TestGenerationViewWithStats(t *testing.T) {
 
 	// Verify enhanced components are present
 	expectedComponents := []string{
-		"my-awesome-api",        // Project name
-		"25/50 files",           // Progress indicator
-		"Files created:",        // Stats label
-		"Total size:",           // Stats label
-		"Time elapsed:",         // Stats label
-		"ETA:",                  // Stats label
-		"Generating domain services",       // Current step (partial match)
+		"my-awesome-api",             // Project name
+		"25/50 files",                // Progress indicator
+		"Files created:",             // Stats label
+		"Total size:",                // Stats label
+		"Time elapsed:",              // Stats label
+		"ETA:",                       // Stats label
+		"Generating domain services", // Current step (partial match)
 	}
 
 	for _, component := range expectedComponents {

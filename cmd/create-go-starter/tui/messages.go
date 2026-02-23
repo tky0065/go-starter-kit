@@ -37,8 +37,8 @@ type GenerationStartedMsg struct {
 // Story 10.7 Task 3: Enhanced with file size and step information for real-time stats
 type FileGeneratedMsg struct {
 	FilePath string
-	Index    int   // Current file number (1-based)
-	Size     int64 // Size of the generated file in bytes
+	Index    int    // Current file number (1-based)
+	Size     int64  // Size of the generated file in bytes
 	Step     string // Current generation step (e.g., "Creating directories...")
 }
 

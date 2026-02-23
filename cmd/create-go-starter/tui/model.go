@@ -77,9 +77,9 @@ type Model struct {
 	validationError string // Validation error for current input (shown inline)
 
 	// Animation state (Story 10.7 Task 1.5 & Task 10)
-	logoAnimation     *AnimationState  // Logo fade-in animation
-	progressPulse     *PulseState      // Progress bar gradient pulse animation (Task 10)
-	screenTransition  *TransitionState // Screen transition animation (Task 10)
+	logoAnimation    *AnimationState  // Logo fade-in animation
+	progressPulse    *PulseState      // Progress bar gradient pulse animation (Task 10)
+	screenTransition *TransitionState // Screen transition animation (Task 10)
 
 	// Help screen state
 	previousState AppState // State to return to after help (HIGH-1 fix)

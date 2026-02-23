@@ -9,20 +9,20 @@ import (
 // KeyMap defines keyboard shortcuts for the application.
 // This is used for generating contextual help screens.
 type KeyMap struct {
-	Up       key.Binding
-	Down     key.Binding
-	Left     key.Binding
-	Right    key.Binding
-	Back     key.Binding
-	Next     key.Binding
-	Help     key.Binding
-	Quit     key.Binding
-	Enter    key.Binding
-	Space    key.Binding
-	PgUp     key.Binding
-	PgDown   key.Binding
-	Home     key.Binding
-	End      key.Binding
+	Up     key.Binding
+	Down   key.Binding
+	Left   key.Binding
+	Right  key.Binding
+	Back   key.Binding
+	Next   key.Binding
+	Help   key.Binding
+	Quit   key.Binding
+	Enter  key.Binding
+	Space  key.Binding
+	PgUp   key.Binding
+	PgDown key.Binding
+	Home   key.Binding
+	End    key.Binding
 }
 
 // DefaultKeyMap returns the default keyboard shortcuts for the application.
