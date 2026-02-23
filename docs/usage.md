@@ -640,7 +640,7 @@ La commande vérifie:
 ### Exemple de sortie
 
 ```
-create-go-starter doctor v1.4.0
+create-go-starter doctor v1.5.1
 
 Checking environment...
 

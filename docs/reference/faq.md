@@ -857,7 +857,7 @@ var requestCount = prometheus.NewCounterVec(
 
 ---
 
-## <i class="material-icons">terminal</i> CLI - Fonctionnalités v1.4.0
+## <i class="material-icons">terminal</i> CLI - Fonctionnalités v1.5.1
 
 ### Comment utiliser le mode interactif?
 
@@ -915,7 +915,7 @@ Chaque vérification affiche un statut clair (OK / WARNING / FAIL) avec des reco
 
 ### Quels sont les alias courts disponibles?
 
-Depuis la v1.4.0, toutes les options CLI ont des alias courts d'une lettre:
+Depuis la v1.5.1, toutes les options CLI ont des alias courts d'une lettre:
 
 | Alias | Option longue | Description |
 |-------|---------------|-------------|

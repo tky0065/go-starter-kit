@@ -5,6 +5,36 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [1.5.1] - 2026-02-23
+
+### <i class="material-icons success">build</i> Corrections TUI Interactive Mode
+
+Corrections critiques du mode interactif Bubble Tea (`-i`).
+
+### <i class="material-icons warning">bug_report</i> Corrections
+
+#### Barre de progression TUI non fonctionnelle
+
+- **Remplacement du pattern channel cassé par `p.Send()`** — La goroutine de `generateProjectCmd()` envoyait des messages de progression dans un `progressChan` qui n'était jamais consommé. La barre de progression ne se mettait jamais à jour pendant la génération
+- **Élimination du risque de deadlock** — Avec plus de 100 fichiers, le buffer du channel débordait et bloquait la goroutine indéfiniment
+- **Pattern Bubble Tea correct** — Utilisation de `p.Send()` pour envoyer les mises à jour de progression directement au runtime Bubble Tea
+
+#### Sortie stdout supprimée en mode TUI (v1.2.1)
+
+- **Ajout du paramètre `quiet`** à `runWithCallback()` pour supprimer les `fmt.Println`/`fmt.Printf` pendant le mode TUI
+- **"Press any key to exit"** fonctionne maintenant sur l'écran de fin (plus seulement Ctrl+C/Esc)
+- **Message de succès post-génération** s'affiche correctement après la sortie du TUI
+
+### <i class="material-icons">upgrade</i> Installation
+
+```bash
+go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@v1.5.1
+# ou
+go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@latest
+```
+
+---
+
 ## [1.4.0] - 2026-02-18
 
 ### <i class="material-icons success">new_releases</i> Améliorations CLI et Expérience Développeur
@@ -538,6 +568,7 @@ Merci à tous les contributeurs et aux projets open-source utilisés :
 - **MINOR** (1.X.0): Ajout de fonctionnalités rétro-compatibles
 - **PATCH** (1.0.X): Corrections de bugs rétro-compatibles
 
+[1.5.1]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.5.1
 [1.4.0]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.4.0
 [1.3.0]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.3.0
 [1.2.0]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.2.0

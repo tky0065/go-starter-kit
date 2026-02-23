@@ -857,7 +857,7 @@ var requestCount = prometheus.NewCounterVec(
 
 ---
 
-## <i class="material-icons">terminal</i> CLI - v1.4.0 Features
+## <i class="material-icons">terminal</i> CLI - v1.5.1 Features
 
 ### How do I use interactive mode?
 
@@ -915,7 +915,7 @@ Each check displays a clear status (OK / WARNING / FAIL) with recommendations if
 
 ### What short aliases are available?
 
-Since v1.4.0, all CLI options have single-letter short aliases:
+Since v1.5.1, all CLI options have single-letter short aliases:
 
 | Alias | Long option | Description |
 |-------|-------------|-------------|
