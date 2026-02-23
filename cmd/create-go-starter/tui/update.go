@@ -329,46 +329,48 @@ func (m Model) navigateBack() Model {
 }
 
 // generateProjectCmd creates a Cmd that runs the project generation.
-// This runs in a goroutine and sends FileGeneratedMsg for real-time progress,
-// then sends a completion message when done.
+// This runs in a goroutine and sends FileGeneratedMsg via p.Send() for real-time progress,
+// then returns a GenerationCompleteMsg when done.
 func (m *Model) generateProjectCmd() tea.Cmd {
 	return func() tea.Msg {
+		// Get the program reference for sending progress messages
+		// The channel is buffered(1) and pre-filled by RunInteractiveTUI
+		var p *tea.Program
+		select {
+		case p = <-m.programChan:
+			// Got the program reference
+		default:
+			// No program available (e.g., in tests) — progress updates will be skipped
+		}
+
 		// Track total files for final report
 		totalFiles := 0
 
-		// Create a channel to send progress updates from generator goroutine to tea.Cmd
-		progressChan := make(chan tea.Msg, 100)
-		generationDone := make(chan error, 1)
-
-		// Start generation in a goroutine
-		go func() {
-			err := m.generatorFunc(
-				m.projectName,
-				m.template,
-				m.database,
-				m.observability,
-				func(current, total int) {
-					// Store total on first callback
-					if totalFiles == 0 {
-						totalFiles = total
-					}
-					// Send FileGeneratedMsg for real-time progress (Story 10.7 AC#3)
-					progressChan <- FileGeneratedMsg{
-						FilePath: "", // File path not available from current generator API
+		// Run generation synchronously within this Cmd goroutine
+		err := m.generatorFunc(
+			m.projectName,
+			m.template,
+			m.database,
+			m.observability,
+			func(current, total int) {
+				// Store total on first callback
+				if totalFiles == 0 {
+					totalFiles = total
+				}
+				// Send progress update to the Bubble Tea runtime via p.Send()
+				// This is the correct pattern for goroutine-to-runtime communication
+				if p != nil {
+					p.Send(FileGeneratedMsg{
+						FilePath: "",
 						Index:    current,
-						Size:     0, // File size calculation would require generator refactoring
+						Size:     0,
 						Step:     fmt.Sprintf("Generating file %d/%d...", current, total),
-					}
-				},
-			)
-			close(progressChan)
-			generationDone <- err
-		}()
+					})
+				}
+			},
+		)
 
-		// Wait for generation to complete
-		err := <-generationDone
-
-		// Send completion message
+		// Return completion message (this is the final message from this Cmd)
 		return GenerationCompleteMsg{
 			TotalFiles: totalFiles,
 			Success:    err == nil,

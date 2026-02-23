@@ -5,6 +5,7 @@ import (
 	"github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 // InteractiveDefaults holds default values for interactive mode prompts.
@@ -59,8 +60,9 @@ func NewInteractiveModel(defaults InteractiveDefaults, generatorFunc GeneratorFu
 		progressBar:   pb,
 		logoAnimation: logoAnim,
 		progressPulse: progressPulse,
-		width:         80, // Default width (will be updated by WindowSizeMsg)
-		height:        24, // Default height (will be updated by WindowSizeMsg)
+		programChan:   make(chan *tea.Program, 1), // Buffered so Send() doesn't block
+		width:         80,                         // Default width (will be updated by WindowSizeMsg)
+		height:        24,                         // Default height (will be updated by WindowSizeMsg)
 		generatorFunc: generatorFunc,
 	}
 

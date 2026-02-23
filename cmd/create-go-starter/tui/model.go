@@ -93,6 +93,10 @@ type Model struct {
 
 	// Generation function (dependency injection to avoid circular imports)
 	generatorFunc GeneratorFunc // Function that performs actual project generation
+
+	// Program reference for sending messages from goroutines
+	// Set via SetProgram() after tea.NewProgram() is created but before Run()
+	programChan chan *tea.Program // Channel to receive the program reference
 }
 
 // NewModel creates a new Model with initial state.
@@ -131,8 +135,9 @@ func NewModel() Model {
 		progressBar:   pb,
 		logoAnimation: logoAnim,
 		progressPulse: progressPulse,
-		width:         80, // Default width
-		height:        24, // Default height
+		programChan:   make(chan *tea.Program, 1), // Buffered so Send() doesn't block
+		width:         80,                         // Default width
+		height:        24,                         // Default height
 	}
 }
 

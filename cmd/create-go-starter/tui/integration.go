@@ -47,6 +47,11 @@ func RunInteractiveTUI(defaults InteractiveDefaults, generatorFunc GeneratorFunc
 		tea.WithMouseCellMotion(), // Enable mouse support
 	)
 
+	// Send the program reference to the model so goroutines can use p.Send()
+	// for real-time progress updates during generation.
+	// This must happen after NewProgram() but before Run() starts processing.
+	model.programChan <- p
+
 	finalModel, err := p.Run()
 	if err != nil {
 		return nil, fmt.Errorf("failed to run interactive TUI: %w", err)
