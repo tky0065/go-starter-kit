@@ -136,6 +136,7 @@ GET    /swagger/*                   # Documentation Swagger UI
 - API GraphQL complète avec gqlgen
 - GraphQL Playground pour explorer l'API interactivement
 - Schéma GraphQL typé avec resolvers
+- Code gqlgen pré-généré pour un premier démarrage immédiat
 - Gestion des utilisateurs avec mutations et queries
 - Architecture hexagonale adaptée à GraphQL
 
@@ -156,21 +157,24 @@ type User {
 }
 
 type Query {
-  users(limit: Int, offset: Int): [User!]!
+  users(page: Int = 1, limit: Int = 10): UsersConnection!
   user(id: ID!): User
+  health: String!
 }
 
 type Mutation {
-  createUser(input: CreateUserInput!): User!
-  updateUser(id: ID!, input: UpdateUserInput!): User!
+  createUser(input: NewUser!): User!
+  updateUser(id: ID!, input: UpdateUser!): User!
   deleteUser(id: ID!): Boolean!
 }
 ```
 
+Le projet généré peut être lancé directement après `go mod tidy`. Utilisez `go generate ./...` uniquement après modification du schéma GraphQL.
+
 **Endpoints générés**:
 ```
 GET    /health                  # Health check
-POST   /graphql                 # Endpoint GraphQL
+POST   /query                   # Endpoint GraphQL
 GET    /                        # GraphQL Playground UI
 ```
 

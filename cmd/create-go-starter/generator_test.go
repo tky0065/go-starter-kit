@@ -1,12 +1,20 @@
 package main
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
 	"github.com/tky0065/go-starter-kit/pkg/utils" // Added for shared validation
+	"io"
+	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestGenerateProjectFiles(t *testing.T) {
@@ -417,10 +425,12 @@ func TestGenerateGraphQLTemplateFiles(t *testing.T) {
 		"cmd/main.go",
 		"gqlgen.yml",
 		"graph/schema.graphqls",
+		"graph/email_helpers.go",
 		"graph/resolver.go",
 		"graph/schema.resolvers.go",
 		"graph/generate.go",
 		"graph/model/models.go",
+		"graph/model/models_gen.go",
 		"graph/generated/generated.go",
 		"internal/infrastructure/server/server.go",
 		"internal/infrastructure/database/database.go",
@@ -485,6 +495,27 @@ func TestGenerateGraphQLTemplateFiles(t *testing.T) {
 		t.Error("schema.graphqls should contain Query type")
 	}
 
+	generatedPath := filepath.Join(projectPath, "graph", "generated", "generated.go")
+	content, err = os.ReadFile(generatedPath)
+	if err != nil {
+		t.Errorf("Failed to read graph/generated/generated.go: %v", err)
+	}
+	if strings.Contains(string(content), "panic(\"Run 'go generate ./...'") {
+		t.Error("graph/generated/generated.go should contain runnable gqlgen output, not the placeholder panic")
+	}
+
+	resolverPath := filepath.Join(projectPath, "graph", "schema.resolvers.go")
+	content, err = os.ReadFile(resolverPath)
+	if err != nil {
+		t.Errorf("Failed to read graph/schema.resolvers.go: %v", err)
+	}
+	if !strings.Contains(string(content), "func (r *Resolver) User() generated.UserResolver") {
+		t.Error("graph/schema.resolvers.go should expose the generated.UserResolver implementation")
+	}
+	if !strings.Contains(string(content), "return strconv.FormatUint(uint64(obj.ID), 10), nil") {
+		t.Error("graph/schema.resolvers.go should implement the User.id resolver without panic")
+	}
+
 	// Verify setup.sh is executable
 	setupPath := filepath.Join(projectPath, "setup.sh")
 	info, err := os.Stat(setupPath)
@@ -537,8 +568,80 @@ func TestGetDirectoriesForGraphQLTemplate(t *testing.T) {
 	}
 }
 
+func getFreePort(t *testing.T) string {
+	t.Helper()
+
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("Failed to allocate free port: %v", err)
+	}
+	defer listener.Close()
+
+	return fmt.Sprintf("%d", listener.Addr().(*net.TCPAddr).Port)
+}
+
+func waitForHTTPReady(t *testing.T, client *http.Client, url string, done <-chan error, logs *bytes.Buffer) {
+	t.Helper()
+
+	deadline := time.Now().Add(30 * time.Second)
+	for time.Now().Before(deadline) {
+		select {
+		case err := <-done:
+			t.Fatalf("Generated GraphQL server exited before becoming ready: %v\nOutput:\n%s", err, logs.String())
+		default:
+		}
+
+		resp, err := client.Get(url)
+		if err == nil {
+			resp.Body.Close()
+			if resp.StatusCode == http.StatusOK {
+				return
+			}
+		}
+
+		time.Sleep(250 * time.Millisecond)
+	}
+
+	t.Fatalf("Timed out waiting for generated GraphQL server readiness at %s\nOutput:\n%s", url, logs.String())
+}
+
+func postGraphQL(t *testing.T, client *http.Client, url, query string) map[string]any {
+	t.Helper()
+
+	payload, err := json.Marshal(map[string]string{"query": query})
+	if err != nil {
+		t.Fatalf("Failed to marshal GraphQL payload: %v", err)
+	}
+
+	resp, err := client.Post(url, "application/json", bytes.NewReader(payload))
+	if err != nil {
+		t.Fatalf("GraphQL request failed: %v", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatalf("Failed to read GraphQL response: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("Unexpected GraphQL status %d: %s", resp.StatusCode, string(body))
+	}
+
+	var decoded map[string]any
+	if err := json.Unmarshal(body, &decoded); err != nil {
+		t.Fatalf("Failed to decode GraphQL response: %v\nBody:\n%s", err, string(body))
+	}
+
+	if errs, ok := decoded["errors"]; ok {
+		t.Fatalf("GraphQL response returned errors: %v", errs)
+	}
+
+	return decoded
+}
+
 // TestE2EGraphQLProjectBuilds is an end-to-end test that verifies
-// a generated GraphQL project can pass go mod tidy
+// a generated GraphQL project can resolve dependencies, start, and answer HTTP requests.
 func TestE2EGraphQLProjectBuilds(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping E2E test in short mode")
@@ -555,7 +658,7 @@ func TestE2EGraphQLProjectBuilds(t *testing.T) {
 	}
 
 	// Generate all project files
-	if err := generateProjectFiles(projectPath, projectName, TemplateGraphQL, DefaultDatabase, DefaultObservabilityLevel, DefaultFramework); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, TemplateGraphQL, DatabaseSQLite, DefaultObservabilityLevel, DefaultFramework); err != nil {
 		t.Fatalf("Failed to generate project files: %v", err)
 	}
 
@@ -583,6 +686,125 @@ func TestE2EGraphQLProjectBuilds(t *testing.T) {
 		// Check that the module name is correct
 		if !strings.Contains(string(output), projectName) {
 			t.Errorf("Module name should be '%s', got: %s", projectName, string(output))
+		}
+	})
+
+	t.Run("ServerSmokeTest", func(t *testing.T) {
+		port := getFreePort(t)
+		baseURL := "http://127.0.0.1:" + port
+		client := &http.Client{Timeout: 5 * time.Second}
+
+		ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
+		defer cancel()
+
+		cmd := exec.CommandContext(ctx, "go", "run", "./cmd")
+		cmd.Dir = projectPath
+		cmd.Env = append(os.Environ(),
+			"APP_PORT="+port,
+			"DB_NAME=test-graphql",
+		)
+
+		var logs bytes.Buffer
+		cmd.Stdout = &logs
+		cmd.Stderr = &logs
+
+		if err := cmd.Start(); err != nil {
+			t.Fatalf("Failed to start generated GraphQL project: %v", err)
+		}
+
+		done := make(chan error, 1)
+		go func() {
+			done <- cmd.Wait()
+		}()
+
+		defer func() {
+			cancel()
+			select {
+			case <-done:
+			case <-time.After(5 * time.Second):
+				t.Logf("Generated GraphQL server did not exit within timeout")
+			}
+		}()
+
+		waitForHTTPReady(t, client, baseURL+"/health", done, &logs)
+
+		resp, err := client.Get(baseURL + "/")
+		if err != nil {
+			t.Fatalf("Failed to query GraphQL playground: %v", err)
+		}
+		playgroundBody, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			t.Fatalf("Failed to read GraphQL playground response: %v", err)
+		}
+		if resp.StatusCode != http.StatusOK {
+			t.Fatalf("Unexpected GraphQL playground status %d: %s", resp.StatusCode, string(playgroundBody))
+		}
+		if !strings.Contains(string(playgroundBody), "GraphQL Playground") {
+			t.Fatalf("GraphQL playground response should contain 'GraphQL Playground', got:\n%s", string(playgroundBody))
+		}
+
+		resp, err = client.Get(baseURL + "/health")
+		if err != nil {
+			t.Fatalf("Failed to query health endpoint: %v", err)
+		}
+		healthBody, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			t.Fatalf("Failed to read health response: %v", err)
+		}
+		if resp.StatusCode != http.StatusOK {
+			t.Fatalf("Unexpected health status %d: %s", resp.StatusCode, string(healthBody))
+		}
+		if !strings.Contains(string(healthBody), `"status":"ok"`) {
+			t.Fatalf("Health response should contain status ok, got: %s", string(healthBody))
+		}
+
+		healthResp := postGraphQL(t, client, baseURL+"/query", `query { health }`)
+		data, ok := healthResp["data"].(map[string]any)
+		if !ok || data["health"] != "ok" {
+			t.Fatalf("Unexpected GraphQL health response: %#v", healthResp)
+		}
+
+		createResp := postGraphQL(t, client, baseURL+"/query", `mutation { createUser(input: { email: "smoke@example.com", password: "password123" }) { id email } }`)
+		createData, ok := createResp["data"].(map[string]any)
+		if !ok {
+			t.Fatalf("Unexpected GraphQL createUser response: %#v", createResp)
+		}
+		user, ok := createData["createUser"].(map[string]any)
+		if !ok {
+			t.Fatalf("GraphQL createUser response missing createUser payload: %#v", createResp)
+		}
+		if user["email"] != "smoke@example.com" {
+			t.Fatalf("Expected created user email smoke@example.com, got %#v", user["email"])
+		}
+		if user["id"] == "" {
+			t.Fatalf("Expected created user ID to be populated, got %#v", user["id"])
+		}
+
+		usersResp := postGraphQL(t, client, baseURL+"/query", `query { users(page: 1, limit: 10) { users { id email } pageInfo { total hasNextPage } } }`)
+		usersData, ok := usersResp["data"].(map[string]any)
+		if !ok {
+			t.Fatalf("Unexpected GraphQL users response: %#v", usersResp)
+		}
+		usersConnection, ok := usersData["users"].(map[string]any)
+		if !ok {
+			t.Fatalf("GraphQL users response missing connection payload: %#v", usersResp)
+		}
+		users, ok := usersConnection["users"].([]any)
+		if !ok || len(users) == 0 {
+			t.Fatalf("Expected at least one user in GraphQL users query, got %#v", usersConnection["users"])
+		}
+		firstUser, ok := users[0].(map[string]any)
+		if !ok {
+			t.Fatalf("Unexpected user payload: %#v", users[0])
+		}
+		if firstUser["id"] == "" || firstUser["email"] != "smoke@example.com" {
+			t.Fatalf("Unexpected first user payload: %#v", firstUser)
+		}
+		pageInfo, ok := usersConnection["pageInfo"].(map[string]any)
+		if !ok || pageInfo["total"] == nil {
+			t.Fatalf("Unexpected pageInfo payload: %#v", usersConnection["pageInfo"])
 		}
 	})
 }

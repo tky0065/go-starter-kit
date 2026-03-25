@@ -37,6 +37,7 @@ Un outil CLI puissant pour générer des projets Go prêts pour la production en
 - **Validation** - go-playground/validator pour valider les entrées
 - **Makefile** - Commandes utiles pour dev, test, build et déploiement
 - **Observabilité avancée** - Prometheus `/metrics`, distributed tracing Jaeger/OpenTelemetry, health checks K8s (`/health/liveness`, `/health/readiness`), dashboard Grafana pré-configuré (`--observability=advanced`)
+- **Template GraphQL exécutable directement** - Le projet généré inclut déjà le code gqlgen nécessaire au premier démarrage
 
 ## Installation rapide
 

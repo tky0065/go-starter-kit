@@ -29,6 +29,7 @@ func ShouldUseTUI() bool {
 // after the alternate screen buffer has been restored.
 type TUIResult struct {
 	ProjectName string
+	Template    string
 	Database    string
 }
 
@@ -76,6 +77,7 @@ func RunInteractiveTUI(defaults InteractiveDefaults, generatorFunc GeneratorFunc
 	// Success - return project info for post-generation display
 	return &TUIResult{
 		ProjectName: m.projectName,
+		Template:    m.template,
 		Database:    m.database,
 	}, nil
 }

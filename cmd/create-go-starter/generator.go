@@ -548,6 +548,10 @@ func buildGraphQLFileList(projectPath, projectName, database string) []FileGener
 			Content: templates.GraphQLSchemaTemplate(),
 		},
 		{
+			Path:    filepath.Join(projectPath, "graph", "email_helpers.go"),
+			Content: templates.GraphQLEmailHelpersTemplate(),
+		},
+		{
 			Path:    filepath.Join(projectPath, "graph", "resolver.go"),
 			Content: templates.GraphQLResolverTemplate(),
 		},
@@ -566,6 +570,10 @@ func buildGraphQLFileList(projectPath, projectName, database string) []FileGener
 		{
 			Path:    filepath.Join(projectPath, "graph", "model", "models.go"),
 			Content: templates.GraphQLModelTemplate(),
+		},
+		{
+			Path:    filepath.Join(projectPath, "graph", "model", "models_gen.go"),
+			Content: templates.GraphQLModelsGenTemplate(),
 		},
 		{
 			Path:    filepath.Join(projectPath, "graph", "generated", "generated.go"),

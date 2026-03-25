@@ -24,7 +24,7 @@ const defaultDirPerm os.FileMode = 0755
 // Template constants define the available project generation templates.
 // - TemplateMinimal: Basic REST API with Swagger (no authentication)
 // - TemplateFull: Complete hexagonal architecture with JWT auth, user management (default)
-// - TemplateGraphQL: GraphQL API with gqlgen and GraphQL Playground (not yet implemented)
+// - TemplateGraphQL: GraphQL API with gqlgen and GraphQL Playground
 const (
 	TemplateMinimal = "minimal"
 	TemplateFull    = "full"
@@ -150,7 +150,7 @@ func runInteractiveTUI(defaults InteractiveDefaults) error {
 	// After TUI exits, the alternate screen buffer is restored.
 	// Now print the detailed success message on the normal terminal
 	// so users get the same post-generation instructions as CLI mode.
-	printSuccessMessage(result.ProjectName, result.Database)
+	printSuccessMessage(result.ProjectName, result.Template, result.Database)
 
 	return nil
 }
@@ -644,7 +644,7 @@ func runWithCallback(projectName, template, database, observabilityLevel, framew
 
 	// Display success message with detailed setup instructions
 	if !quiet {
-		printSuccessMessage(projectName, database)
+		printSuccessMessage(projectName, template, database)
 	}
 
 	// Display generation statistics (AC: #2, #3)
@@ -728,8 +728,8 @@ func getLocalSetupCommand(projectName, database string) string {
 	}
 }
 
-// printSuccessMessage displays the final success message and setup instructions
-func printSuccessMessage(projectName, database string) {
+// printSuccessMessage displays the final success message and setup instructions.
+func printSuccessMessage(projectName, template, database string) {
 	fmt.Printf("\n%s\n", Green("════════════════════════════════════════════════════════════════"))
 	fmt.Printf("%s\n", Green(fmt.Sprintf("🎉 Project '%s' created successfully!", projectName))) // Changed to English
 	fmt.Printf("%s\n\n", Green("════════════════════════════════════════════════════════════════"))
@@ -748,23 +748,35 @@ func printSuccessMessage(projectName, database string) {
 	fmt.Println("    cd " + projectName)
 	fmt.Println()
 
-	// Database-specific setup instructions
-	fmt.Printf("2️⃣  Configure %s (choose one option):\n", getDatabaseDisplayName(database)) // Changed to English
-	fmt.Println()
-	fmt.Println("    Option A - Docker (Recommended):") // Changed to English
-	dockerCmd := getDockerCommand(projectName, database)
-	fmt.Println(dockerCmd)
-	fmt.Println()
-	fmt.Println("    Option B - Local setup:") // Changed to English
-	localCmd := getLocalSetupCommand(projectName, database)
-	fmt.Println(localCmd)
-	fmt.Println()
+	if database == DatabaseSQLite {
+		fmt.Println("2️⃣  Configure SQLite:") // Changed to English
+		fmt.Println("    No external service is required.")
+		fmt.Println("    The SQLite database file will be created automatically in the project directory.")
+		fmt.Println()
+	} else {
+		// Database-specific setup instructions
+		fmt.Printf("2️⃣  Configure %s (choose one option):\n", getDatabaseDisplayName(database)) // Changed to English
+		fmt.Println()
+		fmt.Println("    Option A - Docker (Recommended):") // Changed to English
+		dockerCmd := getDockerCommand(projectName, database)
+		fmt.Println(dockerCmd)
+		fmt.Println()
+		fmt.Println("    Option B - Local setup:") // Changed to English
+		localCmd := getLocalSetupCommand(projectName, database)
+		fmt.Println(localCmd)
+		fmt.Println()
+	}
 
-	fmt.Println("3️⃣  Generate JWT secret (REQUIRED):") // Changed to English
-	fmt.Println("    openssl rand -base64 32")
-	fmt.Println()
-	fmt.Println("    Then edit .env and add:")       // Changed to English
-	fmt.Println("    JWT_SECRET=<generated_secret>") // Changed to English
+	if template == TemplateFull {
+		fmt.Println("3️⃣  Generate JWT secret (REQUIRED):") // Changed to English
+		fmt.Println("    openssl rand -base64 32")
+		fmt.Println()
+		fmt.Println("    Then edit .env and add:")       // Changed to English
+		fmt.Println("    JWT_SECRET=<generated_secret>") // Changed to English
+	} else {
+		fmt.Println("3️⃣  Authentication setup:")
+		fmt.Println("    No JWT configuration is required for this template.")
+	}
 	fmt.Println()
 
 	fmt.Println("4️⃣  Start the application:") // Changed to English
@@ -772,12 +784,22 @@ func printSuccessMessage(projectName, database string) {
 	fmt.Println()
 
 	fmt.Println("5️⃣  Verify installation:") // Changed to English
-	fmt.Println("    curl http://localhost:8080/health")
-	fmt.Println("    # Should return: {\"status\":\"alive\",\"service\":\"" + projectName + "\",\"timestamp\":\"...\"}") // Changed to English
-	fmt.Println()
-	fmt.Println("    # Advanced health checks:")
-	fmt.Println("    curl http://localhost:8080/health/liveness    # Liveness probe (K8s)")
-	fmt.Println("    curl http://localhost:8080/health/readiness   # Readiness probe (K8s)")
+	if template == TemplateGraphQL {
+		fmt.Println("    curl http://localhost:8080/health")
+		fmt.Println("    # Should return: {\"status\":\"ok\"}")
+		fmt.Println()
+		fmt.Println("    # GraphQL Playground:")
+		fmt.Println("    http://localhost:8080/")
+		fmt.Println("    # GraphQL query endpoint:")
+		fmt.Println("    curl -H 'Content-Type: application/json' -d '{\"query\":\"query { health }\"}' http://localhost:8080/query")
+	} else {
+		fmt.Println("    curl http://localhost:8080/health")
+		fmt.Println("    # Should return: {\"status\":\"alive\",\"service\":\"" + projectName + "\",\"timestamp\":\"...\"}") // Changed to English
+		fmt.Println()
+		fmt.Println("    # Advanced health checks:")
+		fmt.Println("    curl http://localhost:8080/health/liveness    # Liveness probe (K8s)")
+		fmt.Println("    curl http://localhost:8080/health/readiness   # Readiness probe (K8s)")
+	}
 	fmt.Println()
 
 	fmt.Println(Green("📚 Full documentation:"))                                    // Changed to English
@@ -785,10 +807,18 @@ func printSuccessMessage(projectName, database string) {
 	fmt.Println("   - README:            " + projectName + "/README.md")           // Changed to English
 	fmt.Println()
 
-	fmt.Println(Green("⚠️  IMPORTANT:"))                                                                       // Changed to English
-	fmt.Printf("   • %s MUST be started before launching the application\n", getDatabaseDisplayName(database)) // Changed to English
-	fmt.Println("   • JWT_SECRET MUST be configured in .env")                                                  // Changed to English
-	fmt.Println("   • The .env file was automatically created from .env.example")                              // Changed to English
+	fmt.Println(Green("⚠️  IMPORTANT:")) // Changed to English
+	if database == DatabaseSQLite {
+		fmt.Println("   • The SQLite database file will be created automatically on first start")
+	} else {
+		fmt.Printf("   • %s MUST be started before launching the application\n", getDatabaseDisplayName(database)) // Changed to English
+	}
+	if template == TemplateFull {
+		fmt.Println("   • JWT_SECRET MUST be configured in .env") // Changed to English
+	} else {
+		fmt.Println("   • No JWT secret configuration is required for this template")
+	}
+	fmt.Println("   • The .env file was automatically created from .env.example") // Changed to English
 	fmt.Println()
 
 	fmt.Println(Green("✨ Happy developing with " + projectName + "!")) // Changed to English

@@ -1080,6 +1080,14 @@ make run
 
 ## Développement
 
+### Projets GraphQL
+
+Les projets générés avec le template `graphql` incluent déjà `graph/generated/generated.go` et `graph/model/models_gen.go`.
+
+- Lancez le projet directement après `go mod tidy`
+- Utilisez `go generate ./...` uniquement après modification de `graph/schema.graphqls`
+- L'endpoint GraphQL exposé par défaut est `POST /query` et le Playground est servi sur `GET /`
+
 ### Workflow quotidien
 
 **1. Lancer la base de données**

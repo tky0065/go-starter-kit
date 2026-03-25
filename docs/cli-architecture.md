@@ -12,6 +12,8 @@ create-go-starter (CLI)
 ├── generator.go         # File generation orchestrator
 ├── templates.go              # Core templates (config, server, domain, setup.sh)
 ├── templates_user.go         # User domain specific templates
+├── templates_graphql.go      # GraphQL template sources
+├── templates_graphql_codegen.go # Embedded gqlgen outputs for runnable-first GraphQL projects
 ├── templates_observability.go # Observability templates (Prometheus, Jaeger, Grafana, Health)
 ├── git.go               # Git repository initialization
 ├── smoke_test.go        # E2E smoke tests
@@ -122,6 +124,8 @@ func generateProjectFiles(projectPath, projectName string) error {
     return nil
 }
 ```
+
+Pour le template `graphql`, `buildGraphQLFileList()` écrit aussi `graph/generated/generated.go` et `graph/model/models_gen.go` à partir d'artefacts gqlgen embarqués. Un projet généré peut donc démarrer immédiatement; `go generate ./...` ne sert qu'après modification du schéma.
 
 ### 2.1. Générateur de Modèles (add-model Command)
 
