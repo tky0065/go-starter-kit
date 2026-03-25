@@ -1182,6 +1182,18 @@ Pour contribuer au CLI:
 
 ## Roadmap technique
 
+## Interface interactive
+
+Le mode `--interactive` s'appuie sur un sous-package TUI dédié dans `cmd/create-go-starter/tui/`.
+
+- Écran d'accueil avec menu principal
+- Sélections guidées pour le nom du projet, le template, la base de données, le framework et l'observabilité
+- Écran de résumé avant génération
+- Écran de progression avec barre de progression, étape courante et statistiques
+- Écran final de succès ou d'échec
+
+Le rendu partage des helpers de style centralisés afin de garder un vocabulaire visuel cohérent entre les écrans.
+
 **Complété**:
 - [x] Dry-run mode (`--dry-run`)
 - [x] Templates multiples (minimal, full, graphql)

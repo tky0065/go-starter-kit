@@ -2,6 +2,7 @@ package tui
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/progress"
@@ -73,29 +74,47 @@ func renderGenerationStats(stats GenerationStats, totalFiles int) string {
 	// Format total size in human-readable format
 	sizeStr := formatFileSize(stats.TotalSize)
 
-	// Build stats panel content
-	var statsContent string
-	statsContent += fmt.Sprintf("%s Files created:  %s\n",
-		RenderMuted("✓"),
-		RenderHighlight(fmt.Sprintf("%d", stats.FilesCreated)))
-	statsContent += fmt.Sprintf("%s Total size:     %s\n",
-		RenderMuted("📦"),
-		RenderHighlight(sizeStr))
-	statsContent += fmt.Sprintf("%s Time elapsed:   %s\n",
-		RenderMuted("⏱ "),
-		RenderHighlight(formatDuration(elapsed)))
+	// Build stats panel content with professional alignment
+	labelStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(ColorMuted)).
+		Width(14).
+		Align(lipgloss.Right)
+
+	valueStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color(ColorInfo))
+
+	var b strings.Builder
+
+	b.WriteString(fmt.Sprintf("%s  %s  %s\n",
+		"OK",
+		labelStyle.Render("Files created:"),
+		valueStyle.Render(fmt.Sprintf("%d / %d", stats.FilesCreated, totalFiles))))
+
+	b.WriteString(fmt.Sprintf("%s  %s  %s\n",
+		"SZ",
+		labelStyle.Render("Total size:"),
+		valueStyle.Render(sizeStr)))
+
+	b.WriteString(fmt.Sprintf("%s  %s  %s\n",
+		"TM",
+		labelStyle.Render("Time elapsed:"),
+		valueStyle.Render(formatDuration(elapsed))))
+
 	if eta > 0 {
-		statsContent += fmt.Sprintf("%s ETA:            %s",
-			RenderMuted("⏳"),
-			RenderHighlight(formatDuration(eta)))
+		b.WriteString(fmt.Sprintf("%s  %s  %s",
+			"ET",
+			labelStyle.Render("ETA:"),
+			valueStyle.Render(formatDuration(eta))))
 	}
 
-	// Create stats box
+	// Create stats box with professional border
 	statsBox := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color(ColorInfo)).
-		Padding(1, 2).
-		Render(statsContent)
+		Padding(1, 4).
+		Width(54).
+		Render(b.String())
 
 	return statsBox
 }
@@ -109,11 +128,9 @@ func renderCurrentStep(step string, currentFile string) string {
 
 	var message string
 	if step != "" {
-		// Show step description (e.g., "Creating directories...")
-		message = fmt.Sprintf("%s %s", RenderSimpleInfo("🔄"), step)
+		message = fmt.Sprintf("%s %s", RenderSimpleInfo("Status:"), step)
 	} else if currentFile != "" {
-		// Show current file being generated
-		message = fmt.Sprintf("%s Creating %s...", RenderSimpleInfo("🔄"), currentFile)
+		message = fmt.Sprintf("%s Creating %s...", RenderSimpleInfo("Status:"), currentFile)
 	}
 
 	return message

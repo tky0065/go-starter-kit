@@ -2,6 +2,7 @@ package tui
 
 import (
 	"os"
+	"strings"
 
 	"github.com/charmbracelet/lipgloss"
 )
@@ -316,6 +317,25 @@ func RenderSeparator(width int) string {
 		separator += "─"
 	}
 	return SeparatorStyle.Render(separator)
+}
+
+// renderStyledFooter renders a footer with styled key/description pairs.
+// Arguments are pairs: key1, desc1, key2, desc2, ...
+func renderStyledFooter(pairs ...string) string {
+	var parts []string
+	for i := 0; i+1 < len(pairs); i += 2 {
+		key := KeyStyle.Render(pairs[i])
+		desc := MutedStyle.Render(pairs[i+1])
+		parts = append(parts, key+" "+desc)
+	}
+
+	dotSep := MutedStyle.Render("  ·  ")
+	return strings.Join(parts, dotSep)
+}
+
+// RenderStyledFooter renders a public footer with styled key/description pairs.
+func RenderStyledFooter(pairs ...string) string {
+	return renderStyledFooter(pairs...)
 }
 
 // RenderProgressBar renders a simple progress bar.

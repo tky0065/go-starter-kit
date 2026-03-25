@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 // InteractiveDefaults holds default values for interactive mode prompts.
@@ -80,14 +81,22 @@ func NewInteractiveModel(defaults InteractiveDefaults, generatorFunc GeneratorFu
 // initializeTemplateList creates and initializes the template selection list.
 func initializeTemplateList(defaultTemplate string) list.Model {
 	items := []list.Item{
-		templateItem{name: "full", desc: "Complete REST API with user auth, database, logging, Swagger"},
-		templateItem{name: "minimal", desc: "Basic HTTP server with health check - lightweight start"},
-		templateItem{name: "graphql", desc: "GraphQL API server with subscriptions and schema"},
+		templateItem{name: "full", desc: "Complete REST API with auth, database, and Swagger"},
+		templateItem{name: "minimal", desc: "Basic HTTP server with health check and minimal setup"},
+		templateItem{name: "graphql", desc: "GraphQL API server with schema and subscriptions"},
 	}
 
 	delegate := list.NewDefaultDelegate()
+	delegate.Styles.SelectedTitle = delegate.Styles.SelectedTitle.Foreground(lipgloss.Color(ColorSuccess)).BorderForeground(lipgloss.Color(ColorSuccess))
+	delegate.Styles.SelectedDesc = delegate.Styles.SelectedDesc.Foreground(lipgloss.Color(ColorMuted))
+
 	l := list.New(items, delegate, 0, 0)
 	l.Title = "Select a Template"
+	l.Styles.Title = lipgloss.NewStyle().
+		Background(lipgloss.Color(ColorSuccess)).
+		Foreground(lipgloss.Color("#ffffff")).
+		Bold(true).
+		Padding(0, 2)
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)
 
@@ -107,14 +116,21 @@ func initializeTemplateList(defaultTemplate string) list.Model {
 // initializeDatabaseList creates and initializes the database selection list.
 func initializeDatabaseList(defaultDatabase string) list.Model {
 	items := []list.Item{
-		databaseItem{name: "postgres", desc: "PostgreSQL - Production-ready, advanced features"},
-		databaseItem{name: "mysql", desc: "MySQL/MariaDB - Wide compatibility, shared hosting"},
-		databaseItem{name: "sqlite", desc: "SQLite - Quick prototyping, embedded apps"},
+		databaseItem{name: "postgres", desc: "PostgreSQL for production-grade relational workloads"},
+		databaseItem{name: "mysql", desc: "MySQL for widely compatible relational deployments"},
+		databaseItem{name: "sqlite", desc: "SQLite for local development and embedded use cases"},
 	}
 
 	delegate := list.NewDefaultDelegate()
+	delegate.Styles.SelectedTitle = delegate.Styles.SelectedTitle.Foreground(lipgloss.Color(ColorSuccess)).BorderForeground(lipgloss.Color(ColorSuccess))
+
 	l := list.New(items, delegate, 0, 0)
 	l.Title = "Select a Database"
+	l.Styles.Title = lipgloss.NewStyle().
+		Background(lipgloss.Color(ColorSuccess)).
+		Foreground(lipgloss.Color("#ffffff")).
+		Bold(true).
+		Padding(0, 2)
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)
 
@@ -134,14 +150,21 @@ func initializeDatabaseList(defaultDatabase string) list.Model {
 // initializeObservabilityList creates and initializes the observability selection list.
 func initializeObservabilityList(defaultObservability string) list.Model {
 	items := []list.Item{
-		observabilityItem{name: "none", desc: "No observability - minimal overhead"},
-		observabilityItem{name: "basic", desc: "Basic - Enhanced /health endpoint only"},
-		observabilityItem{name: "advanced", desc: "Advanced - Full Prometheus metrics + middleware"},
+		observabilityItem{name: "none", desc: "No additional observability components"},
+		observabilityItem{name: "basic", desc: "Health checks and structured logging"},
+		observabilityItem{name: "advanced", desc: "Metrics, tracing, and monitoring support"},
 	}
 
 	delegate := list.NewDefaultDelegate()
+	delegate.Styles.SelectedTitle = delegate.Styles.SelectedTitle.Foreground(lipgloss.Color(ColorSuccess)).BorderForeground(lipgloss.Color(ColorSuccess))
+
 	l := list.New(items, delegate, 0, 0)
-	l.Title = "Select Observability Level"
+	l.Title = "Select Observability"
+	l.Styles.Title = lipgloss.NewStyle().
+		Background(lipgloss.Color(ColorSuccess)).
+		Foreground(lipgloss.Color("#ffffff")).
+		Bold(true).
+		Padding(0, 2)
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)
 
@@ -149,6 +172,40 @@ func initializeObservabilityList(defaultObservability string) list.Model {
 	if defaultObservability != "" {
 		for i, item := range items {
 			if obs, ok := item.(observabilityItem); ok && obs.name == defaultObservability {
+				l.Select(i)
+				break
+			}
+		}
+	}
+
+	return l
+}
+
+// initializeFrameworkList creates and initializes the framework selection list.
+func initializeFrameworkList(defaultFramework string) list.Model {
+	items := []list.Item{
+		frameworkItem{name: "fiber", desc: "Fast, Express-inspired HTTP framework"},
+		frameworkItem{name: "gin", desc: "Mature web framework with broad ecosystem support"},
+		frameworkItem{name: "echo", desc: "High-performance framework with a minimal surface area"},
+	}
+
+	delegate := list.NewDefaultDelegate()
+	delegate.Styles.SelectedTitle = delegate.Styles.SelectedTitle.Foreground(lipgloss.Color(ColorSuccess)).BorderForeground(lipgloss.Color(ColorSuccess))
+
+	l := list.New(items, delegate, 0, 0)
+	l.Title = "Select a Web Framework"
+	l.Styles.Title = lipgloss.NewStyle().
+		Background(lipgloss.Color(ColorSuccess)).
+		Foreground(lipgloss.Color("#ffffff")).
+		Bold(true).
+		Padding(0, 2)
+	l.SetShowStatusBar(false)
+	l.SetFilteringEnabled(false)
+
+	// Set default selection if provided
+	if defaultFramework != "" {
+		for i, item := range items {
+			if fw, ok := item.(frameworkItem); ok && fw.name == defaultFramework {
 				l.Select(i)
 				break
 			}
@@ -187,33 +244,6 @@ type observabilityItem struct {
 func (o observabilityItem) Title() string       { return o.name }
 func (o observabilityItem) Description() string { return o.desc }
 func (o observabilityItem) FilterValue() string { return o.name }
-
-// initializeFrameworkList creates and initializes the framework selection list.
-func initializeFrameworkList(defaultFramework string) list.Model {
-	items := []list.Item{
-		frameworkItem{name: "fiber", desc: "Fiber v2.52.10 - Fast HTTP framework inspired by Express (default)"},
-		frameworkItem{name: "gin", desc: "Gin - High-performance HTTP web framework (planned for v2.0.0)"},
-		frameworkItem{name: "echo", desc: "Echo - Minimalist high-performance HTTP framework (planned for v2.0.0)"},
-	}
-
-	delegate := list.NewDefaultDelegate()
-	l := list.New(items, delegate, 0, 0)
-	l.Title = "Select a Framework"
-	l.SetShowStatusBar(false)
-	l.SetFilteringEnabled(false)
-
-	// Set default selection if provided
-	if defaultFramework != "" {
-		for i, item := range items {
-			if fw, ok := item.(frameworkItem); ok && fw.name == defaultFramework {
-				l.Select(i)
-				break
-			}
-		}
-	}
-
-	return l
-}
 
 // frameworkItem is a list item for framework selection.
 type frameworkItem struct {

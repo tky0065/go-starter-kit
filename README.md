@@ -222,6 +222,7 @@ create-go-starter -i
 ```
 
 Le mode interactif guide l'utilisateur étape par étape pour configurer un nouveau projet: nom du projet, choix du template, base de données, et niveau d'observabilité. Un résumé est affiché avant la génération avec confirmation.
+L'expérience utilise désormais un TUI plus structuré avec écran d'accueil, sélections centrées, résumé lisible et écran de progression avec statistiques en temps réel.
 
 #### Prévisualisation dry-run
 

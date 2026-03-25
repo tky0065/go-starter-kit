@@ -71,8 +71,8 @@ type Model struct {
 	frameworkList list.Model      // For framework selection (Story 11.1)
 	obsList       list.Model      // For observability selection
 	previewModel  PreviewModel    // For dry-run preview (Story 10.7 Task 6)
-	progressBar  progress.Model  // For generation progress
-	loadSpinner  spinner.Model   // For loading indicator
+	progressBar   progress.Model  // For generation progress
+	loadSpinner   spinner.Model   // For loading indicator
 
 	// UI state
 	width           int    // Terminal width (from tea.WindowSizeMsg)

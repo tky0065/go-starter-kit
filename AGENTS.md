@@ -4,7 +4,7 @@ Instructions for AI coding agents working in this repository.
 
 ## Project Overview
 
-`go-starter-kit` is a Go CLI tool (`create-go-starter`) that scaffolds new Go projects with hexagonal architecture. The CLI has **zero external dependencies** - it uses only the Go standard library.
+`go-starter-kit` is a Go CLI tool (`create-go-starter`) that scaffolds new Go projects with hexagonal architecture. The core generator path is stdlib-first, and the interactive terminal UI lives in `cmd/create-go-starter/tui/`.
 
 ## Build/Lint/Test Commands
 
@@ -60,11 +60,12 @@ cmd/create-go-starter/
   generator.go         # File generation orchestrator, validation
   templates.go         # Core infrastructure templates (server, db, config)
   templates_user.go    # User domain templates (handlers, services, auth)
+  tui/                 # Interactive terminal UI (welcome, forms, progress, help)
   *_test.go            # Tests co-located with source files
 ```
 
 ### Imports Organization
-Standard Go convention - **stdlib only** (no external dependencies in CLI):
+Standard Go convention. Keep non-TUI CLI code stdlib-first; follow existing Charmbracelet usage inside `cmd/create-go-starter/tui/`:
 ```go
 import (
     "flag"

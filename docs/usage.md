@@ -555,7 +555,7 @@ create-go-starter mon-projet -t full -d postgres -o advanced
 
 ## Mode Interactif (--interactive) <i class="material-icons success">new_releases</i>
 
-**Nouveau dans v1.4.0!** Le mode interactif guide l'utilisateur étape par étape pour configurer un nouveau projet.
+**Nouveau dans v1.4.0!** Le mode interactif guide l'utilisateur étape par étape pour configurer un nouveau projet avec une interface terminal plus soignée.
 
 ### Utilisation
 
@@ -566,7 +566,7 @@ create-go-starter -i
 
 ### Fonctionnement
 
-Le mode interactif demande successivement:
+Le mode interactif affiche un écran d'accueil, puis guide successivement:
 
 1. **Nom du projet** -- Avec validation en temps réel
 2. **Template** -- Choix entre minimal, full (défaut), graphql
@@ -574,28 +574,38 @@ Le mode interactif demande successivement:
 4. **Observabilité** -- Choix entre none (défaut), basic, advanced (si template full)
 5. **Résumé** -- Affichage de la configuration choisie avec confirmation
 
-```
-create-go-starter - Interactive Mode
+Exemple de parcours:
 
-Enter project name: mon-app
-Select template (minimal/full/graphql) [full]: full
-Select database (postgres/mysql/sqlite) [postgres]: postgres
-Select observability (none/basic/advanced) [none]: advanced
+```text
+Welcome screen
+  Create New Project
+  Help
+  Exit
 
-Configuration Summary:
-  Project:       mon-app
-  Template:      full
-  Database:      postgres
-  Observability: advanced
+Project Name
+  mon-app
 
-Proceed with generation? (y/n) [y]: y
+Select a Template
+  full
+
+Select a Database
+  postgres
+
+Select Observability
+  advanced
+
+Configuration Summary
+  Project Name    mon-app
+  Template        full
+  Database        postgres
+  Observability   advanced
 ```
 
 ### Notes
 
 - <i class="material-icons info">info</i> Le mode interactif nécessite un terminal interactif (pas de pipe stdin)
 - <i class="material-icons warning">warning</i> `--interactive` et `--dry-run` ne peuvent pas être utilisés ensemble
-- <i class="material-icons info">info</i> Zéro dépendance externe -- utilise uniquement `bufio.NewReader` de la stdlib
+- <i class="material-icons info">info</i> Le flux interactif propose une hiérarchie visuelle plus claire: écran d'accueil, résumé centré et progression avec statistiques
 
 ## Prévisualisation Dry-Run (--dry-run) <i class="material-icons success">new_releases</i>
 

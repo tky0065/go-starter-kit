@@ -106,6 +106,7 @@ make run
   - `generator.go` - File generation orchestrator
   - `templates.go` - Core templates (config, server, domain, setup.sh)
   - `templates_user.go` - User domain specific templates
+  - `tui/` - Interactive terminal UI package (welcome, forms, progress, help, styles)
   - `git.go` - Git repository initialization and initial commit
   - `git_test.go` - Tests for Git functionality
   - `smoke_test.go` - End-to-end smoke tests for project generation validation
@@ -126,10 +127,10 @@ When you run `create-go-starter my-project`, the following structure is generate
 ## Architecture Notes
 
 ### CLI Tool Design
-The tool uses a simple command-line interface with:
+The tool uses a standard flag-driven CLI plus an interactive terminal UI:
 - Flag parsing using the standard `flag` package
 - ANSI color support via helper functions `Green()` and `Red()`
-- Basic scaffolding placeholder ready for expansion
+- Interactive flows implemented in `cmd/create-go-starter/tui/`
 
 ### Code Organization
 - CLI logic is organized across multiple files for maintainability:

@@ -11,8 +11,6 @@ import (
 )
 
 // welcomeMenuItem represents an item in the welcome menu.
-// Implements list.Item interface for bubbles/list.
-// Story 10.7 Task 1.3: Menu interactif avec bubbles/list
 type welcomeMenuItem struct {
 	title       string
 	description string
@@ -26,8 +24,8 @@ func (i welcomeMenuItem) FilterValue() string { return i.title }
 // welcomeItemDelegate is a custom delegate for rendering welcome menu items.
 type welcomeItemDelegate struct{}
 
-func (d welcomeItemDelegate) Height() int                               { return 2 }
-func (d welcomeItemDelegate) Spacing() int                              { return 1 }
+func (d welcomeItemDelegate) Height() int                               { return 3 }
+func (d welcomeItemDelegate) Spacing() int                              { return 0 }
 func (d welcomeItemDelegate) Update(msg tea.Msg, m *list.Model) tea.Cmd { return nil }
 func (d welcomeItemDelegate) Render(w io.Writer, m list.Model, index int, item list.Item) {
 	i, ok := item.(welcomeMenuItem)
@@ -35,26 +33,45 @@ func (d welcomeItemDelegate) Render(w io.Writer, m list.Model, index int, item l
 		return
 	}
 
-	// Apply focused/blurred style based on selection
-	var titleStyle, descStyle lipgloss.Style
-	if index == m.Index() {
-		titleStyle = FocusedStyle.Bold(true) // Copy() is deprecated, assignment copies automatically
-		descStyle = InfoStyle
+	isFocused := index == m.Index()
+	width := m.Width()
+	if width == 0 {
+		width = 80 // Fallback
+	}
+
+	if isFocused {
+		titleStyle := lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color(ColorSuccess))
+		descStyle := lipgloss.NewStyle().
+			Foreground(lipgloss.Color(ColorMuted)).
+			Italic(false)
+
+		boxStyle := lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder()).
+			BorderForeground(lipgloss.Color(ColorSuccess)).
+			Padding(0, 2).
+			Width(44)
+
+		content := fmt.Sprintf("%s\n%s",
+			titleStyle.Render(i.title),
+			descStyle.Render(i.description))
+
+		centeredBox := CenterHorizontal(boxStyle.Render(content), width)
+		fmt.Fprint(w, centeredBox)
 	} else {
-		titleStyle = BlurredStyle
-		descStyle = MutedStyle
+		titleStyle := lipgloss.NewStyle().
+			Foreground(lipgloss.Color(ColorText))
+		descStyle := lipgloss.NewStyle().
+			Foreground(lipgloss.Color(ColorMuted))
+
+		content := fmt.Sprintf("%s\n%s",
+			titleStyle.Render(i.title),
+			descStyle.Render(i.description))
+
+		centeredContent := CenterHorizontal(content, width)
+		fmt.Fprintf(w, "\n%s\n", centeredContent)
 	}
-
-	// Render with icon
-	icon := "  "
-	if index == m.Index() {
-		icon = "▸ "
-	}
-
-	title := titleStyle.Render(icon + i.title)
-	desc := descStyle.Render("  " + i.description)
-
-	fmt.Fprintf(w, "%s\n%s", title, desc)
 }
 
 // initializeWelcomeList creates and initializes the welcome menu list.
@@ -88,59 +105,101 @@ func initializeWelcomeList() list.Model {
 	return l
 }
 
-// WelcomeLogo returns the ASCII art logo for go-starter-kit.
-// Uses Option 2 (minimaliste) as recommended in Story 10.7.
+// WelcomeLogo returns the styled logo for go-starter-kit.
+// Renders the logo using lipgloss for consistent styling and alignment.
 func WelcomeLogo() string {
-	logo := `
-╔═══════════════════════════════════╗
-║                                   ║
-║     🚀  go-starter-kit  🚀       ║
-║                                   ║
-║   Production-Ready Go API         ║
-║   in < 5 minutes                  ║
-║                                   ║
-╚═══════════════════════════════════╝
-`
-	return logo
+	titleLine := "go-starter-kit"
+	subtitle := "create-go-starter"
+	tagline := "Scaffold production-ready Go APIs in minutes"
+
+	titleStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color(ColorSuccess)).
+		Background(lipgloss.Color("#003d1f")). // Dark green background for impact
+		Padding(0, 2).
+		MarginBottom(1)
+
+	taglineStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(ColorInfo)).
+		Italic(true).
+		MarginBottom(1)
+
+	subtitleStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(ColorText)).
+		Bold(true)
+
+	metaStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(ColorMuted)).
+		Faint(true)
+
+	content := lipgloss.JoinVertical(
+		lipgloss.Center,
+		titleStyle.Render(titleLine),
+		subtitleStyle.Render(subtitle),
+		taglineStyle.Render(tagline),
+		metaStyle.Render("Interactive project generator"),
+	)
+
+	box := lipgloss.NewStyle().
+		Border(lipgloss.ThickBorder()).
+		BorderForeground(lipgloss.Color(ColorSuccess)).
+		Padding(1, 4).
+		Align(lipgloss.Center).
+		Width(54)
+
+	return box.Render(content)
 }
 
 // RenderWelcomeScreen renders the welcome screen with logo and interactive menu.
-// Story 10.7 Task 1.3: Menu interactif avec bubbles/list
-// Story 10.7 Task 1.5: Fade-in animation for logo
 func RenderWelcomeScreen(width, height int, menuList list.Model, logoOpacity float64) string {
 	var b strings.Builder
 
-	// Render logo with fade-in animation (Story 10.7 Task 1.5)
-	logo := WelcomeLogo()
-	logoStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(ColorSuccess)). // Green for logo
-		Bold(true).
-		Align(lipgloss.Center)
-
-	// Apply opacity to logo (simple approach: render only if opacity > 0)
-	// For a smoother fade, we'd use color blending, but this is sufficient
-	if logoOpacity > 0.0 {
-		b.WriteString("\n")
-		// Note: Lipgloss doesn't directly support opacity/alpha
-		// A production implementation would blend colors or use extended ANSI codes
-		// For now, we show/hide based on a threshold
-		b.WriteString(logoStyle.Render(logo))
-		b.WriteString("\n\n")
-	} else {
-		// Logo is invisible, add spacing to maintain layout
-		b.WriteString("\n\n\n\n\n\n\n\n\n") // Roughly logo height in lines
+	if width <= 0 {
+		width = 80
+	}
+	if height <= 0 {
+		height = 24
+	}
+	if menuList.Items() == nil {
+		menuList = initializeWelcomeList()
+		menuList.SetSize(width-ListWidthMargin, 10)
 	}
 
-	// Render menu header
-	b.WriteString(RenderHeader("What would you like to do?"))
+	// Render logo with fade-in animation
+	if logoOpacity > 0.0 {
+		logo := WelcomeLogo()
+		b.WriteString("\n")
+		b.WriteString(CenterHorizontal(logo, width))
+		b.WriteString("\n")
+	} else {
+		b.WriteString("\n\n\n\n\n\n\n")
+	}
+
+	// Menu header
+	headerStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color(ColorSuccess)).
+		MarginTop(1).
+		MarginBottom(1)
+
+	headerText := "What would you like to do?"
+	b.WriteString(CenterHorizontal(headerStyle.Render(headerText), width))
+
+	// Separator below header
+	sep := RenderSeparator(len(headerText) + 4)
+	b.WriteString(CenterHorizontal(sep, width))
 	b.WriteString("\n\n")
 
-	// Render interactive menu list (Story 10.7 Task 1.3)
+	// Menu list
+	// Adjust list width for centering
+	menuList.SetWidth(width)
 	b.WriteString(menuList.View())
-	b.WriteString("\n\n")
+	b.WriteString("\n")
 
-	// Footer with help text
-	b.WriteString(RenderFooter("↑↓ Navigate • Enter Select • ? Help • Ctrl+C Quit"))
+	// Footer
+	footer := renderStyledFooter("↑↓", "Navigate", "Enter", "Select", "?", "Help", "Ctrl+C", "Quit")
+	b.WriteString("\n")
+	b.WriteString(CenterHorizontal(footer, width))
 	b.WriteString("\n")
 
 	return b.String()
