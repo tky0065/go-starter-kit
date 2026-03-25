@@ -5,7 +5,7 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
-## [1.5.1] - 2026-02-23
+## [1.5.2] - 2026-03-25
 
 ### <i class="material-icons success">build</i> Corrections TUI Interactive Mode
 
@@ -28,7 +28,7 @@ Corrections critiques du mode interactif Bubble Tea (`-i`).
 ### <i class="material-icons">upgrade</i> Installation
 
 ```bash
-go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@v1.5.1
+go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@v1.5.2
 # ou
 go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@latest
 ```
@@ -568,7 +568,7 @@ Merci à tous les contributeurs et aux projets open-source utilisés :
 - **MINOR** (1.X.0): Ajout de fonctionnalités rétro-compatibles
 - **PATCH** (1.0.X): Corrections de bugs rétro-compatibles
 
-[1.5.1]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.5.1
+[1.5.2]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.5.2
 [1.4.0]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.4.0
 [1.3.0]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.3.0
 [1.2.0]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.2.0

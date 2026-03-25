@@ -2,7 +2,7 @@
 
 Ce document présente la vision et les prochaines étapes pour l'évolution de `create-go-starter`.
 
-## <i class="material-icons">rocket_launch</i> Version Actuelle: v1.5.1
+## <i class="material-icons">rocket_launch</i> Version Actuelle: v1.5.2
 
 **Date de release**: 23 février 2026  
 **Statut**: <i class="material-icons success">check</i> Production Ready
