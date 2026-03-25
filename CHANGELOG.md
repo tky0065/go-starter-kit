@@ -5,6 +5,36 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [1.6.1] - 2026-03-25
+
+### <i class="material-icons warning">bug_report</i> Corrections
+
+#### Template GraphQL exécutable dès la génération
+
+- **Ajout du code gqlgen pré-généré dans le scaffold** pour que les projets GraphQL démarrent sans `go generate ./...`
+- **Correction du resolver `User.id`** pour retourner l'identifiant au lieu de panic
+- **Extraction de la validation email dans un helper dédié** pour rester compatible avec les régénérations gqlgen
+- **Versionnage explicite de `go generate`** avec `github.com/99designs/gqlgen@v0.17.73`
+
+#### Validation E2E GraphQL renforcée
+
+- **Nouveau smoke test de démarrage HTTP** sur projet généré en SQLite
+- **Vérification du Playground, du health check et des requêtes GraphQL** (`health`, `createUser`, `users`)
+- **Détection précoce des placeholders gqlgen non exécutables** dans les tests de génération
+
+#### Sortie CLI et documentation corrigées
+
+- **Instructions post-génération adaptées au template GraphQL** et aux projets SQLite
+- **Mise à jour de la documentation** pour refléter le flux "runnable direct"
+
+### <i class="material-icons">upgrade</i> Installation
+
+```bash
+go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@v1.6.1
+# ou
+go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@latest
+```
+
 ## [1.6.0] - 2026-03-25
 
 ### <i class="material-icons success">build</i> Corrections TUI Interactive Mode
@@ -568,6 +598,7 @@ Merci à tous les contributeurs et aux projets open-source utilisés :
 - **MINOR** (1.X.0): Ajout de fonctionnalités rétro-compatibles
 - **PATCH** (1.0.X): Corrections de bugs rétro-compatibles
 
+[1.6.1]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.6.1
 [1.6.0]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.6.0
 [1.5.2]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.5.2
 [1.4.0]: https://github.com/tky0065/go-starter-kit/releases/tag/v1.4.0
