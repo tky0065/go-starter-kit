@@ -6,7 +6,7 @@ Un outil CLI puissant pour générer des projets Go prêts pour la production en
 
 **create-go-starter** est un générateur CLI stable et production-ready pour créer des applications Go modernes.
 
-- <i class="material-icons success">check</i> **Version stable** - v1.5.2 disponible
+- <i class="material-icons success">check</i> **Version stable** - v1.6.0 disponible
 - <i class="material-icons success">check</i> **3 templates** - minimal, full, GraphQL
 - <i class="material-icons success">check</i> **Testé et validé** - Utilisé en production
 - <i class="material-icons success">check</i> **Open source** - MIT License

@@ -673,7 +673,7 @@ La commande vérifie:
 ### Exemple de sortie
 
 ```
-create-go-starter doctor v1.5.2
+create-go-starter doctor v1.6.0
 
 Checking environment...
 

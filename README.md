@@ -8,7 +8,7 @@ Un outil CLI puissant pour générer des projets Go prêts pour la production en
 
 ## Version actuelle
 
-**v1.5.2** - Stable et prêt pour la production
+**v1.6.0** - Stable et prêt pour la production
 
  **Production ready** - Utilisé dans des projets réels
  **3 templates** - Minimal, Full (JWT), GraphQL
@@ -46,7 +46,7 @@ Installation globale en une seule commande, sans cloner le repository:
 
 ```bash
 # Version stable (recommandée)
-go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@v1.5.2
+go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@v1.6.0
 
 # Ou dernière version
 go install github.com/tky0065/go-starter-kit/cmd/create-go-starter@latest
