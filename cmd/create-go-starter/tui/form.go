@@ -20,6 +20,7 @@ type FormModel struct {
 	projectName   string
 	template      string
 	database      string
+	framework     string
 	observability string
 
 	// Validation
@@ -30,7 +31,7 @@ type FormModel struct {
 func NewFormModel() FormModel {
 	return FormModel{
 		currentStep: 1,
-		totalSteps:  4, // Project Name, Template, Database, Observability
+		totalSteps:  5, // Project Name, Template, Database, Framework, Observability
 		history:     []int{},
 	}
 }
@@ -122,9 +123,9 @@ func (f FormModel) RenderProgressIndicator() string {
 // Story 10.7 Task 2: Breadcrumb visual en haut de l'écran
 //
 // Example output:
-// [1/4] Project Name → [2/4] Template → [3/4] Database → [4/4] Observability
+// [1/5] Project Name → [2/5] Template → [3/5] Database → [4/5] Framework → [5/5] Observability
 //
-//	●                     ●                  ○                  ○
+//	●                     ●                  ○                  ○                  ○
 func (f FormModel) RenderBreadcrumb() string {
 	var b strings.Builder
 
@@ -170,6 +171,8 @@ func (f FormModel) GetStepName(step int) string {
 	case 3:
 		return "Database"
 	case 4:
+		return "Framework"
+	case 5:
 		return "Observability"
 	default:
 		return "Unknown"
@@ -198,6 +201,8 @@ func (f FormModel) View() string {
 	case 3:
 		b.WriteString(f.renderDatabaseStep())
 	case 4:
+		b.WriteString(f.renderFrameworkStep())
+	case 5:
 		b.WriteString(f.renderObservabilityStep())
 	}
 
@@ -263,7 +268,22 @@ func (f FormModel) renderDatabaseStep() string {
 	return b.String()
 }
 
-// renderObservabilityStep renders step 4: observability selection.
+// renderFrameworkStep renders step 4: framework selection.
+func (f FormModel) renderFrameworkStep() string {
+	var b strings.Builder
+
+	b.WriteString("Select a web framework:\n\n")
+
+	if f.framework != "" {
+		b.WriteString(FocusedStyle.Render("Selected: " + f.framework))
+	} else {
+		b.WriteString(BlurredStyle.Render("(use framework selection from main flow)"))
+	}
+
+	return b.String()
+}
+
+// renderObservabilityStep renders step 5: observability selection.
 func (f FormModel) renderObservabilityStep() string {
 	var b strings.Builder
 

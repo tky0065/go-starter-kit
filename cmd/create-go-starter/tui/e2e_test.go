@@ -19,7 +19,7 @@ func TestE2EInteractiveTUIBasicFlow(t *testing.T) {
 	projectName := "test-e2e-project"
 
 	// Track if generation was called (not used in this simplified test)
-	mockGenerator := func(name, template, database, observability string, progressCallback func(current, total int)) error {
+	mockGenerator := func(name, template, database, observability, framework string, progressCallback func(current, total int)) error {
 		// Simulate quick generation
 		if progressCallback != nil {
 			progressCallback(10, 10)
@@ -65,6 +65,13 @@ func TestE2EInteractiveTUIBasicFlow(t *testing.T) {
 	// Simulate user selecting database
 	updatedModel, _ = model.Update(DatabaseSelectedMsg{Database: "postgres"})
 	model = updatedModel.(Model)
+	if model.state != StateFrameworkSelect {
+		t.Errorf("Expected state to transition to StateFrameworkSelect, got %v", model.state)
+	}
+
+	// Simulate user selecting framework
+	updatedModel, _ = model.Update(FrameworkSelectedMsg{Framework: "fiber"})
+	model = updatedModel.(Model)
 	if model.state != StateObservabilitySelect {
 		t.Errorf("Expected state to transition to StateObservabilitySelect, got %v", model.state)
 	}
@@ -103,7 +110,7 @@ func TestE2EInteractiveTUIProgressUpdates(t *testing.T) {
 	filesProcessed := 0
 
 	// Mock generator that sends progress updates
-	mockGenerator := func(name, template, database, observability string, progressCallback func(current, total int)) error {
+	mockGenerator := func(name, template, database, observability, framework string, progressCallback func(current, total int)) error {
 		if progressCallback != nil {
 			for i := 1; i <= totalFiles; i++ {
 				progressCallback(i, totalFiles)
@@ -157,7 +164,7 @@ func TestE2EInteractiveTUIErrorHandling(t *testing.T) {
 	expectedError := os.ErrPermission
 
 	// Mock generator that fails
-	mockGenerator := func(name, template, database, observability string, progressCallback func(current, total int)) error {
+	mockGenerator := func(name, template, database, observability, framework string, progressCallback func(current, total int)) error {
 		return expectedError
 	}
 
@@ -196,7 +203,7 @@ func TestE2EInteractiveTUIErrorHandling(t *testing.T) {
 
 // TestE2EInteractiveTUINavigationBack tests the back navigation functionality.
 func TestE2EInteractiveTUINavigationBack(t *testing.T) {
-	mockGenerator := func(name, template, database, observability string, progressCallback func(current, total int)) error {
+	mockGenerator := func(name, template, database, observability, framework string, progressCallback func(current, total int)) error {
 		return nil
 	}
 
@@ -213,6 +220,11 @@ func TestE2EInteractiveTUINavigationBack(t *testing.T) {
 	model.state = StateObservabilitySelect
 
 	// Navigate back
+	model = model.navigateBack()
+	if model.state != StateFrameworkSelect {
+		t.Errorf("Expected state StateFrameworkSelect after back, got %v", model.state)
+	}
+
 	model = model.navigateBack()
 	if model.state != StateDatabaseSelect {
 		t.Errorf("Expected state StateDatabaseSelect after back, got %v", model.state)
@@ -236,7 +248,7 @@ func TestE2EInteractiveTUINavigationBack(t *testing.T) {
 
 // TestE2EInteractiveTUIHelpScreen validates contextual help functionality (AC#9).
 func TestE2EInteractiveTUIHelpScreen(t *testing.T) {
-	mockGenerator := func(name, template, database, observability string, progressCallback func(current, total int)) error {
+	mockGenerator := func(name, template, database, observability, framework string, progressCallback func(current, total int)) error {
 		return nil
 	}
 

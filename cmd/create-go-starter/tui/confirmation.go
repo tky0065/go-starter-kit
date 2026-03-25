@@ -150,6 +150,7 @@ func (m ConfirmationModel) renderButton(text, icon string, focused bool) string 
 // This can be used for quick confirmations without managing a full Model.
 func RenderConfirmation(message string, confirmed bool) string {
 	m := NewConfirmationModel(message)
+
 	m.Focused = confirmed
 	return m.View()
 }

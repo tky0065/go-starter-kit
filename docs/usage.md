@@ -272,6 +272,29 @@ Pour une comparaison détaillée, exemples de configuration, et guides de migrat
 - **[Guide de sélection des databases](databases.md)** - Comparaison complète et aide au choix
 - **[Guide de migration](database-migration.md)** - Migration entre databases
 
+## Framework web (--framework)
+
+<i class="material-icons success">new_releases</i> **Nouveau dans v1.6.0!** Go Starter Kit supporte plusieurs frameworks web via le flag `--framework` (ou `-f`).
+
+### Frameworks disponibles
+
+| Framework | Description | Statut |
+|-----------|-------------|--------|
+| `fiber` | Fiber v2 - Fast HTTP framework inspired by Express **(défaut)** | <i class="material-icons success small">circle</i> Disponible |
+| `gin` | Gin - High-performance HTTP web framework | <i class="material-icons warning small">circle</i> Planifié v2.0.0 |
+| `echo` | Echo - Minimalist high-performance HTTP framework | <i class="material-icons warning small">circle</i> Planifié v2.0.0 |
+
+```bash
+# Fiber (défaut) — pas besoin de spécifier
+create-go-starter mon-app
+
+# Avec flag explicite
+create-go-starter mon-app --framework=fiber
+create-go-starter mon-app -f fiber
+```
+
+> <i class="material-icons warning">warning</i> Gin et Echo retournent une erreur "not yet supported (planned for v2.0.0)" — ils seront disponibles dans les stories 11.2 et 11.3.
+
 ## Observabilité (--observability)
 
 <i class="material-icons success">new_releases</i> **Nouveau dans v1.3.0!** Go Starter Kit supporte **3 niveaux d'observabilité** pour monitorer vos projets générés en production.

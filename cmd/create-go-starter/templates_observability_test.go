@@ -152,7 +152,7 @@ func TestObservabilityNoneGeneratesNoObservabilityFiles(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() with observability=none returned error: %v", err)
 	}
@@ -187,7 +187,7 @@ func TestObservabilityAdvancedGeneratesFiles(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() with observability=advanced returned error: %v", err)
 	}
@@ -221,7 +221,7 @@ func TestPrometheusGoContainsRegistry(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -258,7 +258,7 @@ func TestMetricsMiddlewareContainsHistogram(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -308,7 +308,7 @@ func TestAdvancedGoModIncludesFiberprometheus(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -340,7 +340,7 @@ func TestNoneGoModExcludesFiberprometheus(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -372,7 +372,7 @@ func TestAdvancedMainGoIncludesMetrics(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -407,7 +407,7 @@ func TestAdvancedServerGoIncludesMetrics(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -477,7 +477,7 @@ func TestTracerGoContainsTracerProvider(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -515,7 +515,7 @@ func TestTracingMiddlewareContainsW3CPropagation(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -550,7 +550,7 @@ func TestDockerComposeContainsJaeger(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -588,7 +588,7 @@ func TestEnvExampleContainsOTELEndpoint(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -620,7 +620,7 @@ func TestDBTracingGoContainsCallbacks(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -663,7 +663,7 @@ func TestDBTracingGoMySQLSystem(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, "mysql", ObservabilityAdvanced)
+	err = run(projectName, DefaultTemplate, "mysql", ObservabilityAdvanced, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -695,7 +695,7 @@ func TestGoModContainsOpenTelemetry(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -730,7 +730,7 @@ func TestHealthHandlerGeneratedForAllProjects(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -756,7 +756,7 @@ func TestHealthHandlerContainsLivenessAndReadiness(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -795,7 +795,7 @@ func TestHealthResponseHasJSONSnakeCaseFields(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -831,7 +831,7 @@ func TestHealthRoutesInServerRoutes(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -871,7 +871,7 @@ func TestKubernetesProbesYamlGenerated(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -897,7 +897,7 @@ func TestKubernetesProbesYamlContainsProbes(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityNone, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -938,7 +938,7 @@ func TestAdvancedHealthHandlerHasPrometheusMetrics(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -978,7 +978,7 @@ func TestLoggerContainsWithTraceContext(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework)
 	if err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
@@ -1015,7 +1015,7 @@ func TestPrometheusYMLGeneratedForAdvanced(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	if err := run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced); err != nil {
+	if err := run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework); err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
 
@@ -1040,7 +1040,7 @@ func TestPrometheusYMLContainsProjectJobName(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	if err := run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced); err != nil {
+	if err := run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework); err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
 
@@ -1077,7 +1077,7 @@ func TestGrafanaDashboardIsValidJSON(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	if err := run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced); err != nil {
+	if err := run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework); err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
 
@@ -1116,7 +1116,7 @@ func TestDockerComposeContainsFullObservabilityStack(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	if err := run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced); err != nil {
+	if err := run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework); err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
 
@@ -1164,7 +1164,7 @@ func TestGrafanaFilesNotGeneratedWithoutAdvanced(t *testing.T) {
 				t.Fatalf("Failed to change to temp directory: %v", err)
 			}
 
-			if err := run(projectName, DefaultTemplate, DefaultDatabase, level); err != nil {
+			if err := run(projectName, DefaultTemplate, DefaultDatabase, level, DefaultFramework); err != nil {
 				t.Fatalf("run() returned error: %v", err)
 			}
 
@@ -1197,7 +1197,7 @@ func TestPrometheusAlertRulesGenerated(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	if err := run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced); err != nil {
+	if err := run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework); err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
 
@@ -1230,7 +1230,7 @@ func TestGrafanaProvisioningFilesGenerated(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	if err := run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced); err != nil {
+	if err := run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework); err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
 
@@ -1260,7 +1260,7 @@ func TestEnvExampleContainsGrafanaVars(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	if err := run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced); err != nil {
+	if err := run(projectName, DefaultTemplate, DefaultDatabase, ObservabilityAdvanced, DefaultFramework); err != nil {
 		t.Fatalf("run() returned error: %v", err)
 	}
 

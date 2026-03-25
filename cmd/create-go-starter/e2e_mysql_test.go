@@ -38,7 +38,7 @@ func TestE2EMySQLProjectGeneration(t *testing.T) {
 	}
 
 	// Generate project files
-	if err := generateProjectFiles(projectPath, projectName, template, database, DefaultObservabilityLevel); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, template, database, DefaultObservabilityLevel, DefaultFramework); err != nil {
 		t.Fatalf("Failed to generate project files: %v", err)
 	}
 
@@ -236,7 +236,7 @@ func TestE2EMySQLVsPostgresComparison(t *testing.T) {
 			t.Fatalf("Failed to create dir: %v", err)
 		}
 	}
-	if err := generateProjectFiles(mysqlPath, mysqlProjectName, template, "mysql", DefaultObservabilityLevel); err != nil {
+	if err := generateProjectFiles(mysqlPath, mysqlProjectName, template, "mysql", DefaultObservabilityLevel, DefaultFramework); err != nil {
 		t.Fatalf("Failed to generate MySQL project: %v", err)
 	}
 
@@ -251,7 +251,7 @@ func TestE2EMySQLVsPostgresComparison(t *testing.T) {
 			t.Fatalf("Failed to create dir: %v", err)
 		}
 	}
-	if err := generateProjectFiles(pgPath, pgProjectName, template, "postgres", DefaultObservabilityLevel); err != nil {
+	if err := generateProjectFiles(pgPath, pgProjectName, template, "postgres", DefaultObservabilityLevel, DefaultFramework); err != nil {
 		t.Fatalf("Failed to generate PostgreSQL project: %v", err)
 	}
 

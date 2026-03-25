@@ -15,6 +15,7 @@ type InteractiveDefaults struct {
 	Template      string
 	Database      string
 	Observability string
+	Framework     string
 }
 
 // NewInteractiveModel creates a new Model configured for interactive mode.
@@ -71,6 +72,7 @@ func NewInteractiveModel(defaults InteractiveDefaults, generatorFunc GeneratorFu
 	m.template = defaults.Template
 	m.database = defaults.Database
 	m.observability = defaults.Observability
+	m.framework = defaults.Framework
 
 	return m
 }
@@ -185,3 +187,40 @@ type observabilityItem struct {
 func (o observabilityItem) Title() string       { return o.name }
 func (o observabilityItem) Description() string { return o.desc }
 func (o observabilityItem) FilterValue() string { return o.name }
+
+// initializeFrameworkList creates and initializes the framework selection list.
+func initializeFrameworkList(defaultFramework string) list.Model {
+	items := []list.Item{
+		frameworkItem{name: "fiber", desc: "Fiber v2.52.10 - Fast HTTP framework inspired by Express (default)"},
+		frameworkItem{name: "gin", desc: "Gin - High-performance HTTP web framework (planned for v2.0.0)"},
+		frameworkItem{name: "echo", desc: "Echo - Minimalist high-performance HTTP framework (planned for v2.0.0)"},
+	}
+
+	delegate := list.NewDefaultDelegate()
+	l := list.New(items, delegate, 0, 0)
+	l.Title = "Select a Framework"
+	l.SetShowStatusBar(false)
+	l.SetFilteringEnabled(false)
+
+	// Set default selection if provided
+	if defaultFramework != "" {
+		for i, item := range items {
+			if fw, ok := item.(frameworkItem); ok && fw.name == defaultFramework {
+				l.Select(i)
+				break
+			}
+		}
+	}
+
+	return l
+}
+
+// frameworkItem is a list item for framework selection.
+type frameworkItem struct {
+	name string
+	desc string
+}
+
+func (f frameworkItem) Title() string       { return f.name }
+func (f frameworkItem) Description() string { return f.desc }
+func (f frameworkItem) FilterValue() string { return f.name }

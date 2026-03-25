@@ -187,7 +187,7 @@ func TestRunFunction(t *testing.T) {
 	}
 
 	// Run the main logic
-	err = run(projectName, DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel, DefaultFramework)
 	if err != nil {
 		t.Errorf("run() returned error: %v", err)
 	}
@@ -217,7 +217,7 @@ func TestRunFunction(t *testing.T) {
 
 // TestRunFunctionWithInvalidName tests that run() fails with invalid project name
 func TestRunFunctionWithInvalidName(t *testing.T) {
-	err := run("../invalid-path", DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel)
+	err := run("../invalid-path", DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel, DefaultFramework)
 	if err == nil {
 		t.Error("Expected error for invalid project name, got nil")
 	}
@@ -228,7 +228,7 @@ func TestRunFunctionWithInvalidName(t *testing.T) {
 
 // TestRunFunctionWithEmptyName tests that run() fails with empty project name
 func TestRunFunctionWithEmptyName(t *testing.T) {
-	err := run("", DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel)
+	err := run("", DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel, DefaultFramework)
 	if err == nil {
 		t.Error("Expected error for empty project name, got nil")
 	}
@@ -257,7 +257,7 @@ func TestRunFunctionWithExistingDirectory(t *testing.T) {
 	}
 
 	// Run should fail because directory exists
-	err = run(projectName, DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel)
+	err = run(projectName, DefaultTemplate, DefaultDatabase, DefaultObservabilityLevel, DefaultFramework)
 	if err == nil {
 		t.Error("Expected error for existing directory, got nil")
 	}
@@ -887,5 +887,167 @@ func TestLongFlagsBackwardCompatibility(t *testing.T) {
 	}
 	if !strings.Contains(outputStr, "template: full") {
 		t.Errorf("Expected 'template: full' with long flags, got: %s", outputStr)
+	}
+}
+
+// ============================================================================
+// Story 11.1: Framework Selection Flag Tests (AC: #1)
+// ============================================================================
+
+// TestValidateFrameworkValid tests validateFramework with valid frameworks
+func TestValidateFrameworkValid(t *testing.T) {
+	// Only fiber is currently supported
+	err := validateFramework("fiber")
+	if err != nil {
+		t.Errorf("validateFramework(%q) returned error: %v, want nil", "fiber", err)
+	}
+}
+
+// TestValidateFrameworkUnsupported tests that gin/echo return "not yet supported" error
+func TestValidateFrameworkUnsupported(t *testing.T) {
+	tests := []struct {
+		name      string
+		framework string
+		wantMsg   string
+	}{
+		{"gin not yet supported", "gin", "not yet supported"},
+		{"echo not yet supported", "echo", "not yet supported"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateFramework(tt.framework)
+			if err == nil {
+				t.Errorf("validateFramework(%q) returned nil, want error", tt.framework)
+				return
+			}
+			if !strings.Contains(err.Error(), tt.wantMsg) {
+				t.Errorf("validateFramework(%q) error = %v, want message containing %q", tt.framework, err, tt.wantMsg)
+			}
+		})
+	}
+}
+
+// TestValidateFrameworkInvalid tests validateFramework with completely invalid frameworks
+func TestValidateFrameworkInvalid(t *testing.T) {
+	tests := []struct {
+		name      string
+		framework string
+	}{
+		{"express is invalid", "express"},
+		{"empty is invalid", ""},
+		{"fasthttp is invalid", "fasthttp"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateFramework(tt.framework)
+			if err == nil {
+				t.Errorf("validateFramework(%q) returned nil, want error", tt.framework)
+				return
+			}
+			if !strings.Contains(err.Error(), "invalid framework") {
+				t.Errorf("validateFramework(%q) error = %v, want error containing 'invalid framework'", tt.framework, err)
+			}
+		})
+	}
+}
+
+// TestDefaultFrameworkIsFiber tests that DefaultFramework is "fiber"
+func TestDefaultFrameworkIsFiber(t *testing.T) {
+	if DefaultFramework != "fiber" {
+		t.Errorf("DefaultFramework = %q, want %q", DefaultFramework, "fiber")
+	}
+}
+
+// TestFrameworkFlagFiber tests that --framework=fiber works (AC: #1)
+func TestFrameworkFlagFiber(t *testing.T) {
+	testProjectName := "test-framework-fiber"
+	defer os.RemoveAll(testProjectName)
+
+	cmd := exec.Command(binaryPath, "--framework=fiber", testProjectName)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Expected success with --framework=fiber, got error: %v\nOutput: %s", err, string(output))
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "framework: fiber") {
+		t.Errorf("Expected 'framework: fiber' in output, got: %s", outputStr)
+	}
+}
+
+// TestFrameworkFlagGinError tests that --framework=gin returns "not yet supported" error (AC: #1)
+func TestFrameworkFlagGinError(t *testing.T) {
+	cmd := exec.Command(binaryPath, "--framework=gin", "test-gin-project")
+	output, err := cmd.CombinedOutput()
+
+	if err == nil {
+		t.Error("Expected error for --framework=gin (not yet supported)")
+		os.RemoveAll("test-gin-project")
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "not yet supported") {
+		t.Errorf("Expected 'not yet supported' in error for gin, got: %s", outputStr)
+	}
+}
+
+// TestFrameworkFlagDefault tests that fiber is the default when not specified (AC: #1)
+func TestFrameworkFlagDefault(t *testing.T) {
+	testProjectName := "test-framework-default"
+	defer os.RemoveAll(testProjectName)
+
+	cmd := exec.Command(binaryPath, testProjectName)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Expected success with default framework, got error: %v\nOutput: %s", err, string(output))
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "framework: fiber") {
+		t.Errorf("Expected default 'framework: fiber' in output, got: %s", outputStr)
+	}
+}
+
+// TestFrameworkShortFlag tests that -f fiber works (AC: #1)
+func TestFrameworkShortFlag(t *testing.T) {
+	testProjectName := "test-framework-short"
+	defer os.RemoveAll(testProjectName)
+
+	cmd := exec.Command(binaryPath, "-f", "fiber", testProjectName)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Expected success with -f fiber, got error: %v\nOutput: %s", err, string(output))
+		return
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "framework: fiber") {
+		t.Errorf("Expected 'framework: fiber' in output with -f flag, got: %s", outputStr)
+	}
+}
+
+// TestHelpShowsFrameworkFlag tests that --help shows the framework flag (AC: #1)
+func TestHelpShowsFrameworkFlag(t *testing.T) {
+	cmd := exec.Command(binaryPath, "--help")
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		t.Errorf("Expected exit code 0 for --help, got error: %v", err)
+	}
+
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "framework") {
+		t.Errorf("Expected 'framework' in help output, got: %s", outputStr)
+	}
+	if !strings.Contains(outputStr, "fiber") {
+		t.Errorf("Expected 'fiber' in help output, got: %s", outputStr)
 	}
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -9,7 +10,7 @@ import (
 
 // TestGetFilesForTemplateFull tests that the full template returns a substantial file list
 func TestGetFilesForTemplateFull(t *testing.T) {
-	files := getFilesForTemplate("/tmp/test-project", "test-project", "full", "postgres", "none")
+	files := getFilesForTemplate("/tmp/test-project", "test-project", "full", "postgres", "none", "fiber")
 	if len(files) == 0 {
 		t.Error("expected non-empty file list for full template")
 	}
@@ -20,11 +21,11 @@ func TestGetFilesForTemplateFull(t *testing.T) {
 
 // TestGetFilesForTemplateMinimal tests that the minimal template returns fewer files than full
 func TestGetFilesForTemplateMinimal(t *testing.T) {
-	files := getFilesForTemplate("/tmp/test-project", "test-project", "minimal", "postgres", "none")
+	files := getFilesForTemplate("/tmp/test-project", "test-project", "minimal", "postgres", "none", "fiber")
 	if len(files) == 0 {
 		t.Error("expected non-empty file list for minimal template")
 	}
-	fullFiles := getFilesForTemplate("/tmp/test-project", "test-project", "full", "postgres", "none")
+	fullFiles := getFilesForTemplate("/tmp/test-project", "test-project", "full", "postgres", "none", "fiber")
 	if len(files) >= len(fullFiles) {
 		t.Errorf("minimal template should have fewer files than full: minimal=%d, full=%d", len(files), len(fullFiles))
 	}
@@ -32,7 +33,7 @@ func TestGetFilesForTemplateMinimal(t *testing.T) {
 
 // TestGetFilesForTemplateGraphQL tests that the graphql template returns a non-empty list
 func TestGetFilesForTemplateGraphQL(t *testing.T) {
-	files := getFilesForTemplate("/tmp/test-project", "test-project", "graphql", "postgres", "none")
+	files := getFilesForTemplate("/tmp/test-project", "test-project", "graphql", "postgres", "none", "fiber")
 	if len(files) == 0 {
 		t.Error("expected non-empty file list for graphql template")
 	}
@@ -40,7 +41,7 @@ func TestGetFilesForTemplateGraphQL(t *testing.T) {
 
 // TestGetFilesForTemplateWithSQLite tests database variation is handled
 func TestGetFilesForTemplateWithSQLite(t *testing.T) {
-	files := getFilesForTemplate("/tmp/test-project", "test-project", "minimal", "sqlite", "none")
+	files := getFilesForTemplate("/tmp/test-project", "test-project", "minimal", "sqlite", "none", "fiber")
 	if len(files) == 0 {
 		t.Error("expected non-empty file list for minimal+sqlite template")
 	}
@@ -48,8 +49,8 @@ func TestGetFilesForTemplateWithSQLite(t *testing.T) {
 
 // TestGetFilesForTemplateAdvancedObservability tests that advanced observability adds more files
 func TestGetFilesForTemplateAdvancedObservability(t *testing.T) {
-	filesNone := getFilesForTemplate("/tmp/test-project", "test-project", "full", "postgres", "none")
-	filesAdv := getFilesForTemplate("/tmp/test-project", "test-project", "full", "postgres", "advanced")
+	filesNone := getFilesForTemplate("/tmp/test-project", "test-project", "full", "postgres", "none", "fiber")
+	filesAdv := getFilesForTemplate("/tmp/test-project", "test-project", "full", "postgres", "advanced", "fiber")
 	if len(filesAdv) <= len(filesNone) {
 		t.Errorf("advanced observability should produce more files: advanced=%d, none=%d", len(filesAdv), len(filesNone))
 	}
@@ -73,7 +74,7 @@ func TestDryRunCreatesNoFiles(t *testing.T) {
 	}
 
 	projectName := "test-dry-run"
-	if err := runDryRun(projectName, "full", "postgres", "none"); err != nil {
+	if err := runDryRun(projectName, "full", "postgres", "none", "fiber"); err != nil {
 		t.Fatalf("runDryRun returned unexpected error: %v", err)
 	}
 
@@ -89,7 +90,7 @@ func TestDryRunCreatesNoFiles(t *testing.T) {
 
 // TestDryRunReturnsNilError verifies that runDryRun returns nil (exit code 0)
 func TestDryRunReturnsNilError(t *testing.T) {
-	err := runDryRun("test-project", "full", "postgres", "none")
+	err := runDryRun("test-project", "full", "postgres", "none", "fiber")
 	if err != nil {
 		t.Errorf("runDryRun should return nil error, got: %v", err)
 	}
@@ -97,7 +98,7 @@ func TestDryRunReturnsNilError(t *testing.T) {
 
 // TestDryRunWithMinimalTemplate verifies dry-run works for minimal template
 func TestDryRunWithMinimalTemplate(t *testing.T) {
-	err := runDryRun("test-project", "minimal", "sqlite", "none")
+	err := runDryRun("test-project", "minimal", "sqlite", "none", "fiber")
 	if err != nil {
 		t.Errorf("runDryRun(minimal) should return nil, got: %v", err)
 	}
@@ -105,7 +106,7 @@ func TestDryRunWithMinimalTemplate(t *testing.T) {
 
 // TestDryRunWithGraphQLTemplate verifies dry-run works for graphql template
 func TestDryRunWithGraphQLTemplate(t *testing.T) {
-	err := runDryRun("test-project", "graphql", "postgres", "none")
+	err := runDryRun("test-project", "graphql", "postgres", "none", "fiber")
 	if err != nil {
 		t.Errorf("runDryRun(graphql) should return nil, got: %v", err)
 	}
@@ -135,7 +136,7 @@ func TestDryRunDoesNotErrorWhenDirectoryExists(t *testing.T) {
 	}
 
 	// Should not return error even when directory exists
-	if err := runDryRun(existingProject, "full", "postgres", "none"); err != nil {
+	if err := runDryRun(existingProject, "full", "postgres", "none", "fiber"); err != nil {
 		t.Errorf("runDryRun should not error when directory exists, got: %v", err)
 	}
 
@@ -249,7 +250,7 @@ func captureStdout(t *testing.T, fn func()) string {
 // TestDryRunOutputContainsFileList verifies AC#1: the output lists files with relative paths
 func TestDryRunOutputContainsFileList(t *testing.T) {
 	output := captureStdout(t, func() {
-		_ = runDryRun("my-project", "full", "postgres", "none")
+		_ = runDryRun("my-project", "full", "postgres", "none", "fiber")
 	})
 
 	// AC#1: Should contain file paths relative to project root
@@ -269,16 +270,25 @@ func TestDryRunOutputContainsFileList(t *testing.T) {
 // TestDryRunOutputContainsSummary verifies AC#3: summary includes counts, template, database, observability
 func TestDryRunOutputContainsSummary(t *testing.T) {
 	output := captureStdout(t, func() {
-		_ = runDryRun("my-project", "full", "postgres", "none")
+		_ = runDryRun("my-project", "full", "postgres", "none", "fiber")
 	})
+
+	// Compute expected counts dynamically from getFilesForTemplate to avoid fragile hardcoded values
+	files := getFilesForTemplate("my-project", "my-project", "full", "postgres", "none", "fiber")
+	dirSet := make(map[string]bool)
+	for _, f := range files {
+		dirSet[filepath.Dir(f.Path)] = true
+	}
+	expectedFileCount := fmt.Sprintf("%d files", len(files))
+	expectedDirCount := fmt.Sprintf("%d unique", len(dirSet))
 
 	// AC#3: Summary must include these fields
 	checks := []struct {
 		label string
 		text  string
 	}{
-		{"file count", "36 files"},
-		{"directory count", "18 unique"},
+		{"file count", expectedFileCount},
+		{"directory count", expectedDirCount},
 		{"template", "Template:      full"},
 		{"database", "Database:      postgres"},
 		{"observability", "Observability: none"},
@@ -293,7 +303,7 @@ func TestDryRunOutputContainsSummary(t *testing.T) {
 // TestDryRunOutputContainsCompletionMessage verifies AC#5: "Dry-run completed. No files created."
 func TestDryRunOutputContainsCompletionMessage(t *testing.T) {
 	output := captureStdout(t, func() {
-		_ = runDryRun("my-project", "full", "postgres", "none")
+		_ = runDryRun("my-project", "full", "postgres", "none", "fiber")
 	})
 
 	if !strings.Contains(output, "Dry-run completed. No files created.") {
@@ -324,7 +334,7 @@ func TestDryRunOutputContainsWarningForExistingDir(t *testing.T) {
 	}
 
 	output := captureStdout(t, func() {
-		_ = runDryRun(existingProject, "full", "postgres", "none")
+		_ = runDryRun(existingProject, "full", "postgres", "none", "fiber")
 	})
 
 	if !strings.Contains(output, "Warning") || !strings.Contains(output, "already exists") {

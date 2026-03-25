@@ -153,8 +153,8 @@ func TestPromptSelectFromReader(t *testing.T) {
 
 // TestRunInteractiveModeCancel tests cancellation at confirmation step
 func TestRunInteractiveModeCancel(t *testing.T) {
-	// Input: project name, template (1=full), database (1=postgres), observability (1=none), confirm NO
-	input := "my-project\n1\n1\n1\nn\n"
+	// Input: project name, template (1=full), database (1=postgres), observability (1=none), framework (1=fiber), confirm NO
+	input := "my-project\n1\n1\n1\n1\nn\n"
 	err := runInteractiveModeWithReader(strings.NewReader(input), emptyDefaults())
 	if err == nil {
 		t.Error("Expected error when user cancels at confirmation, got nil")
@@ -188,9 +188,9 @@ func TestRunInteractiveModeSuccess(t *testing.T) {
 	}
 	defer os.Chdir(origDir) //nolint:errcheck
 
-	// Input: project name, template (2=minimal), database (3=sqlite), observability (1=none), confirm YES
+	// Input: project name, template (2=minimal), database (3=sqlite), observability (1=none), framework (1=fiber), confirm YES
 	// We use minimal+sqlite to avoid Docker requirements in tests
-	input := "test-interactive-project\n2\n3\n1\ny\n"
+	input := "test-interactive-project\n2\n3\n1\n1\ny\n"
 	err = runInteractiveModeWithReader(strings.NewReader(input), emptyDefaults())
 	if err != nil {
 		t.Errorf("runInteractiveModeWithReader() unexpected error = %v", err)
@@ -200,7 +200,7 @@ func TestRunInteractiveModeSuccess(t *testing.T) {
 // TestRunInteractiveModeInvalidProjectName tests re-prompting on invalid project name
 func TestRunInteractiveModeInvalidProjectName(t *testing.T) {
 	// Invalid project name "@invalid!" (contains invalid characters) then valid name, then cancel
-	input := "@invalid!\nmy-project\n1\n1\n1\nn\n"
+	input := "@invalid!\nmy-project\n1\n1\n1\n1\nn\n"
 	err := runInteractiveModeWithReader(strings.NewReader(input), emptyDefaults())
 	// Expecting error because we cancel at confirmation
 	if err == nil {
@@ -210,8 +210,8 @@ func TestRunInteractiveModeInvalidProjectName(t *testing.T) {
 
 // TestRunInteractiveModeInvalidSelection tests validation re-prompting
 func TestRunInteractiveModeInvalidSelection(t *testing.T) {
-	// Invalid template selection "99", then valid "1" (full), database "1", observability "1", cancel
-	input := "my-project\n99\n1\n1\n1\nn\n"
+	// Invalid template selection "99", then valid "1" (full), database "1", observability "1", framework "1", cancel
+	input := "my-project\n99\n1\n1\n1\n1\nn\n"
 	err := runInteractiveModeWithReader(strings.NewReader(input), emptyDefaults())
 	// Expecting cancellation error (not invalid selection error)
 	if err == nil {
@@ -222,8 +222,8 @@ func TestRunInteractiveModeInvalidSelection(t *testing.T) {
 // TestRunInteractiveModeWithDefaults tests that CLI flags are pre-populated as defaults
 func TestRunInteractiveModeWithDefaults(t *testing.T) {
 	// Press enter for all prompts (accept defaults) then cancel
-	// With defaults: template=minimal (index 1), database=sqlite (index 2)
-	input := "my-project\n\n\n\nn\n"
+	// With defaults: template=minimal (index 1), database=sqlite (index 2), framework=fiber (index 0)
+	input := "my-project\n\n\n\n\nn\n"
 	defaults := InteractiveDefaults{
 		Template: TemplateMinimal,
 		Database: DatabaseSQLite,
@@ -238,8 +238,8 @@ func TestRunInteractiveModeWithDefaults(t *testing.T) {
 // TestRunInteractiveModeObservabilityValidation tests that advanced observability
 // with non-full template is rejected
 func TestRunInteractiveModeObservabilityValidation(t *testing.T) {
-	// Select project, template=minimal (2), database=postgres (1), observability=advanced (3)
-	input := "my-project\n2\n1\n3\n"
+	// Select project, template=minimal (2), database=postgres (1), observability=advanced (3), framework=fiber (1)
+	input := "my-project\n2\n1\n3\n1\n"
 	err := runInteractiveModeWithReader(strings.NewReader(input), emptyDefaults())
 	if err == nil {
 		t.Error("Expected error for invalid observability+template combination, got nil")

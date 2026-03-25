@@ -284,7 +284,7 @@ func TestGenerateMinimalProjectFiles(t *testing.T) {
 	}
 
 	// Generate project files with minimal template
-	if err := generateProjectFiles(projectPath, projectName, TemplateMinimal, DefaultDatabase, DefaultObservabilityLevel); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, TemplateMinimal, DefaultDatabase, DefaultObservabilityLevel, DefaultFramework); err != nil {
 		t.Fatalf("generateProjectFiles() with minimal template error = %v", err)
 	}
 
@@ -359,7 +359,7 @@ func TestE2EMinimalProjectBuilds(t *testing.T) {
 	}
 
 	// Generate project files with minimal template
-	if err := generateProjectFiles(projectPath, projectName, TemplateMinimal, DefaultDatabase, DefaultObservabilityLevel); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, TemplateMinimal, DefaultDatabase, DefaultObservabilityLevel, DefaultFramework); err != nil {
 		t.Fatalf("Failed to generate project files with minimal template: %v", err)
 	}
 
@@ -420,7 +420,7 @@ func TestMinimalTemplateNoAuthFiles(t *testing.T) {
 	}
 
 	// Generate project files with minimal template
-	if err := generateProjectFiles(projectPath, projectName, TemplateMinimal, DefaultDatabase, DefaultObservabilityLevel); err != nil {
+	if err := generateProjectFiles(projectPath, projectName, TemplateMinimal, DefaultDatabase, DefaultObservabilityLevel, DefaultFramework); err != nil {
 		t.Fatalf("generateProjectFiles() with minimal template error = %v", err)
 	}
 

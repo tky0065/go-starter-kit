@@ -33,6 +33,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.templateList.SetSize(m.width, m.height-ListHeightOffset)
 		case StateDatabaseSelect:
 			m.databaseList.SetSize(m.width, m.height-ListHeightOffset)
+		case StateFrameworkSelect:
+			m.frameworkList.SetSize(m.width, m.height-ListHeightOffset)
 		case StateObservabilitySelect:
 			m.obsList.SetSize(m.width, m.height-ListHeightOffset)
 		case StatePreview:
@@ -84,6 +86,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case DatabaseSelectedMsg:
 		m.database = msg.Database
+		m.state = StateFrameworkSelect
+		m.frameworkList = initializeFrameworkList(m.framework)
+		m.frameworkList.SetSize(m.width, m.height-ListHeightOffset)
+		return m, nil
+
+	case FrameworkSelectedMsg:
+		m.framework = msg.Framework
 		m.state = StateObservabilitySelect
 		m.obsList = initializeObservabilityList(m.observability)
 		m.obsList.SetSize(m.width, m.height-ListHeightOffset)
@@ -248,6 +257,13 @@ func (m Model) handleKeyMsg(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 				return m.Update(DatabaseSelectedMsg{Database: item.name})
 			}
 
+		case StateFrameworkSelect:
+			// Submit framework selection
+			selectedItem := m.frameworkList.SelectedItem()
+			if item, ok := selectedItem.(frameworkItem); ok {
+				return m.Update(FrameworkSelectedMsg{Framework: item.name})
+			}
+
 		case StateObservabilitySelect:
 			// Submit observability selection
 			selectedItem := m.obsList.SelectedItem()
@@ -288,6 +304,9 @@ func (m Model) updateComponents(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case StateDatabaseSelect:
 		m.databaseList, cmd = m.databaseList.Update(msg)
 
+	case StateFrameworkSelect:
+		m.frameworkList, cmd = m.frameworkList.Update(msg)
+
 	case StateObservabilitySelect:
 		m.obsList, cmd = m.obsList.Update(msg)
 
@@ -317,8 +336,10 @@ func (m Model) navigateBack() Model {
 		m.state = StateProjectName
 	case StateDatabaseSelect:
 		m.state = StateTemplateSelect
-	case StateObservabilitySelect:
+	case StateFrameworkSelect:
 		m.state = StateDatabaseSelect
+	case StateObservabilitySelect:
+		m.state = StateFrameworkSelect
 	case StateSummary:
 		m.state = StateObservabilitySelect
 	case StatePreview:
@@ -352,6 +373,7 @@ func (m *Model) generateProjectCmd() tea.Cmd {
 			m.template,
 			m.database,
 			m.observability,
+			m.framework,
 			func(current, total int) {
 				// Store total on first callback
 				if totalFiles == 0 {

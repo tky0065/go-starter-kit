@@ -157,6 +157,25 @@ create-go-starter mon-app --database=sqlite
 - Cas d'usage recommandés
 - Guide de migration entre databases
 
+### Sélectionner un framework web (Nouveau! v1.6.0)
+
+`create-go-starter` supporte plusieurs frameworks web avec le flag `--framework` (ou `-f`):
+
+```bash
+# Fiber (défaut) — Framework performant inspiré d'Express
+create-go-starter mon-app
+
+# Avec flag explicite
+create-go-starter mon-app --framework=fiber
+create-go-starter mon-app -f fiber
+```
+
+| Framework | Description | Statut |
+|-----------|-------------|--------|
+| `fiber` | Fiber v2 - Fast HTTP framework inspired by Express **(défaut)** | ✅ Disponible |
+| `gin` | Gin - High-performance HTTP web framework | 🔜 Planifié v2.0.0 |
+| `echo` | Echo - Minimalist high-performance HTTP framework | 🔜 Planifié v2.0.0 |
+
 ### Activer l'observabilité avancée (Nouveau! v1.3.0)
 
 `create-go-starter` supporte **3 niveaux d'observabilité** avec le flag `--observability`:

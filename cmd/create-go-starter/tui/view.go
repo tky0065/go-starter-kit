@@ -18,6 +18,8 @@ func (m Model) View() string {
 		return m.viewTemplateSelect()
 	case StateDatabaseSelect:
 		return m.viewDatabaseSelect()
+	case StateFrameworkSelect:
+		return m.viewFrameworkSelect()
 	case StateObservabilitySelect:
 		return m.viewObservabilitySelect()
 	case StateSummary:
@@ -90,13 +92,28 @@ func (m Model) viewDatabaseSelect() string {
 	return b.String()
 }
 
-// viewObservabilitySelect renders the observability selection screen.
-func (m Model) viewObservabilitySelect() string {
+// viewFrameworkSelect renders the framework selection screen.
+func (m Model) viewFrameworkSelect() string {
 	var b strings.Builder
 
 	b.WriteString("\n")
 	b.WriteString(fmt.Sprintf("📝 Project: %s | Template: %s | Database: %s\n",
 		m.projectName, m.template, m.database))
+	b.WriteString("\n")
+	b.WriteString(m.frameworkList.View())
+	b.WriteString("\n")
+	b.WriteString("↑↓ Navigate • Enter Select • ? Help • Esc Back • Ctrl+C Quit\n")
+
+	return b.String()
+}
+
+// viewObservabilitySelect renders the observability selection screen.
+func (m Model) viewObservabilitySelect() string {
+	var b strings.Builder
+
+	b.WriteString("\n")
+	b.WriteString(fmt.Sprintf("📝 Project: %s | Template: %s | Database: %s | Framework: %s\n",
+		m.projectName, m.template, m.database, m.framework))
 	b.WriteString("\n")
 	b.WriteString(m.obsList.View())
 	b.WriteString("\n")
@@ -117,6 +134,7 @@ func (m Model) viewSummary() string {
 	summary := fmt.Sprintf("%s Project Name:   %s\n", RenderMuted("📝"), RenderHighlight(m.projectName))
 	summary += fmt.Sprintf("%s Template:       %s\n", RenderMuted("📦"), RenderHighlight(m.template))
 	summary += fmt.Sprintf("%s Database:       %s\n", RenderMuted("🗄️ "), RenderHighlight(m.database))
+	summary += fmt.Sprintf("%s Framework:      %s\n", RenderMuted("🔧"), RenderHighlight(m.framework))
 	summary += fmt.Sprintf("%s Observability:  %s", RenderMuted("📊"), RenderHighlight(m.observability))
 
 	b.WriteString(RenderBox(summary))

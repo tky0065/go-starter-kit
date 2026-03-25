@@ -15,8 +15,8 @@ func TestFormModel_Creation(t *testing.T) {
 		t.Errorf("Expected initial step to be 1, got %d", form.currentStep)
 	}
 
-	if form.totalSteps != 4 {
-		t.Errorf("Expected 4 total steps (project name, template, database, observability), got %d", form.totalSteps)
+	if form.totalSteps != 5 {
+		t.Errorf("Expected 5 total steps (project name, template, database, framework, observability), got %d", form.totalSteps)
 	}
 
 	if len(form.history) != 0 {
@@ -227,7 +227,8 @@ func TestFormModel_StepNames(t *testing.T) {
 		{1, "Project Name"},
 		{2, "Template"},
 		{3, "Database"},
-		{4, "Observability"},
+		{4, "Framework"},
+		{5, "Observability"},
 	}
 
 	for _, tt := range tests {
@@ -246,7 +247,7 @@ func TestFormModel_HistoryStack(t *testing.T) {
 	form.currentStep = 1
 
 	// Navigate through all steps
-	steps := []int{2, 3, 4}
+	steps := []int{2, 3, 4, 5}
 	for _, expectedStep := range steps {
 		form = form.goNext().(FormModel)
 		if form.currentStep != expectedStep {
@@ -254,8 +255,8 @@ func TestFormModel_HistoryStack(t *testing.T) {
 		}
 	}
 
-	// History should have [1, 2, 3]
-	expectedHistory := []int{1, 2, 3}
+	// History should have [1, 2, 3, 4]
+	expectedHistory := []int{1, 2, 3, 4}
 	if len(form.history) != len(expectedHistory) {
 		t.Errorf("Expected history length %d, got %d", len(expectedHistory), len(form.history))
 	}
@@ -268,13 +269,13 @@ func TestFormModel_HistoryStack(t *testing.T) {
 
 	// Navigate back
 	form = form.goBack().(FormModel)
-	if form.currentStep != 3 {
-		t.Errorf("Expected step 3 after going back, got %d", form.currentStep)
+	if form.currentStep != 4 {
+		t.Errorf("Expected step 4 after going back, got %d", form.currentStep)
 	}
 
-	// History should have [1, 2]
-	if len(form.history) != 2 {
-		t.Errorf("Expected history length 2 after going back, got %d", len(form.history))
+	// History should have [1, 2, 3]
+	if len(form.history) != 3 {
+		t.Errorf("Expected history length 3 after going back, got %d", len(form.history))
 	}
 }
 

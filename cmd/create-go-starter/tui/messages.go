@@ -23,6 +23,11 @@ type DatabaseSelectedMsg struct {
 	Database string
 }
 
+// FrameworkSelectedMsg is sent when the user selects a web framework.
+type FrameworkSelectedMsg struct {
+	Framework string
+}
+
 // ObservabilitySelectedMsg is sent when the user selects observability level.
 type ObservabilitySelectedMsg struct {
 	Observability string

@@ -14,7 +14,7 @@ import (
 // It receives the project configuration and a progress callback.
 // The progress callback is called with (current, total) for each file generated.
 // The function should call progressCallback(current, total) for progress updates.
-type GeneratorFunc func(projectName, template, database, observability string, progressCallback func(current, total int)) error
+type GeneratorFunc func(projectName, template, database, observability, framework string, progressCallback func(current, total int)) error
 
 // UI dimension constants
 const (
@@ -34,6 +34,8 @@ const (
 	StateTemplateSelect
 	// StateDatabaseSelect is the state for selecting a database
 	StateDatabaseSelect
+	// StateFrameworkSelect is the state for selecting a web framework (Story 11.1)
+	StateFrameworkSelect
 	// StateObservabilitySelect is the state for selecting observability level
 	StateObservabilitySelect
 	// StateSummary is the state for showing configuration summary
@@ -59,14 +61,16 @@ type Model struct {
 	template      string
 	database      string
 	observability string
+	framework     string // Web framework selection (Story 11.1)
 
 	// Bubbles components for different screens
-	welcomeList  list.Model      // For welcome menu (Story 10.7 Task 1.3)
-	projectInput textinput.Model // For project name input
-	templateList list.Model      // For template selection
-	databaseList list.Model      // For database selection
-	obsList      list.Model      // For observability selection
-	previewModel PreviewModel    // For dry-run preview (Story 10.7 Task 6)
+	welcomeList   list.Model      // For welcome menu (Story 10.7 Task 1.3)
+	projectInput  textinput.Model // For project name input
+	templateList  list.Model      // For template selection
+	databaseList  list.Model      // For database selection
+	frameworkList list.Model      // For framework selection (Story 11.1)
+	obsList       list.Model      // For observability selection
+	previewModel  PreviewModel    // For dry-run preview (Story 10.7 Task 6)
 	progressBar  progress.Model  // For generation progress
 	loadSpinner  spinner.Model   // For loading indicator
 

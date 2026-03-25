@@ -18,6 +18,7 @@ type InteractiveDefaults struct {
 	Template      string
 	Database      string
 	Observability string
+	Framework     string
 }
 
 // runInteractiveMode runs the interactive mode using os.Stdin with the given defaults.
@@ -94,14 +95,33 @@ func runInteractiveModeWithReader(r io.Reader, defaults InteractiveDefaults) err
 		return err
 	}
 
-	// 5. Validate observability + template combination
+	// 5. Collect framework
+	frameworkOptions := []string{FrameworkFiber, FrameworkGin, FrameworkEcho}
+	frameworkDescs := []string{
+		FrameworkFiberDesc,
+		FrameworkGinDesc,
+		FrameworkEchoDesc,
+	}
+
+	frameworkDefault := defaults.Framework
+	if frameworkDefault == "" {
+		frameworkDefault = DefaultFramework
+	}
+	frameworkDefaultIdx := indexOfOption(frameworkOptions, frameworkDefault, 0)
+	framework, err := promptSelectFromReader(reader, "Framework", frameworkOptions, frameworkDescs, frameworkDefaultIdx)
+	if err != nil {
+		fmt.Println("Cancelled.")
+		return err
+	}
+
+	// 6. Validate observability + template combination
 	if observability == ObservabilityAdvanced && template != TemplateFull {
 		fmt.Println(Red(fmt.Sprintf("  --observability=advanced is only supported with template=full (got template=%s)", template)))
 		fmt.Println("  Please re-run interactive mode with a compatible combination.")
 		return fmt.Errorf("--observability=advanced is only supported with --template=full (got --template=%s)", template)
 	}
 
-	// 6. Display summary
+	// 7. Display summary
 	fmt.Println()
 	fmt.Println("══════════════════════════════════════════")
 	fmt.Println("Summary:")
@@ -109,10 +129,11 @@ func runInteractiveModeWithReader(r io.Reader, defaults InteractiveDefaults) err
 	fmt.Printf("  Template:      %s\n", template)
 	fmt.Printf("  Database:      %s\n", database)
 	fmt.Printf("  Observability: %s\n", observability)
+	fmt.Printf("  Framework:     %s\n", framework)
 	fmt.Println("══════════════════════════════════════════")
 	fmt.Println()
 
-	// 7. Confirm
+	// 8. Confirm
 	confirmed, err := promptConfirmFromReader(reader, "Confirm?", true)
 	if err != nil {
 		fmt.Println("Cancelled.")
@@ -123,8 +144,8 @@ func runInteractiveModeWithReader(r io.Reader, defaults InteractiveDefaults) err
 		return fmt.Errorf("cancelled by user")
 	}
 
-	// 8. Run project creation
-	return run(projectName, template, database, observability)
+	// 9. Run project creation
+	return run(projectName, template, database, observability, framework)
 }
 
 // indexOfOption returns the index of value in the options slice, or defaultIdx if not found.

@@ -100,11 +100,11 @@ development_status:
   v1.5.1-release: done
 
   # Epic 11 - Multi-Framework Support (v2.0.0 - ROADMAP)
-  epic-11: backlog
-  11-1-framework-selection-flag: backlog
-  11-2-gin-framework-templates: backlog
-  11-3-echo-framework-templates: backlog
-  11-4-framework-agnostic-abstraction: backlog
+  epic-11: in-progress
+  11-1-framework-selection-flag: done
+  11-2-gin-framework-templates: ready-for-dev
+  11-3-echo-framework-templates: ready-for-dev
+  11-4-framework-agnostic-abstraction: ready-for-dev
   epic-11-retrospective: optional
 
   # Epic 12 - Plugin System & Extensibility (v2.x - ROADMAP)

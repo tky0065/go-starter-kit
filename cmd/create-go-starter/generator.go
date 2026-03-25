@@ -82,11 +82,12 @@ type FileGenerator struct {
 // The template parameter specifies the type of project to generate (minimal, full, graphql).
 // The database parameter specifies the database type (postgres, mysql, sqlite, mongodb).
 // The observabilityLevel parameter specifies the observability mode (none, basic, advanced).
+// The framework parameter specifies the web framework (fiber, gin, echo). Only fiber is currently implemented.
 // Database-specific templates are used to generate the correct driver, DSN, and configurations.
 //
 // Note: In production, run() in main.go calls getFilesForTemplate() + writeFiles() directly
 // to support progress bar reporting. This function is kept for direct API usage and tests.
-func generateProjectFiles(projectPath, projectName, template, database, observabilityLevel string) error {
+func generateProjectFiles(projectPath, projectName, template, database, observabilityLevel, framework string) error {
 	// Validate that the project directory exists
 	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
 		return fmt.Errorf("project directory does not exist: %s", projectPath)
@@ -99,11 +100,11 @@ func generateProjectFiles(projectPath, projectName, template, database, observab
 
 	switch template {
 	case "full":
-		return generateFullTemplateFiles(projectPath, projectName, database, observabilityLevel)
+		return generateFullTemplateFiles(projectPath, projectName, database, observabilityLevel, framework)
 	case "minimal":
-		return generateMinimalTemplateFiles(projectPath, projectName, database)
+		return generateMinimalTemplateFiles(projectPath, projectName, database, framework)
 	case "graphql":
-		return generateGraphQLTemplateFiles(projectPath, projectName, database)
+		return generateGraphQLTemplateFiles(projectPath, projectName, database, framework)
 	default:
 		// This case should ideally not be reached if validateTemplate is called beforehand.
 		return fmt.Errorf("unsupported template '%s'", template)
@@ -322,7 +323,8 @@ func buildFullFileList(projectPath, projectName, database, observabilityLevel st
 // generateFullTemplateFiles generates all files for the "full" template.
 // This function was extracted from the original generateProjectFiles to improve modularity.
 // The observabilityLevel parameter controls which observability files are generated.
-func generateFullTemplateFiles(projectPath, projectName, database, observabilityLevel string) error {
+// The framework parameter specifies the web framework (fiber, gin, echo). Only fiber is currently implemented.
+func generateFullTemplateFiles(projectPath, projectName, database, observabilityLevel, framework string) error {
 	files := buildFullFileList(projectPath, projectName, database, observabilityLevel)
 	if err := writeFiles(files, nil); err != nil {
 		return err
@@ -504,7 +506,8 @@ func buildMinimalFileList(projectPath, projectName, database string) []FileGener
 
 // generateMinimalTemplateFiles generates all files for the "minimal" template.
 // This template includes basic infrastructure without authentication.
-func generateMinimalTemplateFiles(projectPath, projectName, database string) error {
+// The framework parameter specifies the web framework (fiber, gin, echo). Only fiber is currently implemented.
+func generateMinimalTemplateFiles(projectPath, projectName, database, framework string) error {
 	files := buildMinimalFileList(projectPath, projectName, database)
 	if err := writeFiles(files, nil); err != nil {
 		return err
@@ -652,7 +655,8 @@ func buildGraphQLFileList(projectPath, projectName, database string) []FileGener
 
 // generateGraphQLTemplateFiles generates all files for the "graphql" template.
 // This template includes GraphQL support with gqlgen, gofiber/adaptor, and GORM.
-func generateGraphQLTemplateFiles(projectPath, projectName, database string) error {
+// The framework parameter specifies the web framework (fiber, gin, echo). Only fiber is currently implemented.
+func generateGraphQLTemplateFiles(projectPath, projectName, database, framework string) error {
 	files := buildGraphQLFileList(projectPath, projectName, database)
 	if err := writeFiles(files, nil); err != nil {
 		return err

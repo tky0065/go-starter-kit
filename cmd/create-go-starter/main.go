@@ -75,6 +75,30 @@ var ValidObservabilityLevels = []string{ObservabilityNone, ObservabilityBasic, O
 // DefaultObservabilityLevel is the default observability level when not specified
 const DefaultObservabilityLevel = ObservabilityNone
 
+// Framework type constants define the available web frameworks.
+// - FrameworkFiber: Fiber v2.52.10 (default, fully implemented)
+// - FrameworkGin: Gin framework (planned for v2.0.0)
+// - FrameworkEcho: Echo framework (planned for v2.0.0)
+const (
+	FrameworkFiber = "fiber"
+	FrameworkGin   = "gin"
+	FrameworkEcho  = "echo"
+)
+
+// Framework descriptions (in English for consistency with code)
+const (
+	FrameworkFiberDesc = "Fiber v2.52.10 - Fast HTTP framework inspired by Express (default)"
+	FrameworkGinDesc   = "Gin - High-performance HTTP web framework (planned)"
+	FrameworkEchoDesc  = "Echo - Minimalist high-performance HTTP framework (planned)"
+)
+
+// ValidFrameworks contains the list of valid framework types
+// Note: Only Fiber is currently implemented (Stories 11.2-11.3 add Gin/Echo)
+var ValidFrameworks = []string{FrameworkFiber, FrameworkGin, FrameworkEcho}
+
+// DefaultFramework is the default framework when not specified
+const DefaultFramework = FrameworkFiber
+
 // Green returns the string wrapped in green ANSI code
 func Green(msg string) string {
 	return ColorGreen + msg + ColorReset
@@ -107,14 +131,15 @@ func runInteractiveTUI(defaults InteractiveDefaults) error {
 		Template:      defaults.Template,
 		Database:      defaults.Database,
 		Observability: defaults.Observability,
+		Framework:     defaults.Framework,
 	}
 
 	// Create a generator function that wraps the existing run() function
 	// This allows the TUI to call the generation logic without circular imports
-	generatorFunc := func(projectName, template, database, observability string, progressCallback func(current, total int)) error {
+	generatorFunc := func(projectName, template, database, observability, framework string, progressCallback func(current, total int)) error {
 		// Call runWithCallback with quiet=true to suppress stdout output during TUI mode
 		// The TUI has its own rendering via viewGenerating() and viewDone()
-		return runWithCallback(projectName, template, database, observability, progressCallback, true)
+		return runWithCallback(projectName, template, database, observability, framework, progressCallback, true)
 	}
 
 	result, err := tui.RunInteractiveTUI(tuiDefaults, generatorFunc)
@@ -170,6 +195,22 @@ func validateDatabase(database string) error {
 
 	// Generic error for other invalid databases
 	return fmt.Errorf("invalid database '%s'.\nSupported databases: %s", database, strings.Join(ValidDatabases, ", "))
+}
+
+// validateFramework checks if the framework type is valid and supported.
+// Valid frameworks are: fiber, gin, echo
+// Note: gin and echo are planned for v2.0.0 (Stories 11.2-11.3)
+func validateFramework(framework string) error {
+	for _, valid := range ValidFrameworks {
+		if framework == valid {
+			// Only Fiber is currently supported
+			if framework != FrameworkFiber {
+				return fmt.Errorf("framework '%s' is not yet supported (planned for v2.0.0).\nCurrently supported: fiber", framework)
+			}
+			return nil
+		}
+	}
+	return fmt.Errorf("invalid framework '%s'.\nSupported frameworks: %s", framework, strings.Join(ValidFrameworks, ", "))
 }
 
 // createProjectStructure creates the hexagonal architecture directory structure.
@@ -270,6 +311,7 @@ func main() {
 	var template string = DefaultTemplate
 	var database string = DefaultDatabase
 	var observability string = DefaultObservabilityLevel
+	var framework string = DefaultFramework
 	var projectName string
 
 	// Manually parse arguments to allow flags in any position
@@ -301,6 +343,12 @@ func main() {
 			if len(parts) == 2 {
 				observability = parts[1]
 			}
+		} else if strings.HasPrefix(arg, "-framework=") || strings.HasPrefix(arg, "--framework=") || strings.HasPrefix(arg, "-f=") {
+			// Handle -framework=value, --framework=value, -f=value syntax
+			parts := strings.SplitN(arg, "=", 2)
+			if len(parts) == 2 {
+				framework = parts[1]
+			}
 		} else if (arg == "-template" || arg == "--template" || arg == "-t") && i+1 < len(args) {
 			template = args[i+1]
 			i++ // Skip next arg since we consumed it
@@ -309,6 +357,9 @@ func main() {
 			i++ // Skip next arg since we consumed it
 		} else if (arg == "-observability" || arg == "--observability" || arg == "-o") && i+1 < len(args) {
 			observability = args[i+1]
+			i++ // Skip next arg since we consumed it
+		} else if (arg == "-framework" || arg == "--framework" || arg == "-f") && i+1 < len(args) {
+			framework = args[i+1]
 			i++ // Skip next arg since we consumed it
 		} else if !strings.HasPrefix(arg, "-") && projectName == "" {
 			// First non-flag argument is the project name
@@ -338,6 +389,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "        Template type to generate (default \"full\")\n")
 		fmt.Fprintf(os.Stderr, "  -o, --observability string\n")
 		fmt.Fprintf(os.Stderr, "        Observability level: none|basic|advanced (default \"none\")\n")
+		fmt.Fprintf(os.Stderr, "  -f, --framework string\n")
+		fmt.Fprintf(os.Stderr, "        Web framework to use: fiber|gin|echo (default \"fiber\")\n")
 		fmt.Fprintf(os.Stderr, "  -h, --help\n")
 		fmt.Fprintf(os.Stderr, "        Show help message\n")
 		fmt.Fprintf(os.Stderr, "\nTemplates:\n")
@@ -353,6 +406,10 @@ func main() {
 		fmt.Fprintf(os.Stderr, "  %-9s No observability (default) - current behavior preserved\n", ObservabilityNone)
 		fmt.Fprintf(os.Stderr, "  %-9s Enhanced /health endpoint only (no Prometheus)\n", ObservabilityBasic)
 		fmt.Fprintf(os.Stderr, "  %-9s Full Prometheus metrics endpoint + HTTP metrics middleware\n", ObservabilityAdvanced)
+		fmt.Fprintf(os.Stderr, "\nFrameworks:\n")
+		fmt.Fprintf(os.Stderr, "  %-9s %s\n", FrameworkFiber, FrameworkFiberDesc)
+		fmt.Fprintf(os.Stderr, "  %-9s %s\n", FrameworkGin, FrameworkGinDesc)
+		fmt.Fprintf(os.Stderr, "  %-9s %s\n", FrameworkEcho, FrameworkEchoDesc)
 		fmt.Fprintf(os.Stderr, "\nExamples:\n")
 		fmt.Fprintf(os.Stderr, "  create-go-starter my-project\n")
 		fmt.Fprintf(os.Stderr, "  create-go-starter -d sqlite my-project\n")
@@ -361,6 +418,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "  create-go-starter my-project --observability=advanced\n")
 		fmt.Fprintf(os.Stderr, "  create-go-starter -d sqlite -t minimal -o none my-project\n")
 		fmt.Fprintf(os.Stderr, "  create-go-starter --database=mysql --template=full my-project\n")
+		fmt.Fprintf(os.Stderr, "  create-go-starter my-project --framework=fiber\n")
+		fmt.Fprintf(os.Stderr, "  create-go-starter -f fiber my-project\n")
 		fmt.Fprintf(os.Stderr, "  create-go-starter -i\n")
 		fmt.Fprintf(os.Stderr, "  create-go-starter -n my-project\n")
 		fmt.Fprintf(os.Stderr, "  create-go-starter doctor\n")
@@ -383,6 +442,7 @@ func main() {
 			Template:      template,
 			Database:      database,
 			Observability: observability,
+			Framework:     framework,
 		}
 
 		// Use Bubble Tea TUI if TTY is available and NO_COLOR is not set
@@ -436,6 +496,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Validate framework
+	if err := validateFramework(framework); err != nil {
+		fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("%v", err)))
+		os.Exit(1)
+	}
+
 	// Validate observability + template combination
 	if observability == ObservabilityAdvanced && template != TemplateFull {
 		fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("--observability=advanced is only supported with --template=full (got --template=%s)", template)))
@@ -444,7 +510,7 @@ func main() {
 
 	// If dry-run flag is set, preview files without creating them (AC: #1-#6)
 	if dryRun {
-		if err := runDryRun(projectName, template, database, observability); err != nil {
+		if err := runDryRun(projectName, template, database, observability, framework); err != nil {
 			fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("%v", err)))
 			os.Exit(1)
 		}
@@ -452,7 +518,7 @@ func main() {
 	}
 
 	// Run the project creation logic
-	if err := run(projectName, template, database, observability); err != nil {
+	if err := run(projectName, template, database, observability, framework); err != nil {
 		// Changed to not include "Error: " prefix as Red() function will color the message itself.
 		fmt.Fprintln(os.Stderr, Red(fmt.Sprintf("%v", err)))
 		os.Exit(1)
@@ -462,8 +528,8 @@ func main() {
 // run executes the main project creation logic without progress callback.
 // This is the legacy function for CLI usage (non-interactive mode).
 // For interactive TUI mode with progress updates, use runWithCallback() instead.
-func run(projectName, template, database, observabilityLevel string) error {
-	return runWithCallback(projectName, template, database, observabilityLevel, nil, false)
+func run(projectName, template, database, observabilityLevel, framework string) error {
+	return runWithCallback(projectName, template, database, observabilityLevel, framework, nil, false)
 }
 
 // runWithCallback executes the main project creation logic with optional progress callback.
@@ -473,12 +539,12 @@ func run(projectName, template, database, observabilityLevel string) error {
 // When quiet is true, all stdout output (progress messages, success message, stats) is suppressed.
 // This is used when the TUI is active since it has its own rendering.
 // Returns an error if any step fails (except git initialization which is non-fatal).
-func runWithCallback(projectName, template, database, observabilityLevel string, progressCallback func(current, total int), quiet bool) error {
+func runWithCallback(projectName, template, database, observabilityLevel, framework string, progressCallback func(current, total int), quiet bool) error {
 	stats := NewGenerationStats()
 
 	// Display start message with template info
 	if !quiet {
-		fmt.Println(Green(fmt.Sprintf("Creating project: %s (template: %s, database: %s, observability: %s)", projectName, template, database, observabilityLevel)))
+		fmt.Println(Green(fmt.Sprintf("Creating project: %s (template: %s, database: %s, observability: %s, framework: %s)", projectName, template, database, observabilityLevel, framework)))
 	}
 
 	// Validate project name again to ensure safety when run() is called directly (e.g. in tests)
@@ -506,7 +572,7 @@ func runWithCallback(projectName, template, database, observabilityLevel string,
 	}
 
 	// Get the full file list before generating (needed for progress bar total count)
-	files := getFilesForTemplate(projectPath, projectName, template, database, observabilityLevel)
+	files := getFilesForTemplate(projectPath, projectName, template, database, observabilityLevel, framework)
 	var pb *ProgressBar
 	if !quiet {
 		pb = NewProgressBar(len(files), 30)

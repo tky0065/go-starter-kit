@@ -8,9 +8,9 @@ import (
 )
 
 // getFilesForTemplate returns the list of files that would be generated for the
-// given template/database/observability combination, without writing anything.
+// given template/database/observability/framework combination, without writing anything.
 // Used by runDryRun to preview files and by tests to validate file lists.
-func getFilesForTemplate(projectPath, projectName, template, database, observabilityLevel string) []FileGenerator {
+func getFilesForTemplate(projectPath, projectName, template, database, observabilityLevel, framework string) []FileGenerator {
 	switch template {
 	case TemplateFull:
 		return buildFullFileList(projectPath, projectName, database, observabilityLevel)
@@ -31,7 +31,7 @@ func getFilesForTemplate(projectPath, projectName, template, database, observabi
 //   - AC#4: Only files for the specified template/database are listed
 //   - AC#5: Returns nil error (exit code 0) with "Dry-run completed" message
 //   - AC#6: Warns if project directory already exists but continues preview
-func runDryRun(projectName, template, database, observabilityLevel string) error {
+func runDryRun(projectName, template, database, observabilityLevel, framework string) error {
 	projectPath := projectName
 
 	// AC#6: Warn if the project directory already exists (does not block dry-run)
@@ -42,8 +42,8 @@ func runDryRun(projectName, template, database, observabilityLevel string) error
 		fmt.Println()
 	}
 
-	// AC#1, AC#4: Get the file list for this template/database combination
-	files := getFilesForTemplate(projectPath, projectName, template, database, observabilityLevel)
+	// AC#1, AC#4: Get the file list for this template/database/framework combination
+	files := getFilesForTemplate(projectPath, projectName, template, database, observabilityLevel, framework)
 
 	// AC#3: Collect unique directories for the summary
 	dirSet := make(map[string]bool)

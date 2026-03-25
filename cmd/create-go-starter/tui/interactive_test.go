@@ -7,7 +7,7 @@ import (
 )
 
 // dummyGenerator is a no-op generator function for tests.
-func dummyGenerator(projectName, template, database, observability string, progressCallback func(current, total int)) error {
+func dummyGenerator(projectName, template, database, observability, framework string, progressCallback func(current, total int)) error {
 	// Simulate successful generation
 	if progressCallback != nil {
 		progressCallback(1, 1)
